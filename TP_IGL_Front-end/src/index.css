@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base{
+    @font-face {
+        font-family:"Tahoma" ;
+        src: url("/src/assets/fonts/Tahoma\ Regular\ font.ttf") format("Regular"),
+        url("/src/assets/fonts/TAHOMABD.TTF") format("bold");
+    }
+
+    @font-face {
+        font-family:"Segoe" ;
+        src: url("/src/assets/fonts/Segoe\ UI.ttf") format("Regular"),
+        url("/src/assets/fonts/Segoe\ UI\ Bold.ttf") format("bold");;
+    }
+
+    
+
+     /* for the navBar radius */
+    .custom-rounded {
+        border-bottom-right-radius: 50px;
+        border-bottom-left-radius: 50px;
+      }
+
+      /*Robot dimensions*/
+    .robot-height {
+        height: 500px;
+      } 
+
+    .robot-width {
+        width: 600px;
+      }
+
+    .splach{
+      height: 350px;
+      width: 500px;
+    }  
+
+
+     /*pink line1 dimensions*/
+    .line1-height {
+        height: 20px;
+      } 
+      
+    .line1-width {
+              width: 600px;
+      }
+
+
+      .square {
+        width: 380px;
+        padding-bottom: 300px;
+        background-color: black;
+      }
+
+      .squareMd {
+        width: 400px;
+        padding-bottom: 300px;
+        background-color: black;
+      }
+
+
+
+      /* Your global styles or component styles */
+.slick-arrow-custom {
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(0, 0, 0);       /* Set the arrow text color */
+  font-size: 29px;    /* Adjust the font size as needed */
+}
+
+.slick-prev-custom {
+  left: 10px; /* Adjust the left position for the previous arrow */
+}
+
+.slick-next-custom {
+  right: 10px; /* Adjust the right position for the next arrow */
+}
+
+      
+}
