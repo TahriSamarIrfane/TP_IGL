@@ -9,24 +9,6 @@ from django.dispatch import receiver
 # Create your models here.
 # models.py
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    reset_code = models.CharField(max_length=32, blank=True, null=True)
-    username = models.CharField(max_length=255, default='')   
-    email = models.EmailField(default='')
-    photo_url = models.URLField(blank=True, null=True)
- 
-    def __str__(self):
-        return self.username
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
  # 1- modele d'utilisateur 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -105,4 +87,69 @@ class Article(models.Model):
 
     def __str__(self):
         return self.titre
+
+#6- article prefere 
+
+class FavoriteArticle(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    articles = models.ManyToManyField(Article)
+    def __str__(self):
+        return f"Favoris de {self.user.username}"
+#7- modele auteur 
+
+class Auteur(models.Model):
+    id = models.AutoField(primary_key=True)
+    nom = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nom
+
+#8- modele institution 
+
+class Institution(models.Model):
+    id = models.AutoField(primary_key=True)
+    nom = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.nom
+
+
+#9- modele institutionauteur 
+
+class InstitutionAuteur(models.Model):
+    id = models.AutoField(primary_key=True)
+    auteur = models.ForeignKey(Auteur, on_delete=models.CASCADE)
+    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.auteur.nom} - {self.institution.nom}"
+
+#10- modele articleauteur 
+class ArticleAuteur(models.Model):
+    id = models.AutoField(primary_key=True)
+    auteur = models.ForeignKey(Auteur, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.auteur.nom} - {self.article.titre}"
+#11- modele profile 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    reset_code = models.CharField(max_length=32, blank=True, null=True)
+    username = models.CharField(max_length=255, default='')   
+    email = models.EmailField(default='')
+    photo_url = models.URLField(blank=True, null=True)
+ 
+    def __str__(self):
+        return self.username    
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+    
     
