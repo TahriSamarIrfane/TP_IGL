@@ -15,6 +15,7 @@ export default {
         'grey':'#8A8785',
         'lightGrey':'#ECECEC',
         'lightPink':'#FFE8F280',
+        'darkGery':"#505050",
       },
 
     },

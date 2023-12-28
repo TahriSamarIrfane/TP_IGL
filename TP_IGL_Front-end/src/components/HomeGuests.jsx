@@ -24,15 +24,17 @@ import bird from'../assets/images/bird.png';
 
 
 const CustomPrevArrow = (props) => (
-    <div {...props} className="slick-arrow-custom ">
-      <span>&lt;</span>
+    <div {...props} className=" absolute top-60 slick-arrow-custom  left-3 bottom-0 items-center cursor-pointer">
+      <span className=' text-darkPink font-extrabold'>&lt;</span>
     </div>
   );
   
   const CustomNextArrow = (props) => (
-    <div {...props} className="slick-arrow-custom">
-      <span>&gt;</span>
+    <span>
+    <div {...props} className="absolute slick-arrow-custom top-60 slick-arrow-custom  right-3 bottom-0 items-center cursor-pointer">
+      <span className='text-darkPink font-extrabold'>&gt;</span>
     </div>
+    </span>
   );
   
 //for the Slick
@@ -74,7 +76,7 @@ const HomeGuests = () => {
             {/*  Text */}
             <div className='md:w-2/3 lg:mt-20'>
                 <div className='px-24'>
-                <h className=" bg-pink text-2xl text-darkPink font-Tahoma md:w-3/4 p-0 leading-snugs">Enjoy
+                <h className=" bg-pink text-2xl text-darkPink font-Tahoma md:w-3/4 p-0 leading-snugs font-bold">Enjoy
                  with ScienVision </h>
                  <p className='text-black font-bold text-3xl md:text-4xl lg:text-5xl md:w-3/4'>L'Univers de la Connaissance à Votre Portée</p>
                  <p className="text-grey font-Tahoma mt-4 md:w-3/4">Plus de 12000 articles scientifiques,
@@ -155,16 +157,16 @@ const HomeGuests = () => {
          </div>
 
          {/* Feedbacks*/}
-         <div class="flex flex-col items-center justify-center mt-20 mb-20">
+         <div class="flex flex-col items-center justify-center mt-20 ">
          <img className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
          <p className='text-grey mt-5 px-5'>Découvrez ce que disent nos utilisateurs satisfaits à propos de notre application</p>
          </div>
 
-         <div >
+         <div className='relative' >
             <Slider {...settings} className='p-10'>
             {data.map((d) =>(
                 <div className='p-3'>
-                <div className='bg-lightPink shadow-md h-72 md:h-96 lg:h-72 mb-8 rounded-3xl p-4'>
+                <div className='bg-lightPink shadow-md h-72 md:h-96 lg:h-72 rounded-3xl p-4'>
                         <div className='flex flex-col'>
                             <div className='flex flex-row'>
                     <img className='h-24 w-24 rounded-full p-3 ' src={d.photo} alt=""/>
@@ -191,7 +193,7 @@ const HomeGuests = () => {
          {/* Que Pensiez-Vous ?*/}
          <div class="flex flex-col items-center justify-center ">
 
-        <div className="bg-white mt-20 flex flex-col  md:flex-row-reverse  items-center justify-between ">
+        <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
           
             <div className='md:w-1/3 lg:mt-20 flex-shrink-0'>
 
