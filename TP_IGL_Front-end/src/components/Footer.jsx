@@ -82,8 +82,8 @@ const Footer =() =>{
                 </a>
 
                 <a href="" className="hover:text-darkPink duration-300 hover:scale-150 px-5">
-                <FaFacebook size={20}/
-                ></a>
+                <FaFacebook size={20}/>
+                </a>
 
                <a href="" className="hover:text-darkPink duration-300 hover:scale-150 px-5">
                  <FaLinkedin size={20}/>
