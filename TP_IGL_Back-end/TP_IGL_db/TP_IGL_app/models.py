@@ -71,32 +71,8 @@ class Admin(AbstractUser):
 
     def __str__(self):
         return self.username
-#5- modele article 
-class Article(models.Model):
-    id = models.AutoField(primary_key=True)
-    titre = models.CharField(max_length=255)
-    abstract = models.TextField()
-    key_words = models.CharField(max_length=255)
-    full_text = models.TextField()
-    pdf_url = models.URLField()
-    references = models.TextField()
-    date = models.DateField()
-    etat = models.ForeignKey(Etat, on_delete=models.CASCADE)
-    moderateur = models.ForeignKey(Moderateur, on_delete=models.CASCADE)
-    admin = models.ForeignKey(Admin, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.titre
-
-#6- article prefere 
-
-class FavoriteArticle(models.Model):
-
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    articles = models.ManyToManyField(Article)
-    def __str__(self):
-        return f"Favoris de {self.user.username}"
-#7- modele auteur 
+#5- modele auteur 
 
 class Auteur(models.Model):
     id = models.AutoField(primary_key=True)
@@ -105,7 +81,7 @@ class Auteur(models.Model):
     def __str__(self):
         return self.nom
 
-#8- modele institution 
+#6- modele institution 
 
 class Institution(models.Model):
     id = models.AutoField(primary_key=True)
@@ -115,7 +91,7 @@ class Institution(models.Model):
         return self.nom
 
 
-#9- modele institutionauteur 
+#7- modele institutionauteur 
 
 class InstitutionAuteur(models.Model):
     id = models.AutoField(primary_key=True)
@@ -125,6 +101,33 @@ class InstitutionAuteur(models.Model):
     def __str__(self):
         return f"{self.auteur.nom} - {self.institution.nom}"
 
+
+#8- article prefere 
+class FavoriteArticle(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    elasticsearch_ids = models.JSONField(default=list, blank=True)
+
+    def __str__(self):
+        return f"Favoris de {self.user.username}"
+#9- modele article 
+class Article(models.Model):
+    id = models.AutoField(primary_key=True)
+    titre = models.CharField(max_length=255)
+    abstract = models.TextField()
+    key_words = models.CharField(max_length=255)
+    full_text = models.TextField()
+    pdf_url = models.URLField()
+    references = models.TextField()
+    date = models.DateField()
+    auteurs = models.ManyToManyField(Auteur)
+    etat = models.ForeignKey(Etat, on_delete=models.CASCADE)
+    moderateur = models.ForeignKey(Moderateur, on_delete=models.CASCADE)
+    admin = models.ForeignKey(Admin, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.titre
+    def get_all_institutions(self):
+        return [auteur.institution for auteur in self.auteurs.all()]  
 #10- modele articleauteur 
 class ArticleAuteur(models.Model):
     id = models.AutoField(primary_key=True)
@@ -132,7 +135,8 @@ class ArticleAuteur(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.auteur.nom} - {self.article.titre}"
+        return f"{self.auteur.nom} - {self.article.titre}"      
+
 #11- modele profile 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
