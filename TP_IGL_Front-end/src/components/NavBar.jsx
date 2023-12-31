@@ -50,7 +50,7 @@ const NavBar =() =>{
          <h className='md:hidden lg:block font-bold text-gray-600 text-xl'>Surfey</h>       
         </div>
 
-      <div className='flex justify-center items-center text-base gap-8 lg:custom-rounded bg-black py-5 '>
+      <div className='flex justify-center items-center text-base gap-8 lg:custom-rounded  bg-black py-5 '>
       
         {/* To show items in large devices */}
       <ul className='md:flex space-x-12 hidden '>

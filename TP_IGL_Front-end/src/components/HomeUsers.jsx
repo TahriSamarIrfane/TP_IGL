@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import'../index.css';
 
 //importation for the slick-carousel
-import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { TbSearch } from "react-icons/tb";
@@ -25,20 +24,12 @@ import man1 from'../assets/images/man1.png';
 import FAQ from'../assets/images/FAQ.png';
 
 
-
 import BlackSplash2 from'../assets/images/BlackSplash2.png';
-import TEAMpic from'../assets/images/TEAMpic.png';
-import icon1 from '../assets/icons/icon1.png';
-import icon2 from '../assets/icons/icon2.png';
 import email from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
-import icon3 from '../assets/icons/icon3.png';
-import icon4 from '../assets/icons/icon4.png';
-import FeedBacks from'../assets/images/FeedBacks.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
-import { Container } from 'postcss';
-import { Checkbox } from 'flowbite-react';
+
 
 
 
@@ -100,11 +91,11 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
         {/* La premiere partie : pour la recherche*/}
         <div className="bg-white mt-20  lg:pr-10 flex flex-col md:flex-row-reverse   justify-between ">
             <div className='mt-20'>
-                <img className='lg:custom-PC mb-10 md:mb-40 lg:mb-40 lg:mt-0 float-left' src={Pc} alt=""/>
+                <img className='lg:custom-PC mb-10   lg:mt-0 float-left' src={Pc} alt=""/>
             </div>
             {/*  Text */}
-            <div className='mt-20'>
-                <div className='px-24'>
+            <div className='md:mt-20'>
+                <div className='px-5 md:px-24'>
                 <h className=" bg-pink text-2xl text-darkPink font-Tahoma md:w-3/4 p-0 leading-snugs font-bold">Enjoy
                  with ScienVision </h>
                  <p className='text-black font-bold text-3xl md:text-4xl lg:text-5xl md:w-3/4'>
@@ -122,23 +113,22 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
                     </button>
                  </div>
                   </div >
-                 </div> 
-                             
+                 </div>                 
          </div>
 
         {/* Nos articles populaires*/}
-            <div className='mt-10 lg:mt-20  '>
-            <h className='font-bold text-3xl ml-28 px-2'>Nos articles populaires</h>
+            <div className='mt-10 '>
+            <h className='font-bold text-2xl md:text-3xl ml-5 md:ml-28 px-2'>Nos articles populaires</h>
 
-            <div className='ml-20  flex flex-col-reverse md:flex-row-reverse  justify-between'>
+            <div className='md:ml-20  flex flex-col-reverse md:flex-row-reverse  justify-between'>
                 {/* the liste of articles */}
                 <div className='lg:w-2/3  h-96 lg:show-atricle-scroll px-10 '>
                     
                 <div class="mx-auto h-full  overflow-scroll ">{/*overflow-scroll will add the scoll when overflow */}
                 {data.map((d,index) =>(
                 <div key={index} className=''>
-                <div className='bg-white h-72 md:h-96 lg:h-48 '>
-                    <div className='flex flex-row'>
+                <div className='bg-white md:h-72 md:h-96 lg:h-48 '>
+                    <div className='flex flex-col md:flex-row'>
                     <img className='h-48 rounded-2xl p-3 mt-3' src={d.photo} alt=""/>
                     <div className='mt-3'>
              <div className='flex flex-col'>
@@ -252,11 +242,11 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
 
 
             {/********** FAQ***********/}
-            <div class="relative flex flex-col items-center justify-center ml-32 mr-32">
-            <img className='absolute top-0 h-52  lg:mt-3 ' src={FAQ} alt=""/>
-            <img className='absolute top-0 h-40  lg:mt-24 left-0' src={woman1} alt=""/>
-            <img className='absolute top-0 h-44  lg:mt-1 mr-2 right-0' src={woman2} alt=""/>
-            <div className=' grid grid-cols-1 md:grid-cols-2 gap-5 bg-black mt-44 pt-6 w-full max-h-full rounded-2xl pb-5'>
+            <div class="relative flex flex-col items-center justify-center md:ml-32 md:mr-32 px-5 md:px-0">
+            <img className='absolute top-0 md:h-52  lg:mt-3 ' src={FAQ} alt=""/>
+            <img className=' absolute top-0 h-40  lg:mt-24 left-0 hidden' src={woman1} alt=""/>
+            <img className='absolute top-0 h-44  lg:mt-1 mr-2 right-0 hidden' src={woman2} alt=""/>
+            <div className=' grid grid-cols-1 md:grid-cols-2 gap-5 bg-black mt-40 md:mt-44 pt-6 w-full max-h-full rounded-2xl pb-5'>
                 <div className=' text-white'>
   <div className='flex flex-col px-10'>
       {faq.map((d, index) => (
@@ -277,7 +267,7 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
     </div>    
                 </div>
 
-                <div className=' text-white'>
+                <div className=' text-white  md:block'>
   <div className='flex flex-col px-10'>
       {faq1.map((d, index) => (
         <div key={index} className='flex flex-col bg-white mt-5  rounded-2xl'>
@@ -301,19 +291,19 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
            </div>
 
          {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center ">
+         <div class="flex flex-col items-center justify-center mb-5">
 
         <div className="bg-white flex flex-col  md:flex-row  items-center justify-between ">
           
           {/* the left side*/}
-            <div className='w-1/2  flex-shrink-0'>         
-                  <img className=' right-0 lg:mt-5 h-[570px] w-[600px]' src={man1} alt=""/>               
+            <div className='md:w-1/2  flex-shrink-0'>         
+                  <img className=' right-0 lg:mt-5 w-[320px] h-[300px] md:h-[570px] md:w-[600px]' src={man1} alt=""/>               
             </div>
 
 
             {/* the right side*/}
-            <div className=' w-1/2'>
-                <div className=' px-10 pb-5  pt-5 lg:mr-48 md:mr-48 bg-lightGrey shadow-xl rounded-2xl'>
+            <div className='md:w-1/2 px-2 ml-24 md:ml-0'>
+                <div className=' px-10 pb-5  pt-5 mr-48 md:mr-48 w-[81%] bg-lightGrey md:shadow-xl rounded-2xl '>
               <p className='font-bold text-black text-4xl text-center'>Que Pensiez-Vous ?</p>
                 <p className='text-black mt-3 ml-4 text-center'>Votre avis est important pour nous aider à mieux comprendre vos besoins et à adapter notre service en conséquence</p>
                 <div className=' mb-10'>
@@ -354,7 +344,7 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
 
 
          {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center ">
+         <div class="flex flex-col items-center justify-center">
 
         <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
           
@@ -362,7 +352,7 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
 
               {/* the right side*/}
             <div className='relative '>
-                  <img className=' right-0 lg:mt-5 ' src={BlackSplash2} alt=""/>
+                  <img className=' right-0 lg:mt-5 ml-6 md:ml-0' src={BlackSplash2} alt=""/>
                   <div className=''>    
                     <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
                     <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>
