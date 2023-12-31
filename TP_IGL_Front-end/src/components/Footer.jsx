@@ -21,12 +21,12 @@ const Footer =() =>{
                         </Link>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">  A propos
-                        </Link>
+                        <a href="/HomeGuests#sectionApropos">  A propos
+                        </a>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Nos services
-                        </Link>
+                        <a href="/HomeGuests#sectionSrevice">Nos services
+                        </a>
                         </li>
                     </ul>
                 </div>
@@ -34,7 +34,7 @@ const Footer =() =>{
                     <h6 className="font-medium py-2 uppercase">Aide</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">FeedBacks</Link></li>{/* LINK is not working see why!! */}
+                        <a href="/HomeGuests#sectionFeedBack">FeedBacks</a></li>{/* LINK is not working see why!! */}
                         <li className="py-2 text-sm list-none">
                         <Link to="">Contact </Link> </li>
                     </ul>
