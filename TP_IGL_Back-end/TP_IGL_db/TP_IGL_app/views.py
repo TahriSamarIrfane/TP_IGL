@@ -107,7 +107,6 @@ def home(request):
 # 1- foction sign up 
 
 CustomUser = get_user_model()
-
 @csrf_exempt
 def signup_page(request):
     if request.method == 'POST':
@@ -167,6 +166,7 @@ def LoginPage(request):
     return JsonResponse({"message": "Méthode non autorisée"}, status=405)
 
 # 3- deconnnexion de l'utilisateur 
+
 @csrf_exempt
 @login_required
 def LogoutPage(request):
@@ -179,6 +179,7 @@ def LogoutPage(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+
 #4- modifier le mot de pass 
 
 @api_view(['POST'])
@@ -242,7 +243,6 @@ def delete_account(request):
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # 7- Mot de passe  oublie 
-
 
 @csrf_exempt
 def request_password_reset_code(request):
@@ -331,7 +331,9 @@ def elasticsearch_status_view(request):
         }
 
     return JsonResponse(response_data)
+
 #9- ajouter article prefere 
+
 @csrf_exempt
 @permission_classes([IsAuthenticated])
 @login_required
@@ -388,7 +390,9 @@ def ajouter_article_prefere(request):
         # Print the exception for debugging purposes
         print(f'An error occurred: {e}')
         return JsonResponse({'status': 'Error', 'message': f'Une erreur s\'est produite: {e}'})
+    
 #10- consulter un article prefere
+
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
@@ -424,7 +428,9 @@ def consulter_articles_preferes(request):
         # Print the exception for debugging purposes
         print(f'An error occurred: {e}')
         return JsonResponse({'status': 'Error', 'message': 'Une erreur s\'est produite'})
+    
 #11- view article details 
+
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
@@ -467,6 +473,7 @@ def afficher_details(request):
         return JsonResponse({'status': 'Error', 'message': f"Une erreur s'est produite : {str(e)}"})
         
 #12- view article full_text
+
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
@@ -484,7 +491,7 @@ def consulter_article_text (request):
         index_name = 'article_7'
 
         try:
-            article_data = es.get(index=index_name, id=article_id)['_source']
+            article_data = es.get(index=index_name,id=article_id)['_source']
         except Exception as es_exception:
             return JsonResponse({'status': 'Error', 'message': f"Erreur lors de la récupération des détails de l'article : {str(es_exception)}"})
 
@@ -500,6 +507,7 @@ def consulter_article_text (request):
       return JsonResponse({'status': 'Error', 'message': f"Une erreur s'est produite : {str(e)}"})
    
 #13- view article pdf 
+
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
@@ -544,7 +552,9 @@ class AllUsersAPIView(APIView):
 
         # Renvoyer la réponse API
         return Response(serialized_users, status=status.HTTP_200_OK)
+    
 #15- rechercher un article 
+
 @csrf_exempt
 @login_required 
 @permission_classes([IsAuthenticated])
