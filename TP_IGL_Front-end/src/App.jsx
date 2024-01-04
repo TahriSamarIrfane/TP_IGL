@@ -6,18 +6,20 @@ import HomeUsers from './components/HomeUsers';
 import Footer from './components/Footer';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
-import MyCollection from './components/MyCollection';
+import Result from './components/Result';
 
 import { IoClose } from "react-icons/io5";
+import MyCollection from './components/MyCollection';
+import Article from './components/Article';
 
 function App() {
   return (
     <Router>
     <div>
     <NavBar/>
-    <MyCollection/>
+    <HomeUsers/>
     <Footer/>
-    </div>
+        </div>
     </Router>
   )
 }
@@ -27,6 +29,9 @@ export default App;
 /*   <NavBar/>
 <HomeUsers/>
 <HomeGuests/>
+<Result/>
     <SignUp/>
     <SignIn/>
+     <Article/>
+    <MyCollection/>
 <Footer/>*/

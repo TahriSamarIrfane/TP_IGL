@@ -12,10 +12,11 @@ import { TbSearch } from "react-icons/tb";
 
 
 //import images
-import science4 from'../assets/images/science4.png';
 import science3 from'../assets/images/science3.png';
 import science2 from'../assets/images/science2.png';
 import science1 from'../assets/images/science1.png';
+import Books from'../assets/images/Books.png';
+
 import { IoClose } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { IoFilter } from "react-icons/io5";
@@ -25,11 +26,21 @@ import { FaFilePdf } from "react-icons/fa6";
 
 const MyCollection = () => {
 
-const[favorite,setFavorite]= useState(false);
-const[hoverFavorite,setHoverFavorite]= useState(false);
+    const [favorite, setFavorite] = useState([]);
+    const[hoverFavorite,setHoverFavorite]= useState(false);
 
 const [startDate, setStartDate] = useState(null);
 const [endDate, setEndDate] = useState(null);
+
+const toggleFavorite = (index) => {
+    if (favorite.includes(index)) {
+      // If index is already in favorites, remove it
+      setFavorite(favorite.filter((favIndex) => favIndex !== index));
+    } else {
+      // If index is not in favorites, add it
+      setFavorite([...favorite, index]);
+    }
+  };
 
     return (
 
@@ -37,20 +48,16 @@ const [endDate, setEndDate] = useState(null);
 
                 <div className='mt-20 mb-10'>   
 
-                  {/*Search bar */}
-                  <div className='flex items-center justify-center mb-5 px-3 md:px-0'>
-                 <div className='flex items-center  bg-white w-full md:w-[70%] h-14 rounded-2xl border border-grey'>
-                    <TbSearch className='text-4xl ml-2 text-grey'/>
-                        <input type="text" className=' w-full h-full outline-none border-none placeholder:text-xl' placeholder='Search articles...' />
-                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'>   
-                    <h2 className='text-white font-bold text-xl'>Search </h2>                   
-                    </button>
-                 </div>
-                 </div>
-
+                  {/*Picture*/}
+                  <div className='px-3 md:px-14'>
+                  <div className=' h-20 md:h-32 relative flex flex-row items-center justify-center bg-pink mt-36 md:mt-40 mb-10 rounded-3xl'>
+                  <h className='text-3xl md:text-5xl font-bold -ml-20 md:ml-68 text-black'>Ma collection</h>
+                  <img className=' absolute h-40 md:h-56 -bottom-5 right-0 md:right-16' src={Books} alt=""/>
+                  </div>
+                  </div>
                 <div className='md:ml-20  flex flex-col-reverse md:flex-row-reverse  justify-between'>
                     {/* the liste of articles */}
-                    <div className='lg:w-3/4  h-[438px] lg:show-atricle-scroll px-3 md:px-10 '>
+                    <div className='md:w-3/4 h-[438px]  md:h-[438px] lg:show-atricle-scroll px-3 md:px-10 '>
                         
                     <div class="mx-auto h-full  overflow-scroll ">{/*overflow-scroll will add the scoll when overflow */}
                     {data.map((d,index) =>(
@@ -66,15 +73,19 @@ const [endDate, setEndDate] = useState(null);
                  <LiaShareSolid className='mt-1 text-2xl'/>
                  <button className='top-0'>Share</button>
                  <label className='flex'>
-                 <input type='Radio' className='opacity-0'
-                 onClick={()=>setFavorite(index)}/> {/* Update the state based on the current value */}
+                 <input
+  type='checkbox'
+  className='opacity-0'
+  checked={favorite === index}
+  onChange={() => toggleFavorite(index)}
+/> {/* Update the state based on the current value */}
                  
-                 <FaHeart  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
-                 color={favorite === index || hoverFavorite === index ? "red" : "grey"}
-                 // Update the color based on state
-                 onMouseEnter={()=> setHoverFavorite(index)}
-                 onMouseLeave={()=> setHoverFavorite(null)}
-                                             />
+<FaHeart
+  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
+  color={(favorite && favorite.includes(index)) || hoverFavorite === index ? "red" : "grey"}
+  onMouseEnter={() => setHoverFavorite(index)}
+  onMouseLeave={() => setHoverFavorite(null)}
+/>
                  </label>
     
     
@@ -86,14 +97,13 @@ const [endDate, setEndDate] = useState(null);
                   {d.article}</p>
                        <a href="#" className=" text-black font-bold text-sm">See more</a>
                        <div className='relative pr-5 mt-2 md:pr-40'>
-                       <div className='flex flex-row items-center justify-between w-full h-10'>
                         {/* inline-block will change the container width according to text length */}
   
 
 
                         <div className='flex flex-wrap flex-row'>
   {d.cle.map((cle) => (
-    <div key={cle} className="bg-white inline-block border rounded-2xl border-darkGery text-center">
+    <div key={cle} className="bg-white inline-block border rounded-2xl border-darkGery text-center mx-1 my-1">
       <h className="px-3 text-darkGery">{cle}</h>
     </div>
   ))}
@@ -102,7 +112,6 @@ const [endDate, setEndDate] = useState(null);
 
 
 
-                     </div>
                      <FaFilePdf className='absolute right-3 top-2 text-xl' />
 
                      </div>
@@ -141,7 +150,7 @@ const [endDate, setEndDate] = useState(null);
                          ))}
                     </div>    
                     <div className='flex pr-2  bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
+                        <input type="text" className=' focus:ring-darkPink rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
                     <button >   
                     <GoPlus className='text-darkPink' />                   
                     </button>
@@ -160,7 +169,7 @@ const [endDate, setEndDate] = useState(null);
                          ))}
                     </div>    
                     <div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
+                        <input type="text" className='focus:ring-darkPink rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
                     <button >   
                     <GoPlus className='text-darkPink' />                   
                     </button>
@@ -179,7 +188,7 @@ const [endDate, setEndDate] = useState(null);
                          ))}
                     </div>    
                     <div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
+                        <input type="text" className='focus:ring-darkPink rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
                     <button >   
                     <GoPlus className='text-darkPink ml-2' />                   
                     </button>
@@ -215,19 +224,21 @@ const [endDate, setEndDate] = useState(null);
         selected={startDate}
         onChange={(date) => setStartDate(date)}
         placeholderText="From"
-        className="py-2 px-4 border-none  w-32 rounded focus:outline-none focus:border-blue-500"
+        className=" focus:ring-darkPink py-2 px-4 border-none  w-32 rounded focus:outline-none focus:border-blue-500"
       />
        <MdKeyboardArrowDown className='absolute right-2 top-2 mt-1 text-darkPink text-xl ' />
        </div>
 
        <div className='relative border border-grey rounded-sm'>
       <DatePicker
+      id='from'
         selected={endDate}
         onChange={(date) => setEndDate(date)}
         placeholderText="To"
-        className="py-2 px-4 border-none  w-32 rounded focus:outline-none focus:border-blue-500"
+        className="focus:ring-darkPink  py-2 px-4 border-none  w-32 rounded focus:outline-none focus:border-blue-500"
       />
-             <MdKeyboardArrowDown className='absolute right-2 top-2 mt-1 text-darkPink text-xl ' />
+            
+                <MdKeyboardArrowDown className='absolute right-2 top-2 mt-1 text-darkPink text-xl ' />
        </div>
 
                                   </div>
@@ -255,7 +266,7 @@ const Institutions = ["Institution1", "Institution2", "Institution3", "Instituti
 const data = [
     {
         Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit `,
+        title:`Lorem ipsum dolor sit`,
         photo:science3,
         cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit'],
         article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
