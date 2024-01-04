@@ -6,6 +6,9 @@ import'../index.css';
 //import icons
 import { IoClose,IoList } from "react-icons/io5";
 import email from '../assets/icons/@.png';
+import profile from '../assets/images/profile.png';
+
+
 const NavBar =() =>{
   const [isMenuOpen,setIsMenuOpen] = useState(false);
   const [isSticky,setIsSticky] = useState(false);
@@ -50,6 +53,10 @@ const NavBar =() =>{
          <h className='md:hidden lg:block font-bold text-gray-600 text-xl'>Surfey</h>       
         </div>
 
+        <div className='items-center absolute  right-6 top-2 hidden md:block'>        
+         <img className='h-14  ' src={profile} alt=""/>
+        </div>
+
       <div className='flex justify-center items-center text-base gap-8 lg:custom-rounded  bg-black py-5 '>
       
         {/* To show items in large devices */}
@@ -57,14 +64,14 @@ const NavBar =() =>{
         {
          /* we generate li by mapping the list ot items*/
         items.map(({link,path}) =><Link to={path} spy={true} smooth={true} 
-        offset={-100} key={path} className='block text-base text-white hover:
-        font-Tahoma'>{link}</Link>)
+        offset={-100} key={path} className='block text-base text-white hover:text-[#FBC5DB]
+        font-Tahoma '>{link}</Link>)
          }
       </ul>
      
       {/*menu for mobile devices */}
       {/*ml-auto to make the icons on the right */}
-      <div className='md:hidden ml-auto px-7'>
+      <div className=' md:hidden ml-auto px-7'>
 
         {/*add the logooooooooooooooooooooooooo here lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
       <div className='grid grid-cols-2 absolute left-3 '>        
@@ -85,12 +92,14 @@ const NavBar =() =>{
       </div>
 
       {/*NAv items for mobile devices */}
-      <div className={`space-y-4 px-4 mt-16 py-7 bg-black
-      ${isMenuOpen ? "block fixed top-0 right-0 left-0":"hidden"}`}>
+
+      <div className={`space-y-4 px-4 mt-16 py-7 bg-black ${
+        isMenuOpen ? 'block fixed top-0 right-0 left-0' : 'hidden'
+      } z-50`}>
       {
          /* we generate li by mapping the list ot items*/
         items.map(({link,path}) =><Link to={path} spy={true} smooth={true} 
-        offset={-100} key={path} className='block text-base text-white hover:text-pink
+        offset={-100} key={path} className='block text-base text-white hover:text-[#FBC5DB]
         font-Tahoma ml-4'>{link}</Link>)
          }
       </div>
