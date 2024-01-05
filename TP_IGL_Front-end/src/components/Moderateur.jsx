@@ -1,40 +1,42 @@
 import React, {useState} from 'react'
 import background from "../assets/images/Page-admin.png"
-import imageS from "../assets/images/Upload.png"
-import imageL from "../assets/images/Loading.png"
 import avatar from "../assets/images/Avatar.png"
 
 import { MdOutlineDashboard } from "react-icons/md";
 import { IoMenu } from "react-icons/io5";
 import { LuLogOut } from "react-icons/lu";
-import { FiUpload } from "react-icons/fi";
-import { FaAddressBook } from "react-icons/fa";
-import { MdOutlineAddBox } from "react-icons/md";
-import { IoSearch } from "react-icons/io5";
+import { GrArticle } from "react-icons/gr";
+import { BiSolidEdit } from "react-icons/bi";
+import { IoIosAddCircleOutline } from "react-icons/io";
 
 
 const Moderateur = () =>  {
   const [nav, setNav] =useState(false);
-  const [Article, setArticle] = useState(false);
+  const [Article, setArticle] = useState(true);
   const [MesArticles, setMesArticles] = useState(false);
   
   const data = [
-    { Titre: 1, Auteur: 'Item 1',Text:'12334' },
-    { Titre: 2, Auteur: 'Item 2',Text:'12334' },
-    { Titre: 3, Auteur: 'Item 3',Text:'12334' },
-    { Titre: 4, Auteur: 'Item 4',Text:'12334' },
-    { Titre: 5, Auteur: 'Item 5',Text:'12334' },
-    { Titre: 6, Auteur: 'Item 6',Text:'12334' },
-    { Titre: 4, Auteur: 'Item 4',Text:'12334' },
-    { Titre: 5, Auteur: 'Item 5',Text:'12334' },
-    { Titre: 6, Auteur: 'Item 6',Text:'12334' },
+    { Titre: 'Titre1', Auteur: 'Item 1',Text:'12334' },
+    { Titre: 'Titre2', Auteur: 'Item 2',Text:'Wrting Writing to test the overflow blablabla' },
+    { Titre: 'Titre3', Auteur: 'Item 3',Text:'12334' },
+    { Titre: 'Titre4', Auteur: 'Item 4',Text:'12334' },
+    { Titre: 'Titre5', Auteur: 'Item 5',Text:'12334' },
+    { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
+    { Titre: 'Titre4', Auteur: 'Item 4',Text:'12334' },
+    { Titre: 'Titre5', Auteur: 'Item 5',Text:'12334' },
+    { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
+    { Titre: 'Titre5', Auteur: 'Item 5',Text:'12334' },
+    { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
+    
   ];
 
   const handleArticle = () => {
-    setArticle(!Article);
+    setArticle(true);
+    setMesArticles(false);
   };
   const handleMesArticles = () => {
-    setMesArticles(!MesArticles);
+    setMesArticles(true);
+    setArticle(false);
   };
   const handleNav = () =>{
     setNav(!nav)
@@ -52,45 +54,14 @@ const Moderateur = () =>  {
                <p className=' text-2 text-white font-bold'>Dashboard</p>
               </div>
              <ul className=' flex-col mt-5 h-full w-full'>
-                 <div className={!showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-gray '}>
-                    <FiUpload className='mt-1 ' size={17}/>
+                 <div className={Article ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-gray '}>
+                    <GrArticle className='mt-1 ' size={17}/>
                     <li onClick={handleArticle}  className=' text-black'>Articles</li>
-                    {Article && (<ul style={{  overflowY: 'auto' }} className='flex-col items-center space-y-6 p-5 w-full ml-[-1%]'>
-                              {data.map((item) => (
-                          
-                           <div key={item.Name}  className='flex flex-row justify-star items-center h-[35%] w-[30%]  rounded-md bg-white'>
-                             <h2>{item.Titre}</h2>
-                              <h4 className='opacity-8'>{item.Auteur}</h4>
-                              <p>{item.Text}</p>
-                            {ModifierMod && (<ul className='w-full max-h-full'>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-1 "><p >Nom:</p>< input  type="text" className=" mt-1 h-4 w-[30%] border-0" placeholder= {item.Name} /></li>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-1 "><p>Email:</p>< input  type="text" className="h-4 w-[30%] border-0" placeholder= {item.Email} /></li>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-1 "><p>Mot de Passe:</p>< input  type="text" className="h-4 w-[30%] border-0" placeholder= {item.Pwd} /></li> 
-                            </ul>  )}
-                            <div className='flex justify-end  w-[20%] ml-[3%]'>
-                            <div className='flex flex-col space-y-8'>
-                                <div onClick={''} >
-                                {!ModifierMod && (<TiDeleteOutline style={{right:0}} color='#DF1477' size={22} />)}
-                                </div>
-                                  <div onClick={handleModifierMod}>
-                                    {!ModifierMod && (<IoSettingsOutline color='#DF1477' size={20}/>)}
-                                    {ModifierMod && (<div className='px-1 mt-4 ml-[-4%]'>
-                                    <div onClick={handleModifierMod} className='md:hidden'><LuSave color='DF1477' size={20}/></div>
-                                    <button onClick={handleModifierMod} className=' bg-darkPink text-center text-white rounded-md hidden md:block '>Sauvegarder</button>
-                                      </div>)}
-                                  </div>
-                              
-                              
-                            </div>
-                            </div>    
-                           </div>
-                           
-                                ))}
-                                </ul>)}  
+                    
                  </div>
-                <div className={!showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                 <FaAddressBook className='mt-1 ' size={17}/>
-                  <li onClick={handleListItemClick} className='text-black'>Mes Articles</li>
+                <div className={!MesArticles? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
+                 <BiSolidEdit className='mt-1 ' size={17}/>
+                  <li onClick={handleMesArticles} className='text-black'>Mes Articles</li>
                 </div>
               
               </ul>
@@ -114,11 +85,40 @@ const Moderateur = () =>  {
          </div>
           
           <div className="flex flex-col items-center justify-center bg-opacity-10 max-w-auto h-full w-[95%] mt-11 bg-white">
-            <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
-             <div className='flex-row  items-center w-[70%]'>
-                 </div>
-              <img className='h-[60%]' src={!ImShift ? imageS : imageL } alt='/' />
-            </div>
+          {Article && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 bg-black overflow-auto'>
+                              {data.map((item) => (
+                          
+                           <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
+                             <div className='flex flex-col justify-start '>
+                             <p className='px-1 font-medium text-xl'>{item.Titre}</p>
+                              <p className='px-2 text-opacity-90 text-lg mb-1'>{item.Auteur}</p>
+                              <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.Text}</p>
+                              </div>
+                              <div className='flex justify-end mb-2'>
+                                         <button className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Modérer</button>
+                                  </div>
+                              </div>
+                           </li>
+                           
+                                ))}
+                                </ul>)} 
+                    {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 bg-black overflow-auto'>
+                              {data.map((item) => (
+                          
+                           <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
+                             <div className='flex flex-col justify-start '>
+                             <p className='px-1 font-medium text-xl'>{item.Titre}</p>
+                              <p className='px-2 text-opacity-90 text-lg mb-1'>{item.Auteur}</p>
+                              <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.Text}</p>
+                              </div>
+                              <div className='flex justify-end mb-2 mr-1'>
+                              <IoIosAddCircleOutline size={23} color='#DF1477' />
+                                           </div>
+                              </div>
+                           </li>
+                           
+                                ))}
+                                </ul>)}  
           </div>
         </div>
           
@@ -127,30 +127,18 @@ const Moderateur = () =>  {
        
            <div className={!nav ? ' fixed left-0 top-20 w-[30%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
-                 <div className={showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-grey'}>
-                    <FiUpload className='mt-1 ' size={17}/>
-                  <li className=' text-black'>Upload</li>
+                 <div className={Article ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'}>
+                    <GrArticle className='mt-1 ' size={17}/>
+                  <li onClick={handleArticle} className=' text-black lg:text-xl text-[80%]'>Articles</li>
                 </div>
-                <div className={showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink '}>
-                 <FaAddressBook className='mt-1 ' size={17}/>
-                  <li onClick={handleListItemClick} className='text-black'>Modérateurs</li>
+                <div className={!MesArticles ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink '}>
+                 <BiSolidEdit className='mt-1 ' size={17}/>
+                  <li onClick={handleMesArticles} className='text-black lg:text-xl text-[80%]'>Mes Articless</li>
                 </div>
-                {!showItems && (
-                            <ul className='ml-6'>
-                                  <div className={!showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <MdOutlineAddBox className='mt-1  ' size={17}/>
-                                    <li  className='text-black'>Nouveau</li>
-                                 </div>
-                                 <div className={!showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <IoSearch className='mt-1 ' size={17}/>
-                                    <li  className='text-black'>Chercher</li>
-                                   </div>
-                              
-                            </ul>
-              )}
+                
                 <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
-                <p className=' text-black'>Déconnecter</p>
+                <p className=' text-black lg:text-xl text-[80%]'>Déconnecter</p>
                </div>
               </ul>
               
@@ -161,7 +149,7 @@ const Moderateur = () =>  {
 
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
-          <img className="h-10" src={avatar} alt='/'/>
+          <img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}}  src={avatar} alt='/'/>
           </div>
     </div>
      

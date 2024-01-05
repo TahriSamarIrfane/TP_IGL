@@ -276,7 +276,7 @@ const Admin = () =>  {
 
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
-          <img className="h-10" src={avatar} alt='/'/>
+          <img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/>
           </div>
     </div>
      

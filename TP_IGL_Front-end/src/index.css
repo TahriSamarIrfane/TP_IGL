@@ -94,8 +94,20 @@
 }
 .vertical-line {
   border-left: 2px solid #8d8a8a76; /* Adjust color and thickness as needed */
-  height: 450px; /* Adjust height as needed */
+  height: 420px;
+  
 }
+.column-list {
+display: grid;
+grid-template-columns: auto auto auto;
+overflow: auto;
+}
+.column-list2 {
+  display: grid;
+  grid-template-columns: auto auto;
+  overflow: auto;
+  }
+
 
  
 }
