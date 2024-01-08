@@ -37,7 +37,7 @@ const ProfileAdminMod = () => {
         </div>
         
         <div className='flex justify-center w-full '>
-        <div className=' w-[80%] h-[92%] bg-white'>
+        <div className=' w-[80%] h-[98%] bg-white'>
         {/*Go Back Arrow*/}
         <div className='  lg:px-9  '><MdOutlineKeyboardBackspace size={40} /></div>
         {/*My Profile heading*/}
@@ -86,11 +86,11 @@ const ProfileAdminMod = () => {
                </ul> 
             </div>
              
-             <div className="vertical-line "></div>
+             
              
                 <div className='flex flex-col space-y-2   px-[1%] py-9 w-[55%]' >
                   
-                  {ModifierInfo && (<div className='flex flex-col space-y-8  px-[10%] '>
+                  {ModifierInfo && (<div className='flex flex-col border-l-grey border-l-2 space-y-8  px-[10%] '>
                     <div className='flex flex-col space-y-2 justify-start '>
                     <p>Nom</p>
                     <input
@@ -116,7 +116,7 @@ const ProfileAdminMod = () => {
                     </div>
                 </div>
                   )}
-                  {ModifierPwd && (<div className='flex flex-col space-y-8  px-[10%] '>
+                  {ModifierPwd && (<div className='flex flex-col border-l-grey border-l-2 space-y-8  px-[10%] '>
                     <div className='flex flex-col space-y-2 justify-start '>
                     <p>Mot de passe actuel</p>
                     <div className='flex flex-col'>

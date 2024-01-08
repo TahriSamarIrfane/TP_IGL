@@ -9,6 +9,6 @@ import Moderateur from './components/Moderateur.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Moderateur/>
+    <ProfileAdminMod/>
   </React.StrictMode>,
 )

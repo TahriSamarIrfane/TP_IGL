@@ -39,7 +39,7 @@ const ProfileUser = () => {
         {/*My Profile heading*/}
         <div className='flex justify-center items-center '>
             <div className=' flex flex-row w-[80%]  '>
-                 <p className='lg:px-[6.8%] px-[6.5%] lg:text-3xl  text-xl text-center font-bold ' style={{ fontFamily:'tahoma' }}>Mon Profile</p>
+                 <p className='lg:px-[7%] px-[6.5%] lg:text-3xl  text-xl text-center font-bold ' style={{ fontFamily:'tahoma' }}>Mon Profile</p>
        
                   {ModifierInfo && (<div className='flex flex-row space-x-2 lg:px-[17%] px-[16%] ml- '>
                     <MdOutlinePersonOutline className='mt-1  ' color='DF1477' size={36}/>
@@ -62,7 +62,7 @@ const ProfileUser = () => {
             <div className='flex flex-col justify-center items-center border-r-black border-r-7   px-[1.4%] w-[40%]'>
              
                   <div className='flex p-4 justify-center items-center '>
-                    <img className='opacity-70' style={{borderRadius:'50%', height:'120px',width:'120px',objectFit:'cover'}}  src={avatar} alt='/'/>
+                    <img className='opacity-70 p-2' style={{borderRadius:'50%', height:'120px',width:'120px',objectFit:'cover'}}  src={avatar} alt='/'/>
                         <p className='lg:px-7 font-bold lg:text-xl px-3 text-black text-opacity-80 text-[80%]' style={{position:'absolute'}}>Modifier</p>
                         </div> 
                    <p className='lg:text-4xl text-xl'>Jacobi</p>
@@ -83,7 +83,7 @@ const ProfileUser = () => {
             </div>
              
              
-                <div className='flex flex-col space-y-2 border-l-black border-l-4 bg-black  px-[1%] py-9 w-[55%]' >
+                <div className='flex flex-col space-y-2 border-l-grey border-l-2  px-[1%] py-9 w-[55%]' >
                   
                   {ModifierInfo && (<div className='flex flex-col space-y-8  px-[10%] '>
                     <div className='flex flex-col space-y-2 justify-start '>

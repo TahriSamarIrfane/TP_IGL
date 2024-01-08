@@ -85,7 +85,7 @@ const Moderateur = () =>  {
          </div>
           
           <div className="flex flex-col items-center justify-center bg-opacity-10 max-w-auto h-full w-[95%] mt-11 bg-white">
-          {Article && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 bg-black overflow-auto'>
+          {Article && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6  overflow-auto'>
                               {data.map((item) => (
                           
                            <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
@@ -102,7 +102,7 @@ const Moderateur = () =>  {
                            
                                 ))}
                                 </ul>)} 
-                    {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 bg-black overflow-auto'>
+                    {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 overflow-auto'>
                               {data.map((item) => (
                           
                            <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
