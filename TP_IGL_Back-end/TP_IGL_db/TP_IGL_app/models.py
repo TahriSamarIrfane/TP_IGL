@@ -5,7 +5,8 @@ from django.contrib.auth.models import  Group, Permission
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.db.models import Model
+from django.core.validators import FileExtensionValidator
 # Create your models here.
 # models.py
 
@@ -57,15 +58,16 @@ class Etat(models.Model):
         return self.nom
 #3- modele moderateur 
 class Moderateur(AbstractUser):
-    groups = models.ManyToManyField(Group, related_name='moderateur_groups', blank=True)
-    user_permissions = models.ManyToManyField(Permission, related_name='moderateur_user_permissions', blank=True)
+    groups = models.ManyToManyField(Group, related_name='admin_groups', blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name='admin_user_permissions', blank=True)
+    id = models.AutoField(primary_key=True)
 
     def __str__(self):
         return self.username
 #4- modele de admin 
 class Admin(AbstractUser):
-    groups = models.ManyToManyField(Group, related_name='admin_groups', blank=True)
-    user_permissions = models.ManyToManyField(Permission, related_name='admin_user_permissions', blank=True)
+    groups = models.ManyToManyField(Group, related_name='moderateur_groups', blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name='moderateur_user_permissions', blank=True)
     id = models.AutoField(primary_key=True)
 
     def __str__(self):
@@ -73,35 +75,26 @@ class Admin(AbstractUser):
 
 #5- modele auteur 
 
-class Auteur(models.Model):
-    id = models.AutoField(primary_key=True)
+class Institution(Model):
+    id = models.BigAutoField(primary_key=True)
     nom = models.CharField(max_length=255)
 
     def __str__(self):
         return self.nom
-
-#6- modele institution 
-
-class Institution(models.Model):
-    id = models.AutoField(primary_key=True)
+class Auteur(Model):
+    id = models.BigAutoField(primary_key=True)
     nom = models.CharField(max_length=255)
+    institutions = models.ManyToManyField(Institution, related_name='institutions')
 
     def __str__(self):
         return self.nom
+# Create your models here.
 
-
-#7- modele institutionauteur 
-
-class InstitutionAuteur(models.Model):
-    id = models.AutoField(primary_key=True)
-    auteur = models.ForeignKey(Auteur, on_delete=models.CASCADE)
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-
+class UploadedFile(Model):
+    id = models.BigAutoField(primary_key=True)
+    uploaded_file = models.FileField(upload_to='./',validators=[FileExtensionValidator()])
     def __str__(self):
-        return f"{self.auteur.nom} - {self.institution.nom}"
-
-
-"""
+        return self.id
 #8- article prefere 
 class FavoriteArticle(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -110,34 +103,41 @@ class FavoriteArticle(models.Model):
     def __str__(self):
         return f"Favoris de {self.user.username}"
 #9- modele article 
-class Article(models.Model):
-    id = models.AutoField(primary_key=True)
-    titre = models.CharField(max_length=255)
-    abstract = models.TextField()
-    key_words = models.CharField(max_length=255)
+class Article(Model):
+    id = models.BigAutoField(primary_key=True)
+    titre = models.CharField(max_length=255,blank=True)
+    abstract = models.TextField(blank=True)
+    key_words = models.TextField(blank=True)
     full_text = models.TextField()
-    pdf_url = models.URLField()
-    references = models.TextField()
-    date = models.DateField()
-    auteurs = models.ManyToManyField(Auteur)
-    etat = models.ForeignKey(Etat, on_delete=models.CASCADE)
-    moderateur = models.ForeignKey(Moderateur, on_delete=models.CASCADE)
-    admin = models.ForeignKey(Admin, on_delete=models.CASCADE)
-
+    pdf_file = models.URLField()
+    references = models.TextField(blank=True)
+    publication_date = models.DateField(auto_now_add=True)
+    auteurs = models.ManyToManyField(Auteur ,related_name='authors')
+    
+    EN_ATTENTE='A'
+    EN_COURS='C'
+    TERMINE='T'
+    Etat_choix=[
+        (EN_ATTENTE,'En_Attente'),
+        (EN_COURS,'En_Cours'),
+        (TERMINE,'Terminé'),
+    ]
+    
+    etat = models.CharField(max_length=1,choices=Etat_choix,default=EN_ATTENTE) #etat de l'article
+   
     def __str__(self):
-        return self.titre
+        return self.titre 
+    
+    def state_to_string(self):
+        if self.etat=='A':
+            return 'En Attente'
+        elif self.etat=='C':
+            return 'En Cours'
+        else:
+            return 'Terminé' 
     def get_all_institutions(self):
-        return [auteur.institution for auteur in self.auteurs.all()] 
+        return [auteur.institution for auteur in self.auteurs.all()]  
 #10- modele articleauteur 
-class ArticleAuteur(models.Model):
-    id = models.AutoField(primary_key=True)
-    auteur = models.ForeignKey(Auteur, on_delete=models.CASCADE)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"{self.auteur.nom} - {self.article.titre}" 
-
-
 #11- modele profile 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -156,4 +156,5 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
-"""
+    
+    
