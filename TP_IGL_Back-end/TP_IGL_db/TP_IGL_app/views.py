@@ -84,11 +84,8 @@ from datetime import datetime
 
 ArticleIndex.init()
 # authentification google 
-
 def authenticate_google(request):
-    
     # Configure the OAuth flow
-    
     flow = InstalledAppFlow.from_client_secrets_file(
         'path/to/client_secret.json',  # Replace with the path to your client_secret.json file
         scopes=['https://www.googleapis.com/auth/gmail.send']
@@ -104,7 +101,6 @@ def authenticate_google(request):
     return HttpResponse("Authentication successful!")
 
 # Create your views here.
-
 def home(request):
     return render(request,'home.html')
 
@@ -260,7 +256,7 @@ def request_password_reset_code(request):
         profile, created = Profile.objects.get_or_create(user=user)
 
         # Générez un code de réinitialisation
-        reset_code = secrets.token_hex(2)
+        reset_code = secrets.token_hex(16)
        
         # Enregistrez le code de réinitialisation dans le modèle Profile
         profile.reset_code = reset_code
@@ -438,7 +434,9 @@ def consulter_articles_preferes(request):
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
+
 def afficher_details(request):
+    
     try:
         # Parse JSON data from the request body
         body = json.loads(request.body.decode('utf-8'))
@@ -449,10 +447,11 @@ def afficher_details(request):
 
         # Use Elasticsearch to retrieve details for the specified article ID
         es = Elasticsearch(['http://localhost:9200'])
+        
         index_name = 'article_7'
 
         try:
-            article_data = es.get(index=index_name, id=article_id)['_source']
+            article_data = es.get(index=index_name, id=article_id)['_source'] 
         except Exception as es_exception:
             return JsonResponse({'status': 'Error', 'message': f"Erreur lors de la récupération des détails de l'article : {str(es_exception)}"})
 
@@ -602,7 +601,7 @@ def rechercher_articles(request):
 }
 
         # Exécutez la requête de recherche
-        result = es.search(index=index_name, body=search_query, size=1000)
+        result = es.search(index=index_name, body=search_query,size=1000)
 
         # Récupérez les résultats de la recherche
         search_results = result['hits']['hits']

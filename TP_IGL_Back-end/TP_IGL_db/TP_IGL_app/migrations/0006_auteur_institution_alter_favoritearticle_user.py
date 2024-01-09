@@ -16,14 +16,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Auteur',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(primary_key=True, serialize=False)),
                 ('nom', models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
             name='Institution',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(primary_key=True, serialize=False)),
                 ('nom', models.CharField(max_length=255)),
             ],
         ),

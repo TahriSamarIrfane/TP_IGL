@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ArticleAuteur',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(primary_key=True, serialize=False)),
                 ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='TP_IGL_app.article')),
                 ('auteur', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='TP_IGL_app.auteur')),
             ],
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='InstitutionAuteur',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
+                ('id', models.IntegerField(primary_key=True, serialize=False)),
                 ('auteur', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='TP_IGL_app.auteur')),
                 ('institution', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='TP_IGL_app.institution')),
             ],
