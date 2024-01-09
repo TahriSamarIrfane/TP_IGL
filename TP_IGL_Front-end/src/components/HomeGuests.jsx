@@ -24,15 +24,17 @@ import bird from'../assets/images/bird.png';
 
 
 const CustomPrevArrow = (props) => (
-    <div {...props} className="slick-arrow-custom ">
-      <span>&lt;</span>
+    <div {...props} className=" absolute top-60 slick-arrow-custom  left-3 bottom-0 items-center cursor-pointer">
+      <span className=' text-darkPink font-extrabold'>&lt;</span>
     </div>
   );
   
   const CustomNextArrow = (props) => (
-    <div {...props} className="slick-arrow-custom">
-      <span>&gt;</span>
+    <span>
+    <div {...props} className="absolute slick-arrow-custom top-60 slick-arrow-custom  right-3 bottom-0 items-center cursor-pointer">
+      <span className='text-darkPink font-extrabold'>&gt;</span>
     </div>
+    </span>
   );
   
 //for the Slick
@@ -73,17 +75,17 @@ const HomeGuests = () => {
             </div>
             {/*  Text */}
             <div className='md:w-2/3 lg:mt-20'>
-                <div className='px-24'>
-                <h className=" bg-pink text-2xl text-darkPink font-Tahoma md:w-3/4 p-0 leading-snugs">Enjoy
-                 with ScienVision </h>
+                <div className='px-2 md:px-24'>
+                <h className=" bg-pink text-2xl text-darkPink font-Tahoma md:w-3/4 p-0 leading-snugs font-bold">Enjoy
+                 with Surfey </h>
                  <p className='text-black font-bold text-3xl md:text-4xl lg:text-5xl md:w-3/4'>L'Univers de la Connaissance à Votre Portée</p>
                  <p className="text-grey font-Tahoma mt-4 md:w-3/4">Plus de 12000 articles scientifiques,
                   Inscrivez-vous et Plonger dans le Monde de la Science.</p>
                   </div >
                   <div className='relative'>
                   <img className='h-60 line1-width lg:splach lg:mt-5' src={BlackSplash} alt=""/>
-                  <div className='flex space-x-72 lg:space-x-72'>
-                  <a href='#' className="text-lg mt-3 ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</a>
+                  <div className='flex  space-x-44 lg:space-x-72'>
+                  <a href='#' className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</a>
                   <a href='#' className="text-lg mt-3 bg-pink font-Segoe rounded-3xl py-2 px-7 text-darkPink font-bold absolute top-0 left-0 ">S’Inscrire</a>
                   </div>
                   </div>
@@ -92,24 +94,24 @@ const HomeGuests = () => {
          </div>
 
         {/* A propos*/}
-            <div className='lg:mt-20'>
-            <div className='ml-20 flex flex-col md:flex-row-reverse  items-center justify-between'>
+            <div id="sectionApropos" className='lg:mt-20'>
+            <div className='ml-5 md:ml-20 flex flex-col md:flex-row-reverse  items-center justify-between'>
                 <div>
                     <div className='flex flex-col md:flex-row-reverse  items-center justify-between'>
                <img className='line1-width line1-height' src={Line1} alt=""/>
              <p className='text-black font-bold text-5xl w-3/4 md:w-3/4 ml-40 md:text-4xl md:ml-56'>A Propos</p>
              </div>
-             <p className="px-20 text-grey font-Tahoma mt-4 ">Lorem ipsum dolor sit amet consectetur. Neque risus et eget molestie consectetur. Euismod sit ligula commodo cursus. Metus ac dui nunc facilisi a vestibulum non. Tortor et quis ac placerat nisl id. Amet etiam tempus quis lacus. Nibh id in etiam libero nunc enim interdum..</p>
+             <p className="md:px-20 text-grey font-Tahoma mt-4 ">Lorem ipsum dolor sit amet consectetur. Neque risus et eget molestie consectetur. Euismod sit ligula commodo cursus. Metus ac dui nunc facilisi a vestibulum non. Tortor et quis ac placerat nisl id. Amet etiam tempus quis lacus. Nibh id in etiam libero nunc enim interdum..</p>
              </div>
              <img className='h-50 md:h-72 lg:h-72 ' src={TEAMpic} alt=""/>
               </div>
             </div> 
 
          {/* Nos Services*/}
-         <p className='text-center text-5xl font-bold mt-10 mb-10'>Nos Services</p>
-         <div className='max-w-screen-lg mx-auto p-4'>
+         <p id="sectionSrevice" className='text-center text-5xl font-bold mt-10 mb-10'>Nos Services</p>
+         <div   className='max-w-screen-lg mx-auto p-4'>
             
-            <div className=' grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5 px-10 lg:px-20 '>
+            <div className=' grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-5 md:px-10 lg:px-20 '>
 
                  {/* first square*/}
               <div className='relative  '>
@@ -118,7 +120,7 @@ const HomeGuests = () => {
                  <p className=' text-white font-bold px-14 pt-2'>Large Choix d'Articles Scientifiques</p> 
                  <p className=' text-white pt-3 px-10'>Explorez une vaste collection d'articles scientifiques sur notre site, offrant un choix étendu pour répondre à vos besoins de recherche.</p>    
                  </div>  
-                 <div className="square md:w-full "/>
+                 <div className="square w-full "/>
               </div>
 
               {/* second square*/}
@@ -128,7 +130,7 @@ const HomeGuests = () => {
                  <p className=' text-white font-bold px-14 pt-2'>Téléchargement PDF</p> 
                  <p className=' text-white pt-3 px-10'>Accédez à la flexibilité avec la possibilité de télécharger les articles au format PDF, vous permettant de les lire hors ligne à tout moment.</p>    
                  </div>  
-                 <div class="square md:w-full "/>
+                 <div class="square w-full "/>
               </div>
 
               {/* third square*/}
@@ -138,7 +140,7 @@ const HomeGuests = () => {
                  <p className=' text-white font-bold px-14 pt-2'>Profil Utilisateur Personnalisé</p> 
                  <p className=' text-white pt-3 px-10'>Créez votre espace personnalisé avec un profil utilisateur. Enregistrez vos articles favoris et personnalisez votre expérience de recherche.</p>    
                  </div>  
-                 <div class="square   md:w-full"/>
+                 <div class="square   w-full"/>
               </div>
 
               {/* fourth square*/}
@@ -148,23 +150,23 @@ const HomeGuests = () => {
                  <p className=' text-white font-bold px-14 pt-2'>Devenir Modérateur</p> 
                  <p className=' text-white pt-3 px-10'>Participez activement en devenant modérateur. Contribuez à la qualité de notre plateforme en modérant les articles et en façonnant le contenu.</p>    
                  </div>  
-                 <div class="square   md:w-full"/>
+                 <div class="square   w-full"/>
               </div>
          
          </div>
          </div>
 
          {/* Feedbacks*/}
-         <div class="flex flex-col items-center justify-center mt-20 mb-20">
-         <img className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
+         <div  class="flex flex-col items-center justify-center mt-20 ">
+         <img id="sectionFeedBack" className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
          <p className='text-grey mt-5 px-5'>Découvrez ce que disent nos utilisateurs satisfaits à propos de notre application</p>
          </div>
 
-         <div >
+         <div className='relative' >
             <Slider {...settings} className='p-10'>
             {data.map((d) =>(
                 <div className='p-3'>
-                <div className='bg-lightPink shadow-md h-72 md:h-96 lg:h-72 mb-8 rounded-3xl p-4'>
+                <div className='bg-lightPink shadow-md  md:h-96 lg:h-72 rounded-3xl p-4'>
                         <div className='flex flex-col'>
                             <div className='flex flex-row'>
                     <img className='h-24 w-24 rounded-full p-3 ' src={d.photo} alt=""/>
@@ -189,15 +191,15 @@ const HomeGuests = () => {
 
 
          {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center ">
+         <div class="flex flex-col items-center justify-center">
 
-        <div className="bg-white mt-20 flex flex-col  md:flex-row-reverse  items-center justify-between ">
+        <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
           
             <div className='md:w-1/3 lg:mt-20 flex-shrink-0'>
 
               {/* the right side*/}
             <div className='relative '>
-                  <img className=' right-0 lg:mt-5 ' src={BlackSplash2} alt=""/>
+                  <img className=' right-0 lg:mt-5 ml-6 mf:ml-0' src={BlackSplash2} alt=""/>
                   <div className=''>    
                     <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
                     <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>

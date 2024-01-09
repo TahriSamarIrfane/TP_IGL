@@ -32,6 +32,11 @@
         width: 600px;
       }
 
+    .custom-PC{
+      height: 600;
+      width: 700px;
+    }  
+
     .splach{
       height: 350px;
       width: 500px;
@@ -109,5 +114,102 @@ overflow: auto;
   }
 
 
+/********************************TO CUSTOMIZE THE SCOLL BARS*********************************/
+/* width */
+::-webkit-scrollbar {
+  width: 12px;
+  
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #E5E5E5;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #DF1477;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Standard scrollbar styles (for non-WebKit browsers) */
+div.overflow-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #DF1477 #E5E5E5;
+  overflow-y: scroll; /* Show vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+div.overflow-scroll::-webkit-scrollbar {
+  width: 10px;
+  
+}
+
+div.overflow-scroll::-webkit-scrollbar-thumb {
+  background-color: #DF1477;
+  
+}
+
+div.overflow-scroll::-webkit-scrollbar-track {
+  background-color: #E5E5E5;
+}
+/************************************************************************************************/
+
+.show-atricle-scroll{
+  height:600px;
+}
+
+/* For the inputes names and password*/
+.placeholder{
  
+  top: 10px;
+  left: -12px;
+  font-size: 15px;
+  padding: 0px 5px;
+  color: #666;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+input:valid + .placeholder,
+input:focus + .placeholder {
+  top: -2px;
+  color: #666;
+  background-color: #FFFF;
+  transform: translateX(20px) translateY(-10px) scale(0.88);
+}
+
+.showPasswordEye{
+  position: absolute;
+  color: #555;
+  top: 13px;
+  right: 10px;
+}
+
+/* Custom styles for square radio button */
+input[type="radio"] {
+  -moz-appearance: none;
+  appearance: none;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 1px solid #666;
+  border-radius: 0em;
+  outline: none;
+  transition: 0.2s;
+}
+
+/* Custom styles for checked state */
+input[type="radio"]:checked {
+  display: inline-block;
+  background-color: #DF1477;
+  border-color: #666;
+}
+
 }
