@@ -1,4 +1,4 @@
-from . import views 
+
 from django.urls import path 
 from .views import AllUsersAPIView
 from django.contrib import admin
@@ -6,6 +6,7 @@ from .views import LoginPage ,LogoutPage , change_password , change_username , d
 from .views import elasticsearch_status_view , ajouter_article_prefere , consulter_articles_preferes
 from .views import consulter_article_pdf , consulter_article_text , afficher_details ,  rechercher_articles
 from .views import filtrer_resultats_key_words, filtrer_resultats_auteurs , filtrer_resultats_institution ,filtrer_resultats_date
+from .views import FileUploadAPIView,Article_correct_and_remove,Article_review
 urlpatterns = [
     path('',home, name='home'),
     path('signup/', signup_page, name='signup'),
@@ -27,6 +28,13 @@ urlpatterns = [
     path('filtrer_resultats_auteurs/',filtrer_resultats_auteurs,name='filtrer_resultats_auteurs'),
     path('filtrer_resultats_institution/',filtrer_resultats_institution,name='filtrer_resultats_institution'),
     path('filtrer_resultats_date/',filtrer_resultats_date,name='filtrer_resultats_date'),
+    path('upload-file/',FileUploadAPIView.as_view(),name='upload-file'),
+    path('moder/<int:id>/',Article_correct_and_remove,name='moderator-page'),
+    path('moder/<int:id>/get/',Article_review,name='moderateur-page-int')
 ]
+
+    
+
+
     
 

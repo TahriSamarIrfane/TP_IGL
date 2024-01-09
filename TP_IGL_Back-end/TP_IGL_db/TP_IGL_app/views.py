@@ -1,4 +1,19 @@
-from django.shortcuts import render,redirect
+import json
+from django.conf import settings
+from rest_framework.viewsets import ModelViewSet
+from elasticsearch import Elasticsearch
+from django.conf import settings
+import os
+from django.shortcuts import render
+from .models import Article,Auteur,Institution,UploadedFile
+from rest_framework.decorators import api_view,parser_classes
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ArticleSerializer,AuteurSerializer,InstitutionSerializer,DocumentSerializer,FileUploadSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser,MultiPartParser,FormParser
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+# Create your views here.from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -81,6 +96,179 @@ from elasticsearch_dsl.connections import connections
 from .utils import get_existing_article_ids
 from datetime import datetime
 
+def transforme_institution_to_json(institution):
+    dic1={}
+    institutions=[]
+    for ins in institution:
+        dic1={"nom":ins}
+        institutions.append(dic1)
+    return institutions
+
+def transform_auteur_institution_to_json(auteurs,des_institutions):
+    les_institutions=transforme_institution_to_json(des_institutions)
+    dic2={}
+    les_auteurs=[]
+    for auteur in auteurs:
+        dic2={"nom":auteur,"institutions":les_institutions}
+        les_auteurs.append(dic2)
+    les_auteurs_json=json.dumps(les_auteurs)
+    return les_auteurs_json
+
+def create_index(index_nom,map,the_document,the_id):
+    es=Elasticsearch('http://localhost:9200')
+    if not es.indices.exists(index=index_nom):
+        es.indices.create(index=index_nom,mappings=map)
+    es.index(index=index_name,id=the_id,body=the_document)
+
+def delete_index(index_nom,the_id):
+    es=Elasticsearch('http://localhost:9200')
+    es.delete(index=index_name,id=3)        
+
+index_name='index_articles'
+
+mapping = {
+        "properties": {
+            "auteurs" :{"type":"nested",
+                       "properties":{   
+                           "id":{"type":"long"},
+                           "nom":{"type":"text"},
+                           "institutions":{"type":"nested",
+                                             "properties":
+                                                 { "id":{"type":"long"},
+                                                   "nom":{"type":"text"}},
+                                          }}},
+            "titre": {"type": "text"},
+            "abstract":{"type":"text"},
+            "references":{"type":"text"},
+            "key_words":{"type":"text"},
+            "full_text":{"type":"text"},
+            "pdf_file":{"type":"text"}
+
+}
+}
+
+@api_view(['GET'])
+def Article_review(request,id):
+    try:
+      article=Article.objects.get(pk=id)
+    except Article.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer= ArticleSerializer(article)
+    return Response(serializer.data)
+
+@api_view(['PATCH','DELETE'])
+def Article_correct_and_remove(request,id):
+    try:
+        
+        article = Article.objects.get(pk=id)
+    except Article.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    le_id=id
+    if request.method == 'PATCH':
+        serializer=ArticleSerializer(article,data=request.data)
+        if serializer.is_valid():
+           serializer.save()
+           le_document={
+                 "auteurs":serializer.data["auteurs"],
+                 "titre": serializer.data['titre'],
+                 "abstract":serializer.data['abstract'],
+                 "references":serializer.data['references'],
+                 "key_words":serializer.data['key_words'],
+                 "full_text":serializer.data['full_text'],
+                 "pdf_file":serializer.data['pdf_file']
+                  }
+           try:
+                create_index(index_name,mapping,le_document,le_id)
+           except:
+                print("erreur lors de l'indexation")
+                return Response("erreur dans elasticsearch",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+           
+           return Response(serializer.data,status=status.HTTP_200_OK)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        article.delete()
+        try:
+            delete_index(index_name,le_id)
+        except:
+            print("erreur lors de la suppression de l'index")
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FileUploadAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = FileUploadSerializer
+    
+    def post(self, request, *args, **kwargs):
+        
+        serializer_f = self.serializer_class(data=request.data)
+        
+        if serializer_f.is_valid():
+            
+            serializer_f.save()
+            
+            file_url=serializer_f.data['uploaded_file']
+            
+            pdf_file="http://127.0.0.1:8000"+str(file_url)
+            
+            the_path=str(settings.BASE_DIR)+file_url
+            
+            titre=extract_title(the_path)
+            
+            full_text=extract_article(the_path)
+            
+            abstract=extract_info(the_path,'abstract')
+            
+            key_words=extract_info(the_path,'keywords')
+            
+            references=extract_info(the_path,'references')
+            
+            auteur=[]
+            
+            institution=[]
+            
+            extract_entities(full_text,auteur,institution)
+            
+            les_auteurs=auteur[:4]
+            
+            les_institutions=institution[:4]
+            
+            auteurs=transform_auteur_institution_to_json(les_auteurs,les_institutions)
+            
+            article_data = {
+                "titre": titre,
+                "abstract": abstract,
+                "key_words": key_words,
+                "full_text": full_text,
+                "pdf_file": pdf_file,
+                "references": references,
+                "auteurs":auteurs,
+            }
+            serializer = ArticleSerializer(data=article_data)
+            if serializer.is_valid():
+                serializer.save()
+                le_id=serializer.data['id']
+                le_document={
+                 "auteurs":serializer.data['auteurs'],
+                 "titre": titre,
+                 "abstract":abstract,
+                 "references":references,
+                 "key_words":key_words,
+                 "full_text":full_text,
+                 "pdf_file":pdf_file
+            }
+                
+                try:
+                    create_index(index_name,mapping,le_document,le_id)
+                except:
+                    print("erreur lors de l'indexation")
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer_f.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 ArticleIndex.init()
 # authentification google 
