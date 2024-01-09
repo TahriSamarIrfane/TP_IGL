@@ -84,8 +84,11 @@ from datetime import datetime
 
 ArticleIndex.init()
 # authentification google 
+
 def authenticate_google(request):
+    
     # Configure the OAuth flow
+    
     flow = InstalledAppFlow.from_client_secrets_file(
         'path/to/client_secret.json',  # Replace with the path to your client_secret.json file
         scopes=['https://www.googleapis.com/auth/gmail.send']
@@ -101,6 +104,7 @@ def authenticate_google(request):
     return HttpResponse("Authentication successful!")
 
 # Create your views here.
+
 def home(request):
     return render(request,'home.html')
 
@@ -256,7 +260,7 @@ def request_password_reset_code(request):
         profile, created = Profile.objects.get_or_create(user=user)
 
         # Générez un code de réinitialisation
-        reset_code = secrets.token_hex(16)
+        reset_code = secrets.token_hex(2)
        
         # Enregistrez le code de réinitialisation dans le modèle Profile
         profile.reset_code = reset_code
