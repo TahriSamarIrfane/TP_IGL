@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status ,generics
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse , JsonResponse
+from django.http import Http404, HttpResponse , JsonResponse
 import json
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -66,23 +66,34 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .serializers import RequestPasswordResetCodeSerializer, ResetPasswordSerializer
 from django.db import models
-from .models import Profile , create_user_profile , save_user_profile ,  FavoriteArticle ,Article
+#from .models import Profile , create_user_profile , save_user_profile ,  FavoriteArticle ,Article
 from . import utils 
 from TP_IGL_app.utils import send_email
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from django.shortcuts import render
-from elasticsearch import Elasticsearch  # Ajoutez cette ligne
-from elasticsearch.exceptions import ElasticsearchException ,  NotFoundError
 from django.db.models import Q
-from .search.search_indexes import ArticleIndex
-from elasticsearch_dsl import Search
-from elasticsearch_dsl.connections import connections
-from .utils import get_existing_article_ids
+#from .utils import get_existing_article_ids
 from datetime import datetime
+import secrets
+import string
+from django.core.mail import send_mail
+from django.contrib.auth.models import Group
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .utils import generate_random_password
+from .serializers import PasswordGeneratorSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .utils import create_moderator
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
+from .utils import remove_moderator
+from .models import Moderateur
+from django.views.decorators.csrf import csrf_protect
+from .forms import ContactForm
 
 
-ArticleIndex.init()
 # authentification google 
 def authenticate_google(request):
     # Configure the OAuth flow
@@ -151,19 +162,28 @@ def LoginPage(request):
             username = data.get('username')
             password = data.get('password')
 
-            # Authentification avec Django
+            # Authentication with Django
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                return JsonResponse({"message": "Authentification réussie"})
+
+                if is_moderator(user):
+                    return JsonResponse({"message": "Authentication successful. User is a moderator."})
+                else:
+                    return JsonResponse({"message": "Authentication successful. User is not a moderator."})
+
             else:
-                return JsonResponse({"message": "Nom d'utilisateur ou mot de passe incorrect"}, status=401)
+                return JsonResponse({"message": "Invalid username or password"}, status=401)
 
         except json.JSONDecodeError:
-            return JsonResponse({"message": "Format JSON invalide"}, status=400)
+            return JsonResponse({"message": "Invalid JSON format"}, status=400)
 
-    return JsonResponse({"message": "Méthode non autorisée"}, status=405)
+    return JsonResponse({"message": "Method not allowed"}, status=405)
+
+# Decorator to check if the user is a moderator
+def is_moderator(user):
+    return user.is_authenticated and user.groups.filter(name='Moderator').exists()
 
 # 3- deconnnexion de l'utilisateur 
 
@@ -306,554 +326,173 @@ def reset_password(request):
     except User.DoesNotExist:
         return JsonResponse({'message': 'Aucun utilisateur trouvé avec cette adresse e-mail.'}, status=400)
 
-#8- test connection of elasticsearch 
-
-def elasticsearch_status_view(request):
-    # Initialise Elasticsearch avec l'URL de votre cluster Elasticsearch
-    es = Elasticsearch(['http://localhost:9200'])  # Remplacez cela par l'URL de votre cluster
-
-    try:
-        # Vérifiez si le cluster est en ligne en faisant une requête simple
-        info = es.info()
-
-        # Si la requête réussit, renvoie une réponse JSON
-        response_data = {
-            'status': 'OK',
-            'message': 'Elasticsearch is running smoothly.',
-            'elasticsearch_version': info['version']['number'],
-        }
-
-    except ElasticsearchException as e:
-        # Si une exception se produit, renvoie une réponse JSON avec l'erreur
-        response_data = {
-            'status': 'Error',
-            'message': f'Error connecting to Elasticsearch: {str(e)}',
-        }
-
-    return JsonResponse(response_data)
-
-#9- ajouter article prefere 
-
+# 8- Generer un mot de passe aleatoirement  
 @csrf_exempt
-@permission_classes([IsAuthenticated])
-@login_required
-def ajouter_article_prefere(request):
-    try:
-        # Récupérez l'ID de l'utilisateur authentifié
-        user_id = request.user.id
+@api_view(['GET'])
+def generate_random_password_view(request):
+    generated_password = generate_random_password()
+    serializer = PasswordGeneratorSerializer(data={'generated_password': generated_password})
 
-        # Récupérez ou créez l'instance FavoriteArticle pour l'utilisateur authentifié
-        user_pref, created = FavoriteArticle.objects.get_or_create(user_id=user_id)
-
-        # Récupérez l'ID de l'article à partir du corps de la requête JSON
-        body = json.loads(request.body.decode('utf-8'))
-        article_id = body.get('id')
-
-        if article_id is None:
-            return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'a pas été fourni dans la requête JSON'})
-
-        # Récupérez les IDs de tous les articles dans l'index Elasticsearch
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
-        print(f'article_id: {article_id}')
-
-        search_query = {
-            "query": {
-                "match_all": {}
-            }
-        }
-
-        result = es.search(index=index_name, body=search_query, size=1000)
-        existing_article_ids = [hit['_id'] for hit in result['hits']['hits']]
-
-        # Vérifiez si l'ID de l'article existe dans Elasticsearch
-        if article_id not in existing_article_ids:
-            return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'existe pas dans Elasticsearch'})
-
-        try:
-            article_data = es.get(index=index_name, id=article_id)['_source']
-        except ElasticsearchException as es_error:
-            return JsonResponse({'status': 'Error', 'message': "L'ID de l'article n'existe pas dans Elasticsearch"})
-
-        # Vérifiez si l'article est déjà dans la liste d'articles préférés
-        if article_id not in user_pref.elasticsearch_ids:
-      # Ajoutez l'ID de l'article à la liste d'articles préférés de l'utilisateur
-         user_pref.elasticsearch_ids.append(article_id)
-         user_pref.save()
-
-
-         return JsonResponse({'status': 'OK', 'message': 'Article ajouté aux favoris avec succès'})
-        else:
-            return JsonResponse({'status': 'Error', 'message': 'Article déjà présent dans les favoris'})
-
-    except Exception as e:
-        # Print the exception for debugging purposes
-        print(f'An error occurred: {e}')
-        return JsonResponse({'status': 'Error', 'message': f'Une erreur s\'est produite: {e}'})
+    if serializer.is_valid():
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=400)
     
-#10- consulter un article prefere
+@csrf_exempt
+@api_view(['POST'])
+def create_moderator_view(request):
+    if request.method == 'POST':
+         try:
+            create_moderator(request.data)
+            return Response({'message': 'Moderator created successfully'}, status=201)
+         except ValidationError as e:
+            error_messages = {}
+            for field, errors in e.message_dict.items():
+                error_messages[field] = [str(error) for error in errors]
+            return Response({'errors': error_messages}, status=status.HTTP_400_BAD_REQUEST)
+         
 
 @csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-def consulter_articles_preferes(request):
-    try:
-        # Ensure user is authenticated
-        if not request.user.is_authenticated:
-            return JsonResponse({'status': 'Error', 'message': 'User not authenticated'})
+@api_view(['POST'])
+def remove_moderator_view(request):
+    if request.method == 'POST':
+        username_to_remove = request.data.get('username', None)
 
-        # Retrieve the FavoriteArticle instance for the authenticated user
-        user_pref, created = FavoriteArticle.objects.get_or_create(user=request.user)
-
-        # Retrieve the list of favorite article IDs from elasticsearch_ids
-        favorite_article_ids = user_pref.elasticsearch_ids
-
-        # You can now use the list of article IDs to fetch the corresponding articles
-        # For example, using Elasticsearch:
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
-
-        favorite_articles = []
-        for article_id in favorite_article_ids:
+        if username_to_remove:
             try:
-                article_data = es.get(index=index_name, id=article_id)['_source']
-                favorite_articles.append(article_data)
-            except ElasticsearchException:
-                # Handle the case where the article doesn't exist in Elasticsearch
-                pass
+                removed = remove_moderator(username_to_remove)
 
-        return JsonResponse({'status': 'OK', 'favorite_articles': favorite_articles})
-
-    except Exception as e:
-        # Print the exception for debugging purposes
-        print(f'An error occurred: {e}')
-        return JsonResponse({'status': 'Error', 'message': 'Une erreur s\'est produite'})
-    
-#11- view article details 
-
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-def afficher_details(request):
-    try:
-        # Parse JSON data from the request body
-        body = json.loads(request.body.decode('utf-8'))
-        article_id = body.get('id')
-
-        if article_id is None:
-            return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'a pas été fourni dans la requête JSON'})
-
-        # Use Elasticsearch to retrieve details for the specified article ID
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
-
-        try:
-            article_data = es.get(index=index_name, id=article_id)['_source']
-        except Exception as es_exception:
-            return JsonResponse({'status': 'Error', 'message': f"Erreur lors de la récupération des détails de l'article : {str(es_exception)}"})
-
-        # Construct and return the response
-        details = {
-           
-            'Titre': article_data.get('title'),
-            'Résumé': article_data.get('abstract'),
-            'Mots clés': article_data.get('keywords'),
-            'Texte intégral': article_data.get('text'),
-            'Pdf_url':article_data.get('pdf_url'),
-            'Référence':article_data.get('reference'),
-            'Date':article_data.get('date') , 
-            'Auteurs':article_data.get('auteurs') , 
-            'Institution':article_data.get('institution') 
-        }
-
-        return JsonResponse({'status': 'OK', 'details': details})
-
-    except Exception as e:
-        # Handle other exceptions
-        return JsonResponse({'status': 'Error', 'message': f"Une erreur s'est produite : {str(e)}"})
+                if removed:
+                    return Response({'message': 'Moderator removed successfully'}, status=200)
+                else:
+                    return Response({'error': 'Moderator not found'}, status=404)
+            except Http404:
+                return Response({'error': 'Moderator not found'}, status=404)
+        else:
+            return Response({'error': 'Please provide a username to remove'}, status=400)
         
-#12- view article full_text
+
+#En verifiant si le moderateur est authentifie (dans le cas ou c'est le moderateur lui même qui va le modifier)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def modify_moderator_password(request):
+    current_moderator = request.user
+    serializer = ChangePasswordSerializer(data=request.data)
+
+    if serializer.is_valid():
+        old_password = serializer.validated_data.get('old_password')
+        new_password = serializer.validated_data.get('new_password')
+
+        # Verify the old password
+        if not current_moderator.check_password(old_password):
+            return Response({'message': 'Ancien mot de passe incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Change the password
+        current_moderator.set_password(new_password)
+        current_moderator.save()
+
+        # Update the authenticated session
+        update_session_auth_hash(request, current_moderator)
+
+        return Response({'message': 'Mot de passe modifié avec succès'}, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#En verifiant si le moderateur est authentifie (dans le cas ou c'est le moderateur lui même qui va le modifier)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def modify_moderator_username(request):
+    current_moderator = request.user
+    new_username = request.data.get('new_username')
+
+    # Vérifier si le nouveau pseudonyme est déjà pris
+    if Moderateur.objects.filter(username=new_username).exclude(id=current_moderator.id).exists():
+        return Response({'message': 'Ce pseudonyme est déjà pris'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Changer le pseudonyme
+    current_moderator.username = new_username
+    current_moderator.save()
+
+    return Response({'message': 'Pseudonyme modifié avec succès'}, status=status.HTTP_200_OK)
+
+
+#Sans verifier si le moderateur est authentifie (dans le cas ou c'est l'admin qui va le modifier)
+@api_view(['POST'])
+def change_moderator_password(request):
+    moderator_username = request.data.get('moderator_username')
+    moderator = get_object_or_404(Moderateur, username=moderator_username)
+
+    new_password = request.data.get('new_password')
+    moderator.set_password(new_password)
+    moderator.save()
+    # Print statements for debugging
+    print(f'username: {moderator_username}, new password: {new_password}')
+
+    return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
+
+
+#Sans verifier si le moderateur est authentifie (dans le cas ou c'est l'admin qui va le modifier)
+@api_view(['POST'])
+def change_moderator_username(request):
+    moderator_username = request.data.get('moderator_username')
+    moderator = get_object_or_404(Moderateur, username=moderator_username)
+
+    new_username = request.data.get('new_username')
+    moderator.username = new_username
+    moderator.save()
+    # Print statements for debugging
+    print(f'old username: {moderator_username}, new username: {new_username}')
+
+    return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
+
 
 @csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 @login_required
-@permission_classes([IsAuthenticated])
-def consulter_article_text (request):
-     try:
-        # Parse JSON data from the request body
-        body = json.loads(request.body.decode('utf-8'))
-        article_id = body.get('id')
-
-        if article_id is None:
-            return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'a pas été fourni dans la requête JSON'})
-
-        # Use Elasticsearch to retrieve details for the specified article ID
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
-
-        try:
-            article_data = es.get(index=index_name,id=article_id)['_source']
-        except Exception as es_exception:
-            return JsonResponse({'status': 'Error', 'message': f"Erreur lors de la récupération des détails de l'article : {str(es_exception)}"})
-
-        # Construct and return the response
-        details = {
-            'Texte intégral': article_data.get('text'),
-        }
-
-        return JsonResponse({'status': 'OK', 'details': details})
-
-     except Exception as e:
-        # Handle other exceptions
-      return JsonResponse({'status': 'Error', 'message': f"Une erreur s'est produite : {str(e)}"})
-   
-#13- view article pdf 
-
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-def consulter_article_pdf(request ):
+def submit_feedback(request):
     try:
-        # Parse JSON data from the request body
-        body = json.loads(request.body.decode('utf-8'))
-        article_id = body.get('id')
+        user = request.user
+        stars = request.data.get('stars')
+        comment = request.data.get('comment')
 
-        if article_id is None:
-            return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'a pas été fourni dans la requête JSON'})
+        # Validate stars and comment
+        if stars is None or not (0 <= stars <= 5):
+            return JsonResponse({'error': 'Invalid stars value'}, status=400)
 
-        # Use Elasticsearch to retrieve details for the specified article ID
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
+        # Sending email
+        subject = 'Feedback from User'
+        message = f"Stars: {stars}\nComment: {comment}\nUser: {user.username}\nEmail: {user.email}"
+        from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
+        to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
+        send_mail(subject, message, from_email, [to_email])
 
-        try:
-            article_data = es.get(index=index_name, id=article_id)['_source']
-        except Exception as es_exception:
-            return JsonResponse({'status': 'Error', 'message': f"Erreur lors de la récupération des détails de l'article : {str(es_exception)}"})
-
-        # Construct and return the response
-        details = {
-            'Pdf': article_data.get('pdf_url'),
-        }
-
-        return JsonResponse({'status': 'OK', 'details': details})
-
+        return JsonResponse({'message': 'Feedback submitted successfully'}, status=201)
     except Exception as e:
-        # Handle other exceptions
-      return JsonResponse({'status': 'Error', 'message': f"Une erreur s'est produite : {str(e)}"})    
+        return JsonResponse({'error': str(e)}, status=500)
 
-#14- afficher les utilisateurs de notre app 
 
-class AllUsersAPIView(APIView):
-    def get(self, request, format=None):
-        # Récupérer tous les utilisateurs
-        all_users = User.objects.all()
-
-        # Sérialiser les utilisateurs (convertir les objets User en données JSON)
-        serialized_users = [{"username": user.username, "email": user.email} for user in all_users]
-
-        # Renvoyer la réponse API
-        return Response(serialized_users, status=status.HTTP_200_OK)
-    
-#15- rechercher un article 
-
-@csrf_exempt
-@login_required 
-@permission_classes([IsAuthenticated])
-def rechercher_articles(request):
+@csrf_protect
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def contact_us(request):
     try:
-        # Récupérez les mots-clés à partir du corps de la requête JSON
-        body = json.loads(request.body.decode('utf-8'))
-        keywords =  body.get('mots_cles')
+        name = request.data.get('nom')
+        email = request.data.get('email')
+        message = request.data.get('message')
 
-        if keywords is None:
-            return JsonResponse({'status': 'Error', 'message': 'Les mots-clés n\'ont pas été fournis dans la requête JSON'})
+       # Validate name, email, and message
+        if not name or not email or not message:
+            return JsonResponse({'error': 'Name, email, and message are required fields'}, status=400)
 
-        # Debugging statement
-        print(f'Search Keywords: {keywords}')
+        # Sending email
+        subject = 'Contact Support'
+        message = f"Nom: {name}\nMessage: {message}\nEmail: {email}"
+        from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
+        to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
+        send_mail(subject, message, from_email, [to_email])
 
-        # Connectez-vous à Elasticsearch
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
-
-        # Construisez une requête de recherche Elasticsearch
-        search_query = {
-            "query": {
-                  "bool": {
-                #    "should": [{"match": {"keywords": keyword}} for keyword in keywords ]
-                #    "should":[ {"match": {"auteurs": keyword}} for keyword in keywords]
-                #    "should":[  {"match": {"title": keyword}} for keyword in keywords],
-                #    "should":[  {"match": {"text": keyword}} for keyword in keywords],
-                 "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
-                    ],
-   
-            "minimum_should_match": 1
-        }
-    }
-}
-
-        # Exécutez la requête de recherche
-        result = es.search(index=index_name, body=search_query, size=1000)
-
-        # Récupérez les résultats de la recherche
-        search_results = result['hits']['hits']
-        
-        # Examinez les résultats de la recherche
-        for hit in search_results:
-            article_data = hit['_source']
-            print(f'Elasticsearch Article Data: {article_data}')
-
-        return JsonResponse({'status': 'OK', 'search_results': search_results})
-
+        return JsonResponse({'message': 'Message submitted successfully'}, status=201)
     except Exception as e:
-        # Print the exception for debugging purposes
-        print(f'An error occurred: {e}')
-        return JsonResponse({'status': 'Error', 'message': 'Une erreur s\'est produite lors de la recherche'})
-
-
-#16- filtrer les resultats par mots_cles 
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-
-def filtrer_resultats_key_words(request):
-    try:
-        # Get keywords from the request body
-        body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
-
-        # Check if no keywords are provided
-        if not keywords:
-            return JsonResponse({'status': 'Error', 'message': 'Aucun mot-clé fourni'})
-
-        # Ensure that keywords is a list
-        if not isinstance(keywords, list):
-            keywords = [keywords]
-
-        # Define your Elasticsearch connection
-        es = Elasticsearch(['http://localhost:9200'])
-
-        # Define the search query
-        search_query = {
-            "query": {
-                "bool": {
-                    "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {"terms": {"keywords": keywords}}
-                    ]
-                }
-            }
-        }
-
-        # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
-
-        # Retrieve search results
-        search_results = result['hits']['hits']
-
-        # Examine search results
-        for hit in search_results:
-            article_data = hit['_source']
-            print(f'Elasticsearch Article Data: {article_data}')
-
-        return JsonResponse({'status': 'OK', 'search_results': search_results})
-
-    except Exception as e:
-        return JsonResponse({'status': 'Error', 'message': str(e)})
-
-#17- filtrer les resultats par auteurs 
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-
-def filtrer_resultats_auteurs(request):
-    try:
-        # Get keywords from the request body
-        body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
-
-        # Check if no keywords are provided
-        if not keywords:
-            return JsonResponse({'status': 'Error', 'message': 'Aucun mot-clé fourni'})
-
-        # Ensure that keywords is a list
-        if not isinstance(keywords, list):
-            keywords = [keywords]
-
-        # Define your Elasticsearch connection
-        es = Elasticsearch(['http://localhost:9200'])
-
-        # Define the search query
-        search_query = {
-            "query": {
-                "bool": {
-                    "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {"terms": {"auteurs": keywords}}
-                    ]
-                }
-            }
-        }
-
-        # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
-
-        # Retrieve search results
-        search_results = result['hits']['hits']
-
-        # Examine search results
-        for hit in search_results:
-            article_data = hit['_source']
-            print(f'Elasticsearch Article Data: {article_data}')
-
-        return JsonResponse({'status': 'OK', 'search_results': search_results})
-
-    except Exception as e:
-        return JsonResponse({'status': 'Error', 'message': str(e)})
-#18- filtrer les resultats par institution 
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-
-def filtrer_resultats_institution(request):
-    try:
-        # Get keywords from the request body
-        body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
-
-        # Check if no keywords are provided
-        if not keywords:
-            return JsonResponse({'status': 'Error', 'message': 'Aucun mot-clé fourni'})
-
-        # Ensure that keywords is a list
-        if not isinstance(keywords, list):
-            keywords = [keywords]
-
-        # Define your Elasticsearch connection
-        es = Elasticsearch(['http://localhost:9200'])
-
-        # Define the search query
-        search_query = {
-            "query": {
-                "bool": {
-                    "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
-                    ],
-                    "minimum_should_match": 1,
-                    "filter": [
-                        {"terms": {"institutions": keywords}}
-                    ]
-                }
-            }
-        }
-
-        # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
-
-        # Retrieve search results
-        search_results = result['hits']['hits']
-
-        # Examine search results
-        for hit in search_results:
-            article_data = hit['_source']
-            print(f'Elasticsearch Article Data: {article_data}')
-
-        return JsonResponse({'status': 'OK', 'search_results': search_results})
-
-    except Exception as e:
-        return JsonResponse({'status': 'Error', 'message': str(e)})
-#19-filtrer les resultats entre deux periode 
-
-
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
-def filtrer_resultats_date(request):
-    try:
-        # Get keywords and date range from the request body
-        body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
-        start_date_str = body.get('start_date', '')
-        end_date_str = body.get('end_date', '')
-
-        # Check if no keywords are provided
-        if not keywords:
-            return JsonResponse({'status': 'Error', 'message': 'Aucun mot-clé fourni'})
-
-        # Ensure that keywords is a list
-        if not isinstance(keywords, list):
-            keywords = [keywords]
-
-        # Parse start and end dates
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
-
-        # Define your Elasticsearch connection
-        es = Elasticsearch(['http://localhost:9200'])
-
-        # Define the search query with date range filter
-        search_query = {
-            "query": {
-                "bool": {
-                    "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
-                    ],
-                    "minimum_should_match": 1,
-                   
-                    "must": [
-                        {"range": {"date": {"gte": start_date, "lte": end_date}}}
-                    ] if start_date and end_date else []
-                }
-            }
-        }
-
-        # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
-
-        # Retrieve search results
-        search_results = result['hits']['hits']
-
-        # Examine search results
-        for hit in search_results:
-            article_data = hit['_source']
-            print(f'Elasticsearch Article Data: {article_data}')
-
-        return JsonResponse({'status': 'OK', 'search_results': search_results})
-
-    except Exception as e:
-        return JsonResponse({'status': 'Error', 'message': str(e)})
+        return JsonResponse({'error': str(e)}, status=500)

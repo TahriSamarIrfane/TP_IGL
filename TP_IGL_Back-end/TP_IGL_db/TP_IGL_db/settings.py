@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     'TP_IGL_app',
     'rest_framework',
     'rest_framework_simplejwt',
-    'django_elasticsearch_dsl',
-    'django_elasticsearch_dsl_drf',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -95,7 +93,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'hadjoura28',
+        'PASSWORD': 'bouty21000',
         'HOST': 'localhost',  # Ou l'adresse IP de votre serveur PostgreSQL
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }
@@ -155,12 +153,6 @@ EMAIL_HOST_PASSWORD = 'hadjer2803'
 
 
 # Application definition
-
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': 'localhost:9200',
-    },
-}
 
 SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.
 SELENIUM_EXECUTABLE_PATH = os.path.join(BASE_DIR, 'geckodriver')  # Chemin vers le fichier GeckoDriver
