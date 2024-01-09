@@ -434,9 +434,7 @@ def consulter_articles_preferes(request):
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
-
 def afficher_details(request):
-    
     try:
         # Parse JSON data from the request body
         body = json.loads(request.body.decode('utf-8'))
@@ -447,11 +445,10 @@ def afficher_details(request):
 
         # Use Elasticsearch to retrieve details for the specified article ID
         es = Elasticsearch(['http://localhost:9200'])
-        
         index_name = 'article_7'
 
         try:
-            article_data = es.get(index=index_name, id=article_id)['_source'] 
+            article_data = es.get(index=index_name, id=article_id)['_source']
         except Exception as es_exception:
             return JsonResponse({'status': 'Error', 'message': f"Erreur lors de la récupération des détails de l'article : {str(es_exception)}"})
 
@@ -601,7 +598,7 @@ def rechercher_articles(request):
 }
 
         # Exécutez la requête de recherche
-        result = es.search(index=index_name, body=search_query,size=1000)
+        result = es.search(index=index_name, body=search_query, size=1000)
 
         # Récupérez les résultats de la recherche
         search_results = result['hits']['hits']
@@ -800,6 +797,7 @@ def filtrer_resultats_institution(request):
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
+
 def filtrer_resultats_date(request):
     try:
         # Get keywords and date range from the request body
