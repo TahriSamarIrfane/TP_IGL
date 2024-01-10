@@ -80,11 +80,41 @@ const settings={
 
 const HomeGuests = () => {
 
+  
 const[rating,setRating]= useState(null);
 const[hover,setHover]= useState(null);
 
-const[favorite,setFavorite]= useState(false);
+const [favorite, setFavorite] = useState([]);
+const [favorite1, setFavorite1] = useState(false);
 const[hoverFavorite,setHoverFavorite]= useState(false);
+
+const [checkboxStates, setCheckboxStates] = useState(new Array(faq.length).fill(false));
+const [checkboxStates1, setCheckboxStates1] = useState(new Array(faq1.length).fill(false));
+
+const toggleFavorite = (index) => {
+  if (favorite.includes(index)) {
+    // If index is already in favorites, remove it
+    setFavorite(favorite.filter((favIndex) => favIndex !== index));
+  } else {
+    // If index is not in favorites, add it
+    setFavorite([...favorite, index]);
+  }
+};
+
+const handleCheckboxChange = (index) => {
+  const newCheckboxStates = [...checkboxStates];
+  newCheckboxStates[index] = !newCheckboxStates[index];
+  setCheckboxStates(newCheckboxStates);
+};
+
+const handleCheckboxChange1 = (index) => {
+  setCheckboxStates1((prevState) => {
+    const newCheckboxStates = [...prevState];
+    newCheckboxStates[index] = !prevState[index];
+    return newCheckboxStates;
+  });
+};
+
     return (
        <div>
 
@@ -107,7 +137,7 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
                  {/*Search bar */}
                  <div className='flex items-center bg-white w-full h-14 rounded-2xl border border-grey mt-10'>
                     <TbSearch className='text-4xl ml-2 text-grey'/>
-                        <input type="text" className=' w-full h-full outline-none border-none placeholder:text-xl' placeholder='Search articles...' />
+                        <input type="text" className='    focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl' placeholder='Search articles...' />
                     <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'>   
                     <h2 className='text-white font-bold text-xl'>Search </h2>                   
                     </button>
@@ -122,67 +152,75 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
 
             <div className='md:ml-20  flex flex-col-reverse md:flex-row-reverse  justify-between'>
                 {/* the liste of articles */}
+
                 <div className='lg:w-2/3  h-96 lg:show-atricle-scroll px-10 '>
-                    
-                <div class="mx-auto h-full  overflow-scroll ">{/*overflow-scroll will add the scoll when overflow */}
-                {data.map((d,index) =>(
-                <div key={index} className=''>
-                <div className='bg-white md:h-72 md:h-96 lg:h-48 '>
-                    <div className='flex flex-col md:flex-row'>
-                    <img className='h-48 rounded-2xl p-3 mt-3' src={d.photo} alt=""/>
-                    <div className='mt-3'>
-             <div className='flex flex-col'>
-             <div className='flex flex-row justify-between'>
-             <h className='text-grey mt-1 text-sm'> {d.Date}</h>
-             <div className=' flex flex-row'>
-             <LiaShareSolid className='mt-1 text-2xl'/>
-             <button className='top-0'>Share</button>
-             <label className='flex'>
-             <input type='Radio' className='opacity-0'
-             onClick={()=>setFavorite(index)}/> {/* Update the state based on the current value */}
-             
-             <FaHeart  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
-             color={favorite === index || hoverFavorite === index ? "red" : "grey"}
-             // Update the color based on state
-             onMouseEnter={()=> setHoverFavorite(index)}
-             onMouseLeave={()=> setHoverFavorite(null)}
-                                         />
-             </label>
-
-
-             {/*<FaRegHeart /> empty heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
-             </div>
-             </div>
-             <p className='font-bold text-xl'>{d.title}</p>
-             <p className="line-clamp-3 text-darkGery text-sm">
-              {d.article}</p>
-                   <a href="#" className=" text-black font-bold">See more</a>
-                   <div className='pr-40'>
-                   <div className='flex flex-row items-center justify-between w-full h-10'>
-                    {/* inline-block will change the container width according to text length */}
-                    <div className="bg-white inline-block border rounded-2xl border-darkGery  text-center">
-                        <h className='px-3 text-darkGery'>lorem</h>
-                    </div>
-
-                    <div className="bg-white inline-block border rounded-2xl border-darkGery  text-center">
-                        <h className='px-3 text-darkGery'>lorem</h>
-                    </div>
-
-                    <div className="bg-white inline-block border rounded-2xl border-darkGery  text-center">
-                        <h className='px-3 text-darkGery'>lorem</h>
-                    </div>
-                 </div>
-                 </div>
-             </div> 
-             </div>     
-                    </div>
-                    </div>
-                    </div> 
-                
-            ))
-            }
-                </div>
-             </div>
+                        
+                        <div class="mx-auto h-full  overflow-scroll ">{/*overflow-scroll will add the scoll when overflow */}
+                        {data.map((d,index) =>(
+                        <div key={index} className=''>
+                        <div className='bg-white  h-full  '>
+                            <div className='flex flex-col md:flex-row'>
+                            <img className='h-48 rounded-2xl p-3 mt-3' src={d.photo} alt=""/>
+                            <div className='mt-3'>
+                     <div className='flex flex-col'>
+                     <div className='flex flex-row justify-between'>
+                     <h className='text-grey mt-1 text-[12px]'> {d.Date}</h>
+                     <div className=' flex flex-row'>
+                     <LiaShareSolid className='mt-1 text-2xl'/>
+                     <button className='top-0'>Share</button>
+                     <label className='flex'>
+                     <input
+  type='checkbox'
+  className='opacity-0'
+  checked={favorite === index}
+  onChange={() => toggleFavorite(index)}
+/>
+{/* Update the state based on the current value */}
+                     
+<FaHeart
+  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
+  color={(favorite && favorite.includes(index)) || hoverFavorite === index ? "red" : "grey"}
+  onMouseEnter={() => setHoverFavorite(index)}
+  onMouseLeave={() => setHoverFavorite(null)}
+/>
+                     </label>
+        
+        
+                     {/*<FaRegHeart /> empty heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
+                     </div>
+                     </div>
+                     <p className='font-bold text-lg'>{d.title}</p>
+                     <p className="line-clamp-2 text-darkGery text-sm">
+                      {d.article}</p>
+                           <a href="#" className=" text-black font-bold text-sm">See more</a>
+                           <div className='relative pr-5 mt-2 md:pr-40'>
+                            {/* inline-block will change the container width according to text length */}
+      
+    
+    
+                            <div className='flex flex-wrap flex-row'>
+      {d.cle.map((cle) => (
+        <div key={cle} className="bg-white inline-block border rounded-2xl border-darkGery text-center mx-1 my-1">
+          <h className="px-3 text-darkGery">{cle}</h>
+        </div>
+      ))}
+    </div>
+    
+    
+    
+    
+    
+                         </div>
+                     </div> 
+                     </div>     
+                            </div>
+                            </div>
+                            </div> 
+                        
+                    ))
+                    }
+                        </div>
+                     </div>
 
 
 
@@ -191,16 +229,16 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
              <div className=''>        
              <img className='md:h-96 lg:h-72 mt-4 mb-5' src={science4} alt=""/>
              <div className='flex flex-row justify-between'>
-             <h className='text-grey mt-1'> 25 decembre 2023</h>
+             <h className='text-grey mt-1'>{bigArticle.Date}</h>
              <div className='flex flex-row'>
              <LiaShareSolid className='mt-1 text-2xl'/>
              <button className='top-0'>Share</button>
 
              <label className='flex'>
              <input type='Radio' className='opacity-0'
-             onClick={()=>setFavorite(!favorite)}/> {/* Update the state based on the current value */}
+             onClick={()=>setFavorite1(!favorite1)}/> {/* Update the state based on the current value */}
              <FaHeart  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
-             color={favorite || hoverFavorite ? "red" : "grey"}// Update the color based on state
+             color={favorite1 || hoverFavorite ? "red" : "grey"}// Update the color based on state
              onMouseEnter={()=> setHoverFavorite(true)}
              onMouseLeave={()=> setHoverFavorite(false)}
                                          />
@@ -210,28 +248,22 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
              </div>
              
              <div>
-                <h1 className='font-bold text-lg text-darkPink'>Lorem ipsum dolor sit amet consectetur</h1>
+                <h1 className='font-bold text-lg text-darkPink'>{bigArticle.title}</h1>
                 <div className="max-w-md overflow-hidden">
                <p className="line-clamp-3 text-darkGery">
-               Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et...
-                   </p>
+               {bigArticle.article}       
+                           </p>
                  <a href="#" className=" text-black font-bold">See more</a>
                  </div>
-                 <div className='pr-32'>
-                 <div className='flex flex-row items-center justify-between  mt-2 w-full h-10'>
+                 <div className='pr-2'>
                     {/* inline-block will change the container width according to text length */}
-                    <div className="bg-white inline-block border rounded-2xl border-darkGery  text-center">
-                        <h className='px-3 text-darkGery'>IOT</h>
-                    </div>
-
-                    <div className="bg-white inline-block border rounded-2xl border-darkGery  text-center">
-                        <h className='px-3 text-darkGery'>Robotic</h>
-                    </div>
-
-                    <div className="bg-white inline-block border rounded-2xl border-darkGery  text-center">
-                        <h className='px-3 text-darkGery'>Cloud</h>
-                    </div>
-                 </div>
+                    <div className='flex flex-wrap flex-row'>
+      {bigArticle.cle.map((cle) => (
+        <div key={cle} className="bg-white inline-block border rounded-2xl border-darkGery text-center mx-1 my-1">
+          <h className="px-3 text-darkGery">{cle}</h>
+        </div>
+      ))}
+    </div>
                  </div>
              </div>
              </div>
@@ -243,20 +275,33 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
 
             {/********** FAQ***********/}
             <div class="relative flex flex-col items-center justify-center md:ml-32 md:mr-32 px-5 md:px-0">
-            <img className='absolute top-0 md:h-52  lg:mt-3 ' src={FAQ} alt=""/>
+            <img className='absolute top-0 md:h-52 lg:mt-3 ' src={FAQ} alt=""/>
             <img className=' absolute top-0 h-40  lg:mt-24 left-0 hidden' src={woman1} alt=""/>
             <img className='absolute top-0 h-44  lg:mt-1 mr-2 right-0 hidden' src={woman2} alt=""/>
-            <div className=' grid grid-cols-1 md:grid-cols-2 gap-5 bg-black mt-40 md:mt-44 pt-6 w-full max-h-full rounded-2xl pb-5'>
+            <div className=' grid grid-cols-1 md:grid-cols-2 gap-5 bg-black mt-56 md:mt-44 pt-6 w-full max-h-full rounded-2xl pb-5'>
                 <div className=' text-white'>
   <div className='flex flex-col px-10'>
       {faq.map((d, index) => (
         <div key={index} className='flex flex-col bg-white mt-5  rounded-2xl'>
-          <input type="checkbox" id={`faqCheckbox${index}`} className='absolute peer opacity-0 ' />
+<input
+  type="checkbox"
+  checked={checkboxStates[index]}
+  onChange={() => handleCheckboxChange(index)}
+  id={`faqCheckbox${index}`}
+  className="absolute peer opacity-0"
+/>
+
           <label htmlFor={`faqCheckbox${index}`} className='flex flex-row h-12 w-full justify-between items-center px-4 cursor-pointer'>
             <p className='text-black text-center font-bold'>{d.Question}</p>
-            <div className='rotate-0 peer-checked:rotate-180'>
-              <MdKeyboardArrowDown className={`text-black transform transition-transform duration-200 `} />
-            </div>
+
+            <div
+  className={`rotate-0 transition-transform duration-200 ${
+    checkboxStates[index] ? 'rotate-180' : ''
+  }`}
+>
+  <MdKeyboardArrowDown className={`text-black transform`} />
+</div>
+
           </label>
           {/* The peer works with checkboxes and radios; here it is used to open the answer part */}
           <div className='bg-white max-h-0 rounded-2xl justify-between items-center px-4 overflow-hidden transition-all ease-in-out duration-200 peer-checked:max-h-full'>
@@ -268,15 +313,29 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
                 </div>
 
                 <div className=' text-white  md:block'>
-  <div className='flex flex-col px-10'>
-      {faq1.map((d, index) => (
+  
+                <div className='hidden md:block flex flex-col px-10'>
+      {faq.map((d, index) => (
         <div key={index} className='flex flex-col bg-white mt-5  rounded-2xl'>
-          <input type="checkbox" id={`faq1Checkbox${index}`} className='absolute peer opacity-0' />
+<input
+  type="checkbox"
+  checked={checkboxStates1[index]}
+  onChange={() => handleCheckboxChange1(index)}
+  id={`faq1Checkbox${index}`}
+  className="absolute peer opacity-0"
+/>
+
           <label htmlFor={`faq1Checkbox${index}`} className='flex flex-row h-12 w-full justify-between items-center px-4 cursor-pointer'>
             <p className='text-black text-center font-bold'>{d.Question}</p>
-            <div className='rotate-0 peer-checked:rotate-180'>
-              <MdKeyboardArrowDown className={`text-black transform transition-transform duration-200 `} />
-            </div>
+
+            <div
+  className={`rotate-0 transition-transform duration-200 ${
+    checkboxStates1[index] ? 'rotate-180' : ''
+  }`}
+>
+  <MdKeyboardArrowDown className={`text-black transform`} />
+</div>
+
           </label>
           {/* The peer works with checkboxes and radios; here it is used to open the answer part */}
           <div className='bg-white max-h-0 rounded-2xl justify-between items-center px-4 overflow-hidden transition-all ease-in-out duration-200 peer-checked:max-h-full'>
@@ -284,7 +343,8 @@ const[hoverFavorite,setHoverFavorite]= useState(false);
           </div>
         </div>
       ))}
-    </div>    
+    </div> 
+
                 </div>
 
             </div>
@@ -483,6 +543,15 @@ const faq1 = [
 
 ]
 
+// For the big articles
+const bigArticle = 
+  {
+      Date:`11 Novembre 2023`,
+      title:`Lorem ipsum dolor sit `,
+      photo:science3,
+      cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit',],
+      article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+  };
 
 // For articles
 const data = [
@@ -490,6 +559,7 @@ const data = [
         Date:`11 Novembre 2023`,
         title:`Lorem ipsum dolor sit `,
         photo:science3,
+        cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit',],
         article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
     },
 
@@ -497,6 +567,7 @@ const data = [
         Date:`11 Novembre 2023`,
         title:`Lorem ipsum dolor sit amet `,
         photo:science2,
+        cle:['Lorem','ipsum','dolor','sit','Lorem'],
         article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
     },
 
@@ -504,6 +575,7 @@ const data = [
         Date:`11 Novembre 2023`,
         title:`Lorem ipsum dolor sit amet consectetur`,
         photo:science1,
+        cle:['Lorem','ipsum','dolor','sit','Lorem'],
         article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
     },
 
@@ -511,6 +583,7 @@ const data = [
         Date:`11 Novembre 2023`,
         title:`Lorem ipsum dolor sit amet `,
         photo:science2,
+        cle:['Lorem','ipsum','dolor','sit','Lorem'],
         article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
     },
 
@@ -518,6 +591,7 @@ const data = [
         Date:`11 Novembre 2023`,
         title:`Lorem ipsum dolor sit amet consectetur`,
         photo:science1,
+        cle:['Lorem','ipsum','dolor','sit','Lorem'],
         article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
     },
 

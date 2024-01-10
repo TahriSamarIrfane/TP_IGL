@@ -82,6 +82,36 @@
 .slick-next-custom {
   right: 10px; /* Adjust the right position for the next arrow */
 }
+.searchBar-admin{
+  background-color: white;
+  width: 60%;
+  border-radius: 2.5rem;
+  padding: 0 15px;
+  align-items: center;
+  display: flex;
+}
+.inputSearch{
+  background-color: transparent;
+  border: none;
+  height: 100%;
+  font-size: 1rem;
+  width: 100%;
+}
+.vertical-line {
+  border-left: 2px solid #8d8a8a76; /* Adjust color and thickness as needed */
+  height: 420px;
+  
+}
+.column-list {
+display: grid;
+grid-template-columns: auto auto auto;
+overflow: auto;
+}
+.column-list2 {
+  display: grid;
+  grid-template-columns: auto auto;
+  overflow: auto;
+  }
 
 
 /********************************TO CUSTOMIZE THE SCOLL BARS*********************************/
