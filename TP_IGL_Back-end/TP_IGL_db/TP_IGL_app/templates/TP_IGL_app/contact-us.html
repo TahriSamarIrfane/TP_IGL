@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+</head>
+<body>
+
+<h2>Contact Us</h2>
+
+<form id="contactForm" method="post" action="{% url 'contact' %}">
+    {% csrf_token %}
+    
+    <label for="nom">Name:</label>
+    <input type="text" id="nom" name="nom" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" rows="4" required></textarea>
+
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Retrieve values from the form
+        var nom = document.getElementById('nom').value;
+        var email = document.getElementById('email').value;
+        var message = document.getElementById('message').value;
+
+        // Perform AJAX request
+        fetch('{% url "contact" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            },
+            body: JSON.stringify({
+                nom: nom,
+                email: email,
+                message: message,
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            // Handle the response data as needed
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+
+</body>
+</html>
