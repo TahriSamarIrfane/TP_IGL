@@ -9,7 +9,7 @@ from .models import Article,Auteur,Institution,UploadedFile
 from rest_framework.decorators import api_view,parser_classes
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import ArticleSerializer,AuteurSerializer,InstitutionSerializer,DocumentSerializer,FileUploadSerializer
+from .serializers import ArticleSerializer,AuteurSerializer,InstitutionSerializer,FileUploadSerializer
 from rest_framework.views import APIView
 from rest_framework.parsers import FileUploadParser,MultiPartParser,FormParser
 from .extraction_methods import extract_article,extract_entities,extract_info,extract_title

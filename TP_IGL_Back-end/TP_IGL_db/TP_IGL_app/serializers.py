@@ -31,7 +31,7 @@ class VotreModeleIndex(Document):
         fields={'raw': fields.KeywordField()}
     )
     field_2 = fields.KeywordField()
-<<<<<<< HEAD
+
     
     
     
@@ -160,7 +160,7 @@ class ArticleSerializer(ModelSerializer):
 
         return instance
     
-=======
+
 
 class PasswordGeneratorSerializer(serializers.Serializer):
     generated_password = serializers.CharField(max_length=12)
@@ -169,4 +169,3 @@ class PasswordGeneratorSerializer(serializers.Serializer):
 class ModeratorCreationSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
     email = serializers.EmailField()
->>>>>>> origin/backend
