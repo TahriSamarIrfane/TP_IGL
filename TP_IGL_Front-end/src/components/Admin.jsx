@@ -18,6 +18,7 @@ import { TfiReload } from "react-icons/tfi";
 import { TiDeleteOutline } from "react-icons/ti";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LuSave } from "react-icons/lu";
+import { Link } from 'react-router-dom';
 
 const Admin = () =>  {
   const [nav, setNav] =useState(false);
@@ -114,7 +115,8 @@ const Admin = () =>  {
                                  ) }
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
-                <p className=' text-black'>Déconnecter</p>
+                <Link to="/Guests" className="text-black ">Déconnecter</Link>
+
               </div>
           </div>
         </div> 

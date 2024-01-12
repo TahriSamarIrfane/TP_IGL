@@ -31,6 +31,14 @@ const Result = () => {
 const [startDate, setStartDate] = useState(null);
 const [endDate, setEndDate] = useState(null);
 
+const [keywordsInput, setKeywordsInput] = useState("");
+const [keywords, setKeywords] = useState([]);
+const [authorsInput, setAuthorsInput] = useState("");
+const [Authors, setAuthors] = useState([]);
+const [institutionsInput, setInstitutionsInput] = useState("");
+const [Institutions, setInstitutions] = useState([]);
+
+
 const toggleFavorite = (index) => {
     if (favorite.includes(index)) {
       // If index is already in favorites, remove it
@@ -41,7 +49,40 @@ const toggleFavorite = (index) => {
     }
   };
   
-  
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  const handleInputChange = (e, setState) => {
+    setState(e.target.value);
+  };
+
+  const addKeyword = (input, setState) => {
+    if (input.trim() !== "") {
+      setState((prevKeywords) => [...prevKeywords, input.trim()]);
+      // Clear input after adding
+      setKeywordsInput("");
+    }
+  };
+
+  const addAuthor = (input, setState) => {
+    if (input.trim() !== "") {
+      setState((prevAuthor) => [...prevAuthor, input.trim()]);
+      // Clear input after adding
+      setAuthorsInput("");
+    }
+  };
+
+  const addInstitutions = (input, setState) => {
+    if (input.trim() !== "") {
+      setState((prevInstitution) => [...prevInstitution, input.trim()]);
+      // Clear input after adding
+      setInstitutionsInput("");
+    }
+  };
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     return (
 
         
@@ -140,23 +181,39 @@ const toggleFavorite = (index) => {
                    </div>
                     {/*Keywords */}
                     <p className='ml-3 font-bold'>mots clés</p>
-                    <div className='flex flex-row flex-wrap ml-1'>
-                        {keyWords.map((word, index) => (
-                        <div className="relative bg-pink rounded-md flex-shrink-0 mt-2 px-5 mx-1 border-darkPink border-[1px] text-sm text-darkPink "
-                         key={index}>
-                        <IoClose className=' absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1'/>
-                        <IoClose className=' absolute text-darkPink text-sm md:hidden  right-1 top-[4px]'/>
+  
 
-                        {word}
-                        </div>
-                         ))}
-                    </div>    
-                    <div className='flex pr-2  bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
-                    <button >   
-                    <GoPlus className='text-darkPink' />                   
-                    </button>
-                 </div>
+                    
+
+                    <div className='flex flex-row flex-wrap ml-1'>
+  {keywords.map((word, index) => (
+    <div
+      className="relative bg-pink rounded-md flex-shrink-0 mt-2 px-5 mx-1 border-darkPink border-[1px] text-sm text-darkPink "
+      key={index}
+    >
+      <IoClose className='absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1'/>
+      <IoClose className='absolute text-darkPink text-sm md:hidden right-1 top-[4px]'/>
+      {word}
+    </div>
+  ))}
+</div>
+
+
+
+                    
+<div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
+  <input
+    type="text"
+    className='rounded-md w-full h-full outline-none border-none placeholder:text-md'
+    placeholder='Chercher des mots clés'
+    value={keywordsInput}
+    onChange={(e) => handleInputChange(e, setKeywordsInput)}
+  />
+  <button onClick={() => addKeyword(keywordsInput, setKeywords)}>
+    <GoPlus className='text-darkPink' />
+  </button>
+</div>
+
 
                  {/*Authors */}
                  <p className='ml-3 font-bold mt-4'>Auteurs</p>
@@ -171,11 +228,19 @@ const toggleFavorite = (index) => {
                          ))}
                     </div>    
                     <div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
-                    <button >   
-                    <GoPlus className='text-darkPink' />                   
+                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md'
+                         placeholder='Chercher des mots clés'
+                         value={authorsInput}
+                         onChange={(e) => handleInputChange(e, setAuthorsInput)}
+                         />
+
+                    <button onClick={() => addAuthor(authorsInput, setAuthors)}>
+                    <GoPlus className='text-darkPink' />
                     </button>
                  </div>
+
+ 
+
 
                 {/*Institutions */}
                  <p className='ml-3 font-bold mt-4'>Institutions</p>
@@ -190,9 +255,15 @@ const toggleFavorite = (index) => {
                          ))}
                     </div>    
                     <div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
-                    <button >   
-                    <GoPlus className='text-darkPink ml-2' />                   
+                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md'
+                         placeholder='Chercher des mots clés'
+                         value={institutionsInput}
+                         onChange={(e) => handleInputChange(e,setInstitutionsInput)}
+                         />
+
+                    
+                    <button onClick={() => addInstitutions(institutionsInput, setInstitutions)}>
+                    <GoPlus className='text-darkPink' />
                     </button>
                  </div>
                  {/*Publication date */}
@@ -251,16 +322,15 @@ const toggleFavorite = (index) => {
     
                  </div>
                   </div>
+                  
                 </div>
+                
                 
     )};
 
 
 export default Result;
 
-const keyWords = ["IOT", "Medicine", "DEGH", "Robotics", "JSQJG"];
-const Authors = ["Name1", "Name2", "Name3", "Name4"];
-const Institutions = ["Institution1", "Institution2", "Institution3", "Institution4"];
 
 
 const data = [

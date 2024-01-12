@@ -7,7 +7,7 @@ import { MdOutlinePersonOutline } from "react-icons/md";
 import { LuKeyRound } from "react-icons/lu";
 import { LuLogOut } from "react-icons/lu";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
-
+import { Link } from 'react-router-dom';
 const ProfileAdminMod = () => {
   const [ModifierInfo,setModifierInfo] = useState(true);
   const [ModifierPwd, setModifierPwd] = useState(false);
@@ -81,7 +81,7 @@ const ProfileAdminMod = () => {
                 </div>
                 <div className='flex flex-row  mx-8 mb-6 space-x-2'>
                 <LuLogOut className='mt-1 ' color='DF1477' size={20}/>
-                <li className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-xl text-10'>Déconnecter</li>
+                <Link to="/Guests" className="text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-xl text-10">Déconnecter</Link>
               </div>
                </ul> 
             </div>
@@ -125,7 +125,7 @@ const ProfileAdminMod = () => {
                     className="rounded-md w-[80%] "
                     placeholder="Jacobi23"
                     />
-                    <p className='lg:text-[80%] text-[70%] text-blue-500'>Mot de passe oublié ?</p>
+            
                     </div>
                     <p>Nouveau mot de passe</p>
                     <input
@@ -133,6 +133,7 @@ const ProfileAdminMod = () => {
                     className="rounded-md w-[80%]"
                     placeholder="*****"
                  />
+                 <p className='lg:text-[80%] text-[70%] text-blue-500'>Mot de passe oublié ?</p>
                     <p>Confirmer mot de passe</p>
                     <input
                     type="password"

@@ -17,15 +17,14 @@ const Footer =() =>{
                     <h6 className="font-medium py-2 uppercase">Compagnie</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <Link to="*">Acceuil
-                        </Link>
+                        <a href="/user"> Acceuil</a>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <a href="/HomeGuests#sectionApropos">  A propos
+                        <a href="/user#blog">  Blog
                         </a>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <a href="/HomeGuests#sectionSrevice">Nos services
+                        <a href="/user#Avis">Avis
                         </a>
                         </li>
                     </ul>
@@ -34,9 +33,12 @@ const Footer =() =>{
                     <h6 className="font-medium py-2 uppercase">Aide</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <a href="/HomeGuests#sectionFeedBack">FeedBacks</a></li>{/* LINK is not working see why!! */}
+                        <a href="/user#faq-section">FAQ</a></li>{/* LINK is not working see why!! */}
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Contact </Link> </li>
+                        <a href="/user#contact">Contact</a>
+                         </li>
+                        
+                        
                     </ul>
                 </div>
                 <div className="flex flex-col gap-5">

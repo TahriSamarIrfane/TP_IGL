@@ -22,15 +22,13 @@ import woman1 from'../assets/images/woman1.png';
 import woman2 from'../assets/images/woman2.png';
 import man1 from'../assets/images/man1.png';
 import FAQ from'../assets/images/FAQ.png';
-
-
 import BlackSplash2 from'../assets/images/BlackSplash2.png';
 import email from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
-
-
+import { Link } from 'react-router-dom';
+import { FaFilePdf } from "react-icons/fa6";
 
 
 
@@ -115,6 +113,50 @@ const handleCheckboxChange1 = (index) => {
   });
 };
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+const [searchResults, setSearchResults] = useState([]);
+const [message, setMessage] = useState('');
+
+
+const [searchTerm, setSearchTerm] = useState('');
+
+const handleSearch = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/rechercher_articles/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mots_cles: searchTerm,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Search results:', data.search_results);
+
+            // Update state with search results
+            setSearchResults(data.search_results);
+
+           // Check if there are no search results
+      if (data.search_results.length === 0) {
+        setMessage('No articles found for the given search term.');
+      } else {
+        setMessage('');
+      } 
+      // Handle the received search results as needed
+    } else {
+      console.error('Error:', response.statusText);
+      setMessage(`Error: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    setMessage('An error occurred while fetching data.');
+  }
+};
+////////////////////////////////////////////////////////////////////////////////
     return (
        <div>
 
@@ -137,17 +179,41 @@ const handleCheckboxChange1 = (index) => {
                  {/*Search bar */}
                  <div className='flex items-center bg-white w-full h-14 rounded-2xl border border-grey mt-10'>
                     <TbSearch className='text-4xl ml-2 text-grey'/>
-                        <input type="text" className='    focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl' placeholder='Search articles...' />
-                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'>   
+                        <input type="text" className='    focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl'
+                         placeholder='Search articles...'
+                         value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
+                    onClick={handleSearch}
+                    >   
                     <h2 className='text-white font-bold text-xl'>Search </h2>                   
                     </button>
                  </div>
                   </div >
+
+{searchResults.length > 0 && (
+  <div>
+    {/* Display search results as needed */}
+{searchResults.map((result, index) => (
+  <div key={result._id || index}>
+    {/* Render each search result */}
+    <p>{result._source.title}</p>
+    {/* Add more fields as needed */}
+  </div>
+))}
+
+    
+  </div>
+)}
+
+{message && <p>{message}</p>}
                  </div>                 
          </div>
 
         {/* Nos articles populaires*/}
-            <div className='mt-10 '>
+            <div className='mt-10 '
+            id='blog'>
             <h className='font-bold text-2xl md:text-3xl ml-5 md:ml-28 px-2'>Nos articles populaires</h>
 
             <div className='md:ml-20  flex flex-col-reverse md:flex-row-reverse  justify-between'>
@@ -183,6 +249,7 @@ const handleCheckboxChange1 = (index) => {
   onMouseEnter={() => setHoverFavorite(index)}
   onMouseLeave={() => setHoverFavorite(null)}
 />
+<FaFilePdf className=' right-3 mt-1 text-xl' />
                      </label>
         
         
@@ -192,7 +259,7 @@ const handleCheckboxChange1 = (index) => {
                      <p className='font-bold text-lg'>{d.title}</p>
                      <p className="line-clamp-2 text-darkGery text-sm">
                       {d.article}</p>
-                           <a href="#" className=" text-black font-bold text-sm">See more</a>
+                      <Link to="/Article" className=" text-black font-bold text-sm">See more</Link>
                            <div className='relative pr-5 mt-2 md:pr-40'>
                             {/* inline-block will change the container width according to text length */}
       
@@ -205,7 +272,7 @@ const handleCheckboxChange1 = (index) => {
         </div>
       ))}
     </div>
-    
+
     
     
     
@@ -233,7 +300,7 @@ const handleCheckboxChange1 = (index) => {
              <div className='flex flex-row'>
              <LiaShareSolid className='mt-1 text-2xl'/>
              <button className='top-0'>Share</button>
-
+             
              <label className='flex'>
              <input type='Radio' className='opacity-0'
              onClick={()=>setFavorite1(!favorite1)}/> {/* Update the state based on the current value */}
@@ -242,6 +309,7 @@ const handleCheckboxChange1 = (index) => {
              onMouseEnter={()=> setHoverFavorite(true)}
              onMouseLeave={()=> setHoverFavorite(false)}
                                          />
+                                         <FaFilePdf className=' right-3 mt-1 text-xl' />
              </label>
              {/*<FaRegHeart /> empry heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
              </div>
@@ -253,7 +321,7 @@ const handleCheckboxChange1 = (index) => {
                <p className="line-clamp-3 text-darkGery">
                {bigArticle.article}       
                            </p>
-                 <a href="#" className=" text-black font-bold">See more</a>
+                           <Link to="/Article" className=" text-black font-bold">See more</Link>
                  </div>
                  <div className='pr-2'>
                     {/* inline-block will change the container width according to text length */}
@@ -264,6 +332,7 @@ const handleCheckboxChange1 = (index) => {
         </div>
       ))}
     </div>
+    
                  </div>
              </div>
              </div>
@@ -274,7 +343,7 @@ const handleCheckboxChange1 = (index) => {
 
 
             {/********** FAQ***********/}
-            <div class="relative flex flex-col items-center justify-center md:ml-32 md:mr-32 px-5 md:px-0">
+            <div id="faq-section" class="relative flex flex-col items-center justify-center md:ml-32 md:mr-32 px-5 md:px-0">
             <img className='absolute top-0 md:h-52 lg:mt-3 ' src={FAQ} alt=""/>
             <img className=' absolute top-0 h-40  lg:mt-24 left-0 hidden' src={woman1} alt=""/>
             <img className='absolute top-0 h-44  lg:mt-1 mr-2 right-0 hidden' src={woman2} alt=""/>
@@ -351,7 +420,8 @@ const handleCheckboxChange1 = (index) => {
            </div>
 
          {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center mb-5">
+         <div class="flex flex-col items-center justify-center mb-5"
+         id="Avis">
 
         <div className="bg-white flex flex-col  md:flex-row  items-center justify-between ">
           
@@ -404,7 +474,8 @@ const handleCheckboxChange1 = (index) => {
 
 
          {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center">
+         <div class="flex flex-col items-center justify-center"
+         id="contact">
 
         <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
           

@@ -6,7 +6,7 @@ import { MdOutlinePersonOutline } from "react-icons/md";
 import { LuKeyRound } from "react-icons/lu";
 import { LuLogOut } from "react-icons/lu";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
-
+import { Link } from 'react-router-dom';
 
 const ProfileUser = () => {
 
