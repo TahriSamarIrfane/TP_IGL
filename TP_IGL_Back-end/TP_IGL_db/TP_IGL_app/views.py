@@ -1,4 +1,19 @@
-from django.shortcuts import render,redirect
+import json
+from django.conf import settings
+from rest_framework.viewsets import ModelViewSet
+from elasticsearch import Elasticsearch
+from django.conf import settings
+import os
+from django.shortcuts import render
+from .models import Article,Auteur,Institution,UploadedFile
+from rest_framework.decorators import api_view,parser_classes
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ArticleSerializer,AuteurSerializer,InstitutionSerializer,FileUploadSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser,MultiPartParser,FormParser
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+# Create your views here.from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -6,7 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status ,generics
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse , JsonResponse
+from django.http import Http404,HttpResponse , JsonResponse
 import json
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -80,7 +95,198 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.connections import connections
 from .utils import get_existing_article_ids
 from datetime import datetime
+#from .utils import get_existing_article_ids
+import secrets
+import string
+from django.core.mail import send_mail
+from django.contrib.auth.models import Group
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .utils import generate_random_password
+from .serializers import PasswordGeneratorSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .utils import create_moderator
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
+from .utils import remove_moderator
+from .models import Moderateur
+from django.views.decorators.csrf import csrf_protect
+from .forms import ContactForm
 
+def transforme_institution_to_json(institution):
+    dic1={}
+    institutions=[]
+    for ins in institution:
+        dic1={"nom":ins}
+        institutions.append(dic1)
+    return institutions
+
+def transform_auteur_institution_to_json(auteurs,des_institutions):
+    les_institutions=transforme_institution_to_json(des_institutions)
+    dic2={}
+    les_auteurs=[]
+    for auteur in auteurs:
+        dic2={"nom":auteur,"institutions":les_institutions}
+        les_auteurs.append(dic2)
+    les_auteurs_json=json.dumps(les_auteurs)
+    return les_auteurs_json
+
+def create_index(index_nom,map,the_document,the_id):
+    es=Elasticsearch('http://localhost:9200')
+    if not es.indices.exists(index=index_nom):
+        es.indices.create(index=index_nom,mappings=map)
+    es.index(index=index_name,id=the_id,body=the_document)
+
+def delete_index(index_nom,the_id):
+    es=Elasticsearch('http://localhost:9200')
+    es.delete(index=index_name,id=3)        
+
+index_name='index_articles'
+
+mapping = {
+        "properties": {
+            "auteurs" :{"type":"nested",
+                       "properties":{   
+                           "id":{"type":"long"},
+                           "nom":{"type":"text"},
+                           "institutions":{"type":"nested",
+                                             "properties":
+                                                 { "id":{"type":"long"},
+                                                   "nom":{"type":"text"}},
+                                          }}},
+            "titre": {"type": "text"},
+            "abstract":{"type":"text"},
+            "references":{"type":"text"},
+            "key_words":{"type":"text"},
+            "full_text":{"type":"text"},
+            "pdf_file":{"type":"text"}
+
+}
+}
+
+@api_view(['GET'])
+def Article_review(request,id):
+    try:
+      article=Article.objects.get(pk=id)
+    except Article.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer= ArticleSerializer(article)
+    return Response(serializer.data)
+
+@api_view(['PATCH','DELETE'])
+def Article_correct_and_remove(request,id):
+    try:
+        
+        article = Article.objects.get(pk=id)
+    except Article.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    le_id=id
+    if request.method == 'PATCH':
+        serializer=ArticleSerializer(article,data=request.data)
+        if serializer.is_valid():
+           serializer.save()
+           le_document={
+                 "auteurs":serializer.data["auteurs"],
+                 "titre": serializer.data['titre'],
+                 "abstract":serializer.data['abstract'],
+                 "references":serializer.data['references'],
+                 "key_words":serializer.data['key_words'],
+                 "full_text":serializer.data['full_text'],
+                 "pdf_file":serializer.data['pdf_file']
+                  }
+           try:
+                create_index(index_name,mapping,le_document,le_id)
+           except:
+                print("erreur lors de l'indexation")
+                return Response("erreur dans elasticsearch",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+           
+           return Response(serializer.data,status=status.HTTP_200_OK)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        article.delete()
+        try:
+            delete_index(index_name,le_id)
+        except:
+            print("erreur lors de la suppression de l'index")
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FileUploadAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = FileUploadSerializer
+    
+    def post(self, request, *args, **kwargs):
+        
+        serializer_f = self.serializer_class(data=request.data)
+        
+        if serializer_f.is_valid():
+            
+            serializer_f.save()
+            
+            file_url=serializer_f.data['uploaded_file']
+            
+            pdf_file="http://127.0.0.1:8000"+str(file_url)
+            
+            the_path=str(settings.BASE_DIR)+file_url
+            
+            titre=extract_title(the_path)
+            
+            full_text=extract_article(the_path)
+            
+            abstract=extract_info(the_path,'abstract')
+            
+            key_words=extract_info(the_path,'keywords')
+            
+            references=extract_info(the_path,'references')
+            
+            auteur=[]
+            
+            institution=[]
+            
+            extract_entities(full_text,auteur,institution)
+            
+            les_auteurs=auteur[:4]
+            
+            les_institutions=institution[:4]
+            
+            auteurs=transform_auteur_institution_to_json(les_auteurs,les_institutions)
+            
+            article_data = {
+                "titre": titre,
+                "abstract": abstract,
+                "key_words": key_words,
+                "full_text": full_text,
+                "pdf_file": pdf_file,
+                "references": references,
+                "auteurs":auteurs,
+            }
+            serializer = ArticleSerializer(data=article_data)
+            if serializer.is_valid():
+                serializer.save()
+                le_id=serializer.data['id']
+                le_document={
+                 "auteurs":serializer.data['auteurs'],
+                 "titre": titre,
+                 "abstract":abstract,
+                 "references":references,
+                 "key_words":key_words,
+                 "full_text":full_text,
+                 "pdf_file":pdf_file
+            }
+                
+                try:
+                    create_index(index_name,mapping,le_document,le_id)
+                except:
+                    print("erreur lors de l'indexation")
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer_f.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 ArticleIndex.init()
 # authentification google 
@@ -796,6 +1002,7 @@ def filtrer_resultats_institution(request):
 @csrf_exempt
 @login_required
 @permission_classes([IsAuthenticated])
+
 def filtrer_resultats_date(request):
     try:
         # Get keywords and date range from the request body
@@ -856,3 +1063,174 @@ def filtrer_resultats_date(request):
 
     except Exception as e:
         return JsonResponse({'status': 'Error', 'message': str(e)})
+    
+    # 8- Generer un mot de passe aleatoirement  
+@csrf_exempt
+@api_view(['GET'])
+def generate_random_password_view(request):
+    generated_password = generate_random_password()
+    serializer = PasswordGeneratorSerializer(data={'generated_password': generated_password})
+
+    if serializer.is_valid():
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=400)
+    
+@csrf_exempt
+@api_view(['POST'])
+def create_moderator_view(request):
+    if request.method == 'POST':
+         try:
+            create_moderator(request.data)
+            return Response({'message': 'Moderator created successfully'}, status=201)
+         except ValidationError as e:
+            error_messages = {}
+            for field, errors in e.message_dict.items():
+                error_messages[field] = [str(error) for error in errors]
+            return Response({'errors': error_messages}, status=status.HTTP_400_BAD_REQUEST)
+         
+
+@csrf_exempt
+@api_view(['POST'])
+def remove_moderator_view(request):
+    if request.method == 'POST':
+        username_to_remove = request.data.get('username', None)
+
+        if username_to_remove:
+            try:
+                removed = remove_moderator(username_to_remove)
+
+                if removed:
+                    return Response({'message': 'Moderator removed successfully'}, status=200)
+                else:
+                    return Response({'error': 'Moderator not found'}, status=404)
+            except Http404:
+                return Response({'error': 'Moderator not found'}, status=404)
+        else:
+            return Response({'error': 'Please provide a username to remove'}, status=400)
+        
+
+#En verifiant si le moderateur est authentifie (dans le cas ou c'est le moderateur lui même qui va le modifier)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def modify_moderator_password(request):
+    current_moderator = request.user
+    serializer = ChangePasswordSerializer(data=request.data)
+
+    if serializer.is_valid():
+        old_password = serializer.validated_data.get('old_password')
+        new_password = serializer.validated_data.get('new_password')
+
+        # Verify the old password
+        if not current_moderator.check_password(old_password):
+            return Response({'message': 'Ancien mot de passe incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Change the password
+        current_moderator.set_password(new_password)
+        current_moderator.save()
+
+        # Update the authenticated session
+        update_session_auth_hash(request, current_moderator)
+
+        return Response({'message': 'Mot de passe modifié avec succès'}, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#En verifiant si le moderateur est authentifie (dans le cas ou c'est le moderateur lui même qui va le modifier)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def modify_moderator_username(request):
+    current_moderator = request.user
+    new_username = request.data.get('new_username')
+
+    # Vérifier si le nouveau pseudonyme est déjà pris
+    if Moderateur.objects.filter(username=new_username).exclude(id=current_moderator.id).exists():
+        return Response({'message': 'Ce pseudonyme est déjà pris'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Changer le pseudonyme
+    current_moderator.username = new_username
+    current_moderator.save()
+
+    return Response({'message': 'Pseudonyme modifié avec succès'}, status=status.HTTP_200_OK)
+
+
+#Sans verifier si le moderateur est authentifie (dans le cas ou c'est l'admin qui va le modifier)
+@api_view(['POST'])
+def change_moderator_password(request):
+    moderator_username = request.data.get('moderator_username')
+    moderator = get_object_or_404(Moderateur, username=moderator_username)
+
+    new_password = request.data.get('new_password')
+    moderator.set_password(new_password)
+    moderator.save()
+    # Print statements for debugging
+    print(f'username: {moderator_username}, new password: {new_password}')
+
+    return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)
+
+
+#Sans verifier si le moderateur est authentifie (dans le cas ou c'est l'admin qui va le modifier)
+@api_view(['POST'])
+def change_moderator_username(request):
+    moderator_username = request.data.get('moderator_username')
+    moderator = get_object_or_404(Moderateur, username=moderator_username)
+
+    new_username = request.data.get('new_username')
+    moderator.username = new_username
+    moderator.save()
+    # Print statements for debugging
+    print(f'old username: {moderator_username}, new username: {new_username}')
+
+    return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
+
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+@login_required
+def submit_feedback(request):
+    try:
+        user = request.user
+        stars = request.data.get('stars')
+        comment = request.data.get('comment')
+
+        # Validate stars and comment
+        if stars is None or not (0 <= stars <= 5):
+            return JsonResponse({'error': 'Invalid stars value'}, status=400)
+
+        # Sending email
+        subject = 'Feedback from User'
+        message = f"Stars: {stars}\nComment: {comment}\nUser: {user.username}\nEmail: {user.email}"
+        from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
+        to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
+        send_mail(subject, message, from_email, [to_email])
+
+        return JsonResponse({'message': 'Feedback submitted successfully'}, status=201)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_protect
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def contact_us(request):
+    try:
+        name = request.data.get('nom')
+        email = request.data.get('email')
+        message = request.data.get('message')
+
+       # Validate name, email, and message
+        if not name or not email or not message:
+            return JsonResponse({'error': 'Name, email, and message are required fields'}, status=400)
+
+        # Sending email
+        subject = 'Contact Support'
+        message = f"Nom: {name}\nMessage: {message}\nEmail: {email}"
+        from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
+        to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
+        send_mail(subject, message, from_email, [to_email])
+
+        return JsonResponse({'message': 'Message submitted successfully'}, status=201)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

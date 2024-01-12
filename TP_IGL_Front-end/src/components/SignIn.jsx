@@ -14,10 +14,52 @@ import { Link } from 'react-router-dom';
 const SignIn = () => {
 
     const [showPassword, setShowPassword] = useState(false);
+    const [Password, setPassword] = useState('');
+    const [Pseudo, setPseudo] = useState('');
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
       };
+      const handleButton = async()  => {
+//         const url = 'http://localhost:8000/login/'
+//         const data = {
+//   username: Pseudo,
+//   password: Password,
+// };
+// await axios
+//   .post(url, data, {
+//     headers: {
+//       Accept: "application/json",
+//       "Content-Type": "application/json;charset=UTF-8",
+//     },
+//   })
+//   .then(({data}) => {
+//     console.log(data);
+// });
+const url = "http://localhost:8000/login/";
+console.log('ERRE')
+const options = {
+  method: "POST",
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    username: Pseudo,
+    password: Password,
+  }),
+};
+fetch(url,options)
+  .then((response) => response.json())
+  .then(async (data) => {
+    console.log(data);
+     data = await response.json();
+  });
+      }
+      const onSubmit = e => {
+        e.preventDefault();
+      };
+      const onChange = e => setFormData ({ ...FormData, [e.target.name]:e.target.value});
 
     return (
         <div>
@@ -34,13 +76,14 @@ const SignIn = () => {
                 <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
                 <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
                     <p className='text-3xl font-bold text-center mb-4 md:mb-9'>Se Connecter</p>
+                    <form >
                     <form className='relative'>
-                        <input type='text' className='rounded-md w-full border-gray-300 '/>
+                        <input  onChange={e => setPseudo(e.target.value)} value={Pseudo} type='text' className='rounded-md w-full border-gray-300 '/>
                             <label className='absolute placeholder'>Pseudo</label>
                     </form>
 
                     <form className='relative mt-5'>
-                        <input type={showPassword ? 'text' : 'password'} className='rounded-md w-full border-gray-300 '/>
+                        <input onChange={e => setPassword(e.target.value)} type={showPassword ? 'text' : 'password'} value={Password} className='rounded-md w-full border-gray-300  '/>
                             <label className='absolute placeholder'>Mot de Passe</label>
                             <button type='button' onClick={togglePasswordVisibility}>
                             {showPassword ? <IoEyeOffSharp className='showPasswordEye'/> : <IoEyeSharp   className='showPasswordEye' />}
@@ -49,11 +92,16 @@ const SignIn = () => {
                     </form>
 
 
+<<<<<<< HEAD
                     <button className='bg-darkPink w-full h-10 rounded-md mt-5'>
                         <Link to="/user" className='text-white font-bold text-lg'>Se Connecter</Link>
 
+=======
+                    <button className='bg-darkPink w-full h-10 rounded-md mt-5' onClick={handleButton}>
+                        <p className='text-white font-bold text-lg'>Créer Compte</p>
+>>>>>>> e7342538b6028f7cf89a367829c6d8d84f9f9438
                     </button>
-
+                    </form>
                     <div className='mt-5 mb-7 md:mb-0 flex flex-col items-center '>
                     <div className='flex flex-row'>
                     <p className='text-center mr-1 text-grey text-sm'>Vous n’avez pas de compte ?</p>

@@ -17,6 +17,9 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_URL='/upload_pdf/'
+
+MEDIA_ROOT=os.path.join(BASE_DIR,'upload_pdf')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -98,7 +101,11 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
+<<<<<<< HEAD
         'PASSWORD': '123456789',
+=======
+        'PASSWORD': 'bouty21000',
+>>>>>>> e7342538b6028f7cf89a367829c6d8d84f9f9438
         'HOST': 'localhost',  # Ou l'adresse IP de votre serveur PostgreSQL
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }
