@@ -82,11 +82,7 @@ const ProfileAdminMod = () => {
                 </div>
                 <div className='flex flex-row  mx-8 mb-6 space-x-2'>
                 <LuLogOut className='mt-1 ' color='DF1477' size={20}/>
-<<<<<<< HEAD
                 <Link to="/Guests" className="text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-xl text-10">Déconnecter</Link>
-=======
-                <li className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Déconnecter</li>
->>>>>>> e7342538b6028f7cf89a367829c6d8d84f9f9438
               </div>
                </ul> 
             </div>
