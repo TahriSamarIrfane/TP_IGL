@@ -18,6 +18,6 @@ import SignIn from './components/SignIn.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ProfileUser/>
+    <ProfileAdminMod/>
   </React.StrictMode>,
 )
