@@ -3,8 +3,11 @@ import background from "../assets/images/Page-admin.png"
 import imageS from "../assets/images/Upload.png"
 import imageL from "../assets/images/Loading.png"
 import avatar from "../assets/images/Avatar.png"
-import imageSearch from "../assets/images/Search.png"
+import imageModifierMod from "../assets/images/ModifierMod.png"
 import imageNewMod from "../assets/images/NewMod.png"
+import imageDeleteMod from "../assets/images/DeleteMod.png"
+
+
 
 
 import { MdOutlineDashboard } from "react-icons/md";
@@ -18,6 +21,8 @@ import { TfiReload } from "react-icons/tfi";
 import { TiDeleteOutline } from "react-icons/ti";
 import { IoSettingsOutline } from "react-icons/io5";
 import { LuSave } from "react-icons/lu";
+import { MdOutlineDeleteForever } from "react-icons/md";
+
 
 const Admin = () =>  {
   const [nav, setNav] =useState(false);
@@ -25,10 +30,17 @@ const Admin = () =>  {
   const [ImShift, setImShift] = useState(false);
   const [Upload, setUpload] = useState(true);
   const [NewMod, setNewMod] = useState(false);
-  const [SearchMod, setSearchMod] = useState(false);
-  const [SearchRes, setSearchRes] = useState(false);
+  const [DeleteMod, setDeleteMod] = useState(false);
   const [ModifierMod, setModifierMod] = useState(false);
 
+    const[username,setusername] =useState('');
+    const[usernameNew,setusernameNew] =useState('');
+    const[email,setemail] =useState('');
+    const[password,setpassword] =useState('');
+
+    
+ 
+  
   const data = [
     { Name: 1, Email: 'Item 1',Pwd:'12334' },
     { Name: 2, Email: 'Item 2',Pwd:'12334' },
@@ -40,37 +52,175 @@ const Admin = () =>  {
     { Name: 5, Email: 'Item 5',Pwd:'12334' },
     { Name: 6, Email: 'Item 6',Pwd:'12334' },
   ];
+  const handleChangePW = (e) => {
+    setpassword(e.target.value);
+    console.log(password);
+    };
+  const handleChangeE = (e) => {
+    setemail(e.target.value);
+    console.log(email);
+    };
+    const handleChangeP = (e) => {
+      setusername(e.target.value);
+      console.log(username);
+    };
+    const handleChangePNew = (e) => {
+      setusernameNew(e.target.value);
+      console.log(usernameNew);
+    };
+ 
+    
+const handleNewModInfo = (e) =>{
+  const url = "http://localhost:8000/create-moderator/";
+  e.preventDefault();
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: username,
+      email: email,
+    }),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+ 
+  });
+}
 
+
+const handleModifierModName = () =>{
+  const url = "http://localhost:8000/change_moderator_username/";
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      moderator_username: username,
+      new_username: usernameNew,
+    }),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+ 
+  });
+}
+const handleModifierModPW = (e) =>{
+  const url = "http://localhost:8000/change_moderator_password/";
+  e.preventDefault();
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      moderator_username: username,
+      new_password: password,
+    }),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+ 
+  });
+}
+const handleDelete = (e) =>{
+  const url = "http://localhost:8000/remove-moderator/";
+  e.preventDefault();
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: username,
+    }),
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+ 
+  });
+}
+//Wrapper Fucntion
+const handleClick = (e)=>{handleModifierModPW(e);handleModifierModName()}
+const handleButtonClick = (e) => {
+  const compareResult = usernameNew.localeCompare('');
+  const areEqual = compareResult === 0;
+  const compareRes = password.localeCompare('');
+  const isEqual = compareRes === 0;
+  const inter = compareRes + compareResult;
+  {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
+  
+   {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
+   {isEqual && areEqual ? console.log("Pas de modification"): handleButtonClick(e)}
+  }
+  
+
+
+ const handleUploadArticle = () => {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+  fetch('http://localhost:8000/upload-file/', {
+    method: 'POST',
+    headers: {
+      'Content-Type':'application/json'
+    },
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error('File upload failed');
+    }
+  })
+  .then(data => {
+    console.log('Server response:', data);
+  })
+  .catch(error => {
+    console.error('Error uploading file:', error);
+  });
+ }
   const handleListItemClick = () => {
     setShowItems(!showItems);
-
   };
   const handleModifierMod= () => {
-    setModifierMod(!ModifierMod);
-
+    setModifierMod(true);
+    setNewMod(false);
+    setUpload(false);
+    setDeleteMod(false);
   };
-  const handleSearchRes = () => {
-    setSearchRes(!SearchRes);
+  const handleDeleteMod = () => {
+    setDeleteMod(true);
+    setNewMod(false);
+    setUpload(false);
+    setModifierMod(false);
 
   };
   const handleNewMod = () => {
     setNewMod(true);
     setUpload(false);
-    setSearchMod(false);
+    setModifierMod(false);
+    setDeleteMod(false);
   };
-  const handleSearchMod = () => {
-    setSearchMod(true);
-    setNewMod(false);
-    setUpload(false);
-  };
+
   const handleImShift = () => {
     setImShift(!ImShift);
+
   };
   const handleUpload = () => {
     setUpload(true);
     setNewMod(false);
-    setSearchMod(false);
+    setDeleteMod(false);
     setShowItems(false);
+    setModifierMod(false);
   };
   const handleNav = () =>{
     setNav(!nav)
@@ -104,9 +254,13 @@ const Admin = () =>  {
                                     <MdOutlineAddBox className='mt-1 ' size={17}/>
                                     <li onClick={handleNewMod} className='text-black'>Nouveau</li>
                                  </div>
-                                 <div className={!SearchMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <IoSearch className='mt-1 ' size={17}/>
-                                    <li onClick={handleSearchMod}  className='text-black'>Chercher</li>
+                                 <div className={!ModifierMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
+                                    <IoSettingsOutline className='mt-1 ' size={17}/>
+                                    <li onClick={handleModifierMod}  className='text-black'>Modifier</li>
+                                   </div>
+                                   <div className={!DeleteMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
+                                    <MdOutlineDeleteForever className='mt-1 ' size={17}/>
+                                    <li onClick={handleDeleteMod}  className='text-black'>Supprimer</li>
                                    </div>
                               
                             </ul>
@@ -132,75 +286,53 @@ const Admin = () =>  {
           
           <div className="flex flex-col items-center justify-center bg-opacity-10 max-w-auto h-full w-[95%] mt-11 bg-white">
           {Upload && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
-             <div className='flex flex-row  items-center w-[70%]'>
+             <div className='flex flex-row  items-center w-[60%] '>
+             <form action="http://localhost:8000/upload-file/" method="POST" encType='multipart/form-data'>
                <input
-                type="url"
-                className="py-2 w-[75%] rounded-l-xl"
-                placeholder="Enter URL..."
-                /> 
-
+                type="file"
+                name="uploaded_file"
+                id='uploaded_file'
+                className="py-2 w-[75%] rounded-l-3xl text-white "
                 
-               <button onClick={handleImShift} style={{ position:'relative',fontSize: 'auto', overflow:'hidden' }} className='fixed h-full py-2 w-[25%] bg-darkPink rounded-r-xl text-white text-size-auto '>Upload</button>
+                /> 
+               <button onClick={handleUploadArticle}  style={{ position:'relative',fontSize: 'auto', overflow:'hidden' }} className='fixed h-full py-2 w-[25%] bg-darkPink rounded-r-xl text-white text-size-auto '>Upload</button>
+               </form>
               </div>
+              
               <img className='h-[60%]' src={!ImShift ? imageS : imageL } alt='/' />
              
             </div>
              )}
-             {SearchMod && ( <div className="flex flex-col justify-center items-center space-y-10  h-full w-full">
-             <div className='searchBar-admin'>
+             {ModifierMod && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
+             <div className='flex flex-col justify-center items-center space-y-5 w-[80%] mt-[-5%]'>
+             <img className='h-[20%]' src={imageModifierMod} alt='/' />
                <input
                 type="text"
-                className="inputSearch focus:outline-none"
-                placeholder="Recherche..."
+                className="py-2 w-[75%] rounded-md text-black"
+                placeholder="Pseudo Actuel"
+                name='moderator_username'
+                value={username}
+                onChange={handleChangeP}
                />
-                <div onClick={handleSearchRes} className=''>
-                 <IoSearch className="text-black" size={20} />
-                </div>
-               
+                 <input
+                type="text"
+                className="py-2 w-[75%] rounded-md text-black"
+                placeholder="Nouveau Pseudo"
+                name='moderator_username'
+                value={usernameNew}
+                onChange={handleChangePNew}
+               />
+                <input
+                type="password"
+                name='moderator_username'
+                className="py-2 w-[75%] rounded-md"
+                placeholder="Nouveau Mot de Passe"
+                value={password}
+                onChange={handleChangePW}
+               />
+               <button type='button' onClick={handleButtonClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
      
               </div>
-             {!SearchRes ? (<img className='h-[60%]' src={imageSearch} alt='/' />) : (
-              <div className='flex flex-col justify-center space-y-3 w-[80%] h-[70%]'>
-               <hr className='w-full'></hr>
-                            <ul style={{  overflowY: 'auto' }} className='flex-col items-center space-y-6 p-5 w-full ml-[-1%]'>
-                              {data.map((item) => (
-                          
-                           <div key={item.Name}  className='flex flex-row justify-star items-center h-[35%]  rounded-md bg-white'>
-                            <img className="p-2 " style={{ height: '12vh',width: 'auto' }} src={avatar}  alt='/'/>
-                            {!ModifierMod && (<ul className='w-full max-h-full'>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-2 "><p>Nom:</p><p> {item.Name}</p></li>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-2 "><p>Email:</p><p>{item.Email}</p></li>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-2 "><p>Mot de Passe:</p><p>{item.Pwd}</p></li> 
-                            </ul>  )}
-                            {ModifierMod && (<ul className='w-full max-h-full'>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-1 "><p >Nom:</p>< input  type="text" className=" mt-1 h-4 w-[30%] border-0" placeholder= {item.Name} /></li>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-1 "><p>Email:</p>< input  type="text" className="h-4 w-[30%] border-0" placeholder= {item.Email} /></li>
-                            <li style={{ fontSize: '1rem' }} className="flex flex-row space-x-1 "><p>Mot de Passe:</p>< input  type="text" className="h-4 w-[30%] border-0" placeholder= {item.Pwd} /></li> 
-                            </ul>  )}
-                            <div className='flex justify-end  w-[20%] ml-[3%]'>
-                            <div className='flex flex-col space-y-8'>
-                                <div onClick={''} >
-                                {!ModifierMod && (<TiDeleteOutline style={{right:0}} color='#DF1477' size={22} />)}
-                                </div>
-                                  <div onClick={handleModifierMod}>
-                                    {!ModifierMod && (<IoSettingsOutline color='#DF1477' size={20}/>)}
-                                    {ModifierMod && (<div className='px-1 mt-4 ml-[-4%]'>
-                                    <div onClick={handleModifierMod} className='md:hidden'><LuSave color='DF1477' size={20}/></div>
-                                    <button onClick={handleModifierMod} className=' bg-darkPink text-center text-white rounded-md hidden md:block '>Sauvegarder</button>
-                                      </div>)}
-                                  </div>
-                              
-                              
-                            </div>
-                            </div>    
-                           </div>
-                           
-                                ))}
-                                </ul>
-                               
-              </div>
-
-             )}
              
             </div>
              )}
@@ -210,37 +342,55 @@ const Admin = () =>  {
              
                <input
                 type="text"
-                className="py-2 w-[75%] rounded-md"
+                className="py-2 w-[75%] rounded-md text-black"
                 placeholder="Pseudo"
+                name='username'
+                value={username}
+                onChange={handleChangeP}
                />
                 <input
                 type="email"
+                name='email'
                 className="py-2 w-[75%] rounded-md"
                 placeholder="Email"
+                value={email}
+                onChange={handleChangeE}
                />
-               <div className='flex flex-row items-center w-[75%]'>
-                 <input
-                 type="password"
-                 className=" w-[90%] rounded-l-md"
-                 placeholder="Mot de Passe"
-                 />
-                 <div onClick={handleNav} className='flex items-center h-full px-3 bg-darkPink rounded-r-md w-[10%]'>
-                 <TfiReload size={20} color='white'/>
-                 </div>
-               </div>
-               <button className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Ajouter</button>
+             
+               <button type='button' onClick={handleNewModInfo} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Ajouter</button>
      
               </div>
              
             </div>
              )}
+
+          {DeleteMod && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
+             <div className='flex flex-col justify-center items-center space-y-5 w-[80%] mt-[-5%]'>
+               <img className='h-[33%]' src={imageDeleteMod} alt='/' />
+             
+               <input
+                type="text"
+                className="py-2 w-[75%] rounded-md text-black"
+                placeholder="Pseudo"
+                name='username'
+                value={username}
+                onChange={handleChangeP}
+               />
+            
+               <button type='button' onClick={handleDelete} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
+     
+              </div>
+             
+            </div>
+             )}
+
           </div>
         </div>
           
            {/*NavBar for a small frame */}
            
        
-           <div className={!nav ? ' fixed left-0 top-20 w-[40%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
+           /* <div className={!nav ? ' fixed left-0 top-20 w-[40%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
                  <div className={Upload ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 '}>
                     <FiUpload className='mt-1 ' size={17}/>
@@ -251,18 +401,23 @@ const Admin = () =>  {
                   <li onClick={handleListItemClick} className='text-black'>Modérateurs</li>
                 </div>
                 {showItems && (
-                            <ul className='ml-6'>
+                            <ul className='ml-3'>
                                   <div className={!NewMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <MdOutlineAddBox className='mt-1  ' size={17}/>
+                                    <MdOutlineAddBox className='mt-1 ' size={17}/>
                                     <li onClick={handleNewMod} className='text-black'>Nouveau</li>
                                  </div>
-                                 <div className={!SearchMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <IoSearch className='mt-1 ' size={17}/>
-                                    <li onClick={handleSearchMod} className='text-black'>Chercher</li>
+                                 <div className={!ModifierMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
+                                    <IoSettingsOutline className='mt-1 ' size={17}/>
+                                    <li onClick={handleModifierMod}  className='text-black'>Modifier</li>
+                                   </div>
+                                   <div className={!DeleteMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
+                                    <MdOutlineDeleteForever className='mt-1 ' size={17}/>
+                                    <li onClick={handleDeleteMod}  className='text-black'>Supprimer</li>
                                    </div>
                               
                             </ul>
-              )}
+
+                                 ) }
                 <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
                 <p className=' text-black'>Déconnecter</p>
@@ -272,7 +427,7 @@ const Admin = () =>  {
               
             </div>
       
-      </div> 
+      </div>  
 
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>

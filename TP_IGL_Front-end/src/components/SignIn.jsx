@@ -36,7 +36,6 @@ const SignIn = () => {
 //     console.log(data);
 // });
 const url = "http://localhost:8000/login/";
-console.log('ERRE')
 const options = {
   method: "POST",
   headers: {

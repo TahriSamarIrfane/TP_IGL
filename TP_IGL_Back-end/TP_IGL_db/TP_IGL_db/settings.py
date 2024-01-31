@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'corsheaders',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -54,8 +55,12 @@ REST_FRAMEWORK = {
         # ...
     ],
 }
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Add your frontend origin
+]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',  # Une seule occurrence nécessaire
@@ -98,7 +103,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'bouty21000',
+        'PASSWORD': 'SY2024',
         'HOST': 'localhost',  # Ou l'adresse IP de votre serveur PostgreSQL
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }

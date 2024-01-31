@@ -1,5 +1,6 @@
 import React from 'react';
 import'../index.css';
+import {Link} from "react-router-dom";
 
 //importation for the slick-carousel
 import Slider from 'react-slick';

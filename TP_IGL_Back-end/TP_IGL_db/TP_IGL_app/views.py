@@ -129,8 +129,7 @@ def transform_auteur_institution_to_json(auteurs,des_institutions):
     for auteur in auteurs:
         dic2={"nom":auteur,"institutions":les_institutions}
         les_auteurs.append(dic2)
-    les_auteurs_json=json.dumps(les_auteurs)
-    return les_auteurs_json
+    return les_auteurs
 
 def create_index(index_nom,map,the_document,the_id):
     es=Elasticsearch('http://localhost:9200')
@@ -1181,7 +1180,7 @@ def change_moderator_username(request):
     moderator.username = new_username
     moderator.save()
     # Print statements for debugging
-    print(f'old username: {moderator_username}, new username: {new_username}')
+    print('old username: {moderator_username}, new username: {new_username}')
 
     return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
 
