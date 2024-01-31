@@ -1,19 +1,24 @@
 import React from 'react';
-import NavBar from './components/NavBar';
-import HomeGuests from './components/HomeGuests';
-import HomeUsers from './components/HomeUsers';
-import Footer from './components/Footer';
-import SignUp from './components/SignUp';
-import SignIn from './components/SignIn';
-import Result from './components/Result';
-import MyCollection from './components/MyCollection';
-import Article from './components/Article';
+import NavBar from './components/NavBar.jsx';
+import HomeGuests from './components/HomeGuests.jsx';
+import HomeUsers from './components/HomeUsers.jsx';
+import Footer from './components/Footer.jsx';
+import SignUp from './components/SignUp.jsx';
+import SignIn from './components/SignIn.jsx';
+import Result from './components/Result.jsx';
+import MyCollection from './components/MyCollection.jsx';
+import Article from './components/Article.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import NavBarGuest from './components/NavBarGeust';
-import Admin from './components/Admin';
-import ProfileAdminMod from './components/ProfileAdminMod';
-import ProfileUser from './components/ProfileUser';
-import FooterGeust from './components/FooterGeust';
+import NavBarGuest from './components/NavBarGeust.jsx';
+import Admin from './components/Admin.jsx';
+import ProfileAdminMod from './components/ProfileAdminMod.jsx';
+import ProfileUser from './components/ProfileUser.jsx';
+import FooterGeust from './components/FooterGeust.jsx';
+import SendCode from './components/SendCode.jsx';
+import MDP_oublie from './components/MDP_oublie.jsx';
+
+
+
 
 function App() {
   return (
@@ -22,7 +27,7 @@ function App() {
 
       {/*Guest */}
         <Route 
-        path="/Guests"
+        path="/"
         element={
         <>
         <NavBarGuest/>
@@ -45,7 +50,8 @@ function App() {
         <Footer/>
       </>
         } />
-
+        <Route path="/MDP_oublie/:Email" element={<MDP_oublie />} />
+        <Route path="/SendCode" element={<SendCode />} />
         <Route path="/HomeGuests" element={<HomeGuests />} />
         <Route path="/Result" element={<Result />} />
         <Route path="/Article" element={<Article />} />
@@ -61,10 +67,22 @@ function App() {
     </Routes>
     </Router>
   );
-  
 }
 
 export default App;
+
+/*
+
+
+function App() {
+  return (
+    <div>
+    <SignIn/>
+    <SignUp/>
+    </div>
+  
+  )
+}
 
 /*   <NavBar/>
 <HomeUsers/>

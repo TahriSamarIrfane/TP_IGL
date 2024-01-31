@@ -13,10 +13,11 @@ import MDP_oublie from './components/MDP_oublie.jsx'
 import SendCode from './components/SendCode.jsx'
 import Result from './components/Result.jsx'
 import HomeGuests from './components/HomeGuests.jsx'
+import SignIn from './components/SignIn.jsx'
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App/>
+    <ProfileUser/>
   </React.StrictMode>,
 )

@@ -4,6 +4,7 @@ import halfRobot from'../assets/images/halfRobot.png';
 
 
 import { IoClose } from "react-icons/io5";
+import { Link } from 'react-router-dom';
 
 
 
@@ -12,25 +13,34 @@ import { IoClose } from "react-icons/io5";
 const SendCode = () => {
    
     const [Email, setEmail] = useState('');
+    const [Compare, setCompare] = useState(false);
+    const [Compare2, setCompare2] = useState(false);
 
+    const handleCompare =(e) =>{
+      {!(Email =='' ) ? setCompare(true):setCompare2(true)};
+     // {Compare && ( handleButton(e) )}
+  
+    }
+
+    const handleButton = (e) =>{
     
-     const handleButton = (e) =>{
-        const url = "http://localhost:8000/request-password-reset/";
-        e.preventDefault();
-        fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: Email,
-          }),
-        })
-        .then(response => response.json()) // This assumes the response is JSON
-  .then(data => console.log(data))
-  .catch(error => console.error('Error:', error)); 
-     } 
-    
+     const url = "http://localhost:8000/request-password-reset/";
+      e.preventDefault();
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: Email,
+        }),
+      })
+      .then(response => response.json()) // This assumes the response is JSON
+.then(data => console.log(data))
+.catch(error => console.error('Error:', error)); 
+   } 
+  
+  
 
   return (
     <div>
@@ -41,8 +51,7 @@ const SendCode = () => {
             
             <img className=' width-[900] mb-5 hidden md:block' src={robot} alt=""/>
             <img className=' width-[900] md:hidden' src={halfRobot} alt=""/>
-            <IoClose className='absolute text-white right-2 top-2 text-4xl md:hidden'/>
-            </div>
+             </div>
             {/* the right part */}
             <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
             <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
@@ -52,10 +61,22 @@ const SendCode = () => {
                 <form className='relative'>
                     <input  onChange={e => setEmail(e.target.value)} value={Email} type='email' className='rounded-md w-full mb-3 border-gray-300 '/>
                         <label className='absolute placeholder'>Email</label>
+                          
+                        {Compare2 && ( 
+                        <p className='text-sm text-red-600'>Entrer Email !</p>
+                        )}
                 </form>
 
-                <button className='bg-darkPink w-full h-8 mb-3 lg:h-10 rounded-md lg:mt-5' onClick={handleButton}>
-                    <p className='text-white text-md font-bold lg:text-lg'>Envoyer Code</p>
+
+                <button className='bg-darkPink w-full h-8 mb-3 lg:h-10 rounded-md lg:mt-5' onClick={handleCompare}>
+                {Compare ?  
+                         <Link to={{pathname:'/MDP_oublie'}} className='text-white text-md font-bold lg:text-lg'>Envoyer Code</Link>
+                         :
+                      
+                 ( 
+                         <Link to="/SendCode" className='text-white text-md font-bold lg:text-lg' >Envoyer Code</Link>
+                         )}
+                
                 </button>
                 </form>
                

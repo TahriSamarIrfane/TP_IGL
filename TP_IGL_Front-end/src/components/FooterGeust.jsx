@@ -17,15 +17,15 @@ const FooterGeust =() =>{
                     <h6 className="font-medium py-2 uppercase">Compagnie</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <a href="/Guests">Acceuil
+                        <a href="/">Acceuil
                         </a>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <a href="/Guests#sectionApropos">  A propos
+                        <a href="/#sectionApropos">  A propos
                         </a>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <a href="/Guests#sectionSrevice">Nos services
+                        <a href="/#sectionSrevice">Nos services
                         </a>
                         </li>
                     </ul>
@@ -34,9 +34,9 @@ const FooterGeust =() =>{
                     <h6 className="font-medium py-2 uppercase">Aide</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <a href="/Guests#sectionFeedBack">FeedBacks</a></li>{/* LINK is not working see why!! */}
+                        <a href="/#sectionFeedBack">FeedBacks</a></li>{/* LINK is not working see why!! */}
                         <li className="py-2 text-sm list-none">
-                        <a href="/Guests#sectionContact">Contact</a>
+                        <a href="/#sectionContact">Contact</a>
                         </li>
                     </ul>
                 </div>

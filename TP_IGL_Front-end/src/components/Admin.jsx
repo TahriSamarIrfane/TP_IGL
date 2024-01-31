@@ -16,11 +16,7 @@ import { LuLogOut } from "react-icons/lu";
 import { FiUpload } from "react-icons/fi";
 import { FaAddressBook } from "react-icons/fa";
 import { MdOutlineAddBox } from "react-icons/md";
-import { IoSearch } from "react-icons/io5";
-import { TfiReload } from "react-icons/tfi";
-import { TiDeleteOutline } from "react-icons/ti";
 import { IoSettingsOutline } from "react-icons/io5";
-import { LuSave } from "react-icons/lu";
 import { MdOutlineDeleteForever } from "react-icons/md";
 
 
@@ -41,17 +37,7 @@ const Admin = () =>  {
     
  
   
-  const data = [
-    { Name: 1, Email: 'Item 1',Pwd:'12334' },
-    { Name: 2, Email: 'Item 2',Pwd:'12334' },
-    { Name: 3, Email: 'Item 3',Pwd:'12334' },
-    { Name: 4, Email: 'Item 4',Pwd:'12334' },
-    { Name: 5, Email: 'Item 5',Pwd:'12334' },
-    { Name: 6, Email: 'Item 6',Pwd:'12334' },
-    { Name: 4, Email: 'Item 4',Pwd:'12334' },
-    { Name: 5, Email: 'Item 5',Pwd:'12334' },
-    { Name: 6, Email: 'Item 6',Pwd:'12334' },
-  ];
+
   const handleChangePW = (e) => {
     setpassword(e.target.value);
     console.log(password);
@@ -269,6 +255,7 @@ const handleButtonClick = (e) => {
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
                 <p className=' text-black'>Déconnecter</p>
+
               </div>
           </div>
         </div> 
@@ -330,7 +317,7 @@ const handleButtonClick = (e) => {
                 value={password}
                 onChange={handleChangePW}
                />
-               <button type='button' onClick={handleButtonClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
+               <button type='button' onClick={handleClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
      
               </div>
              

@@ -89,7 +89,7 @@ import halfRobot from'../assets/images/halfRobot.png';
 import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-
+import { Link } from 'react-router-dom';
 
 const SignUp = () => {
 
@@ -150,7 +150,6 @@ const SignUp = () => {
                 </div>
                 {/* the right part */}
                 <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
-                <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
                     <p className='text-3xl font-bold text-center mb-4 md:mb-9'>S'inscrire</p>
                     <form  className='relative'>
                     <input
@@ -202,13 +201,14 @@ const SignUp = () => {
                             
                     </form>
 
-                    <button onClick={handleSubmit} className='bg-darkPink w-full h-10 rounded-md mt-5'>
-                       <p className='text-white font-bold text-lg'>Créer Compte</p>
+                    <button className='bg-darkPink w-full h-10 rounded-md mt-5'>
+                        <p className='text-white font-bold text-lg'>Créer Compte</p>
+                        
                     </button>
 
                     <div className='mt-4 mb-7 md:mb-0 flex flex-row justify-center'>
-                        <p className='text-center mr-1 text-grey text-sm'>Vous avez déjà un compte ?</p>
-                        <a href="#" className='text-[#5E6DF5] text-sm'>Se Connecter</a>
+                    <p className='text-center mr-1 text-grey text-sm'>Vous avez déjà un compte ?</p>
+                    <Link to="/SignIn" className='text-[#5E6DF5] text-sm'>Se Connecter</Link>
                     </div>
                     
                 </div>

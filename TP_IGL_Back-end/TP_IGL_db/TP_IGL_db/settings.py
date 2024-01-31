@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_elasticsearch_dsl',
     'django_elasticsearch_dsl_drf',
+    
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -59,8 +60,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Add your frontend origin
 ]
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',  # Une seule occurrence nécessaire
@@ -169,6 +170,17 @@ ELASTICSEARCH_DSL = {
         'hosts': 'localhost:9200',
     },
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5174",
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = [
+    'access-control-allow-origin',
+    'access-control-allow-credentials',
+    'content-type',
+]
 
 SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.
 SELENIUM_EXECUTABLE_PATH = os.path.join(BASE_DIR, 'geckodriver')  # Chemin vers le fichier GeckoDriver

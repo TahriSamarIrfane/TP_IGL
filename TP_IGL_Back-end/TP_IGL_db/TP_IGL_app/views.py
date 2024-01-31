@@ -347,7 +347,6 @@ def signup_page(request):
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 # 2- fonction se connecter 
-
 @csrf_exempt
 def LoginPage(request):
     if request.method == 'POST':
@@ -761,8 +760,8 @@ class AllUsersAPIView(APIView):
 #15- rechercher un article 
 
 @csrf_exempt
-@login_required 
-@permission_classes([IsAuthenticated])
+#@login_required 
+#@permission_classes([IsAuthenticated])
 def rechercher_articles(request):
     try:
         # Récupérez les mots-clés à partir du corps de la requête JSON
