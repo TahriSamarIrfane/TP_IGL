@@ -1,6 +1,7 @@
 import React from 'react';
 import'../index.css';
 
+
 //importation for the slick-carousel
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -21,6 +22,7 @@ import icon4 from '../assets/icons/icon4.png';
 import FeedBacks from'../assets/images/FeedBacks.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
+import { Link } from 'react-router-dom';
 
 
 const CustomPrevArrow = (props) => (
@@ -66,7 +68,7 @@ const settings={
 
 const HomeGuests = () => {
     return (
-       <div>
+       <div id="sectionhome">
 
         {/* S'inscrire , Se connecter*/}
         <div className="bg-white mt-20  lg:pr-10 flex flex-col md:flex-row-reverse  items-center justify-between ">
@@ -85,8 +87,9 @@ const HomeGuests = () => {
                   <div className='relative'>
                   <img className='h-60 line1-width lg:splach lg:mt-5' src={BlackSplash} alt=""/>
                   <div className='flex  space-x-44 lg:space-x-72'>
-                  <a href='#' className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</a>
-                  <a href='#' className="text-lg mt-3 bg-pink font-Segoe rounded-3xl py-2 px-7 text-darkPink font-bold absolute top-0 left-0 ">S’Inscrire</a>
+                  
+                  <Link to="/SignIn" className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</Link>
+                  <Link to="/SignUp" className="text-lg mt-3 bg-pink font-Segoe rounded-3xl py-2 px-7 text-darkPink font-bold absolute top-0 left-0 ">S’Inscrire</Link>
                   </div>
                   </div>
                  </div> 
@@ -157,8 +160,8 @@ const HomeGuests = () => {
          </div>
 
          {/* Feedbacks*/}
-         <div  class="flex flex-col items-center justify-center mt-20 ">
-         <img id="sectionFeedBack" className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
+         <div  id="sectionFeedBack" class="flex flex-col items-center justify-center mt-20 ">
+         <img  className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
          <p className='text-grey mt-5 px-5'>Découvrez ce que disent nos utilisateurs satisfaits à propos de notre application</p>
          </div>
 
@@ -191,7 +194,8 @@ const HomeGuests = () => {
 
 
          {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center">
+         <div class="flex flex-col items-center justify-center"
+         id="sectionContact">
 
         <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
           

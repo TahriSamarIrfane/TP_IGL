@@ -114,6 +114,24 @@ from .models import Moderateur
 from django.views.decorators.csrf import csrf_protect
 from .forms import ContactForm
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from elasticsearch import Elasticsearch
+from django.conf import settings
+from django.shortcuts import render
+from .models import Article,Auteur,Institution,UploadedFile,Profile
+from rest_framework.decorators import api_view,parser_classes
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ArticleSerializer,FileUploadSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser,FormParser
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+# Create your views here.
+from django.core.mail import send_mail
+from . import utils 
+
 def transforme_institution_to_json(institution):
     dic1={}
     institutions=[]
@@ -129,8 +147,7 @@ def transform_auteur_institution_to_json(auteurs,des_institutions):
     for auteur in auteurs:
         dic2={"nom":auteur,"institutions":les_institutions}
         les_auteurs.append(dic2)
-    les_auteurs_json=json.dumps(les_auteurs)
-    return les_auteurs_json
+    return les_auteurs
 
 def create_index(index_nom,map,the_document,the_id):
     es=Elasticsearch('http://localhost:9200')
@@ -164,13 +181,25 @@ mapping = {
 
 }
 }
+@api_view(['GET'])
+def get_articles(request, format=None):
+    try:
+        # Obtenez tous les articles en attente
+        articles_en_attente = Article.objects.filter(etat='A')
+
+        # Sérialisez les articles pour les revoyer en réponse
+        serialized_articles = [{"id": article.id, "titre": article.titre, "abstract": article.abstract} for article in articles_en_attente]
+
+        return Response({'articles_en_attente': serialized_articles}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 def Article_review(request,id):
     try:
       article=Article.objects.get(pk=id)
     except Article.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response("object doesn't exists",status=status.HTTP_404_NOT_FOUND)
     serializer= ArticleSerializer(article)
     return Response(serializer.data)
 
@@ -248,18 +277,18 @@ class FileUploadAPIView(APIView):
             extract_entities(full_text,auteur,institution)
             
             les_auteurs=auteur[:4]
-            
+           # print(les_auteurs)
             les_institutions=institution[:4]
             
             auteurs=transform_auteur_institution_to_json(les_auteurs,les_institutions)
             
             article_data = {
                 "titre": titre,
-                "abstract": abstract,
-                "key_words": key_words,
-                "full_text": full_text,
+                "abstract": abstract.replace("\n"," "),
+                "key_words": key_words.replace("\n"," "),
+                "full_text": full_text.replace("\n"," "),
                 "pdf_file": pdf_file,
-                "references": references,
+                "references": references.replace("\n"," "),
                 "auteurs":auteurs,
             }
             serializer = ArticleSerializer(data=article_data)
@@ -269,10 +298,10 @@ class FileUploadAPIView(APIView):
                 le_document={
                  "auteurs":serializer.data['auteurs'],
                  "titre": titre,
-                 "abstract":abstract,
-                 "references":references,
-                 "key_words":key_words,
-                 "full_text":full_text,
+                 "abstract":abstract.replace("\n"," "),
+                 "references":references.replace("\n"," "),
+                 "key_words":key_words.replace("\n"," "),
+                 "full_text":full_text.replace("\n"," "),
                  "pdf_file":pdf_file
             }
                 
@@ -348,7 +377,6 @@ def signup_page(request):
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 # 2- fonction se connecter 
-
 @csrf_exempt
 def LoginPage(request):
     if request.method == 'POST':
@@ -762,8 +790,8 @@ class AllUsersAPIView(APIView):
 #15- rechercher un article 
 
 @csrf_exempt
-@login_required 
-@permission_classes([IsAuthenticated])
+#@login_required 
+#@permission_classes([IsAuthenticated])
 def rechercher_articles(request):
     try:
         # Récupérez les mots-clés à partir du corps de la requête JSON
@@ -1181,7 +1209,7 @@ def change_moderator_username(request):
     moderator.username = new_username
     moderator.save()
     # Print statements for debugging
-    print(f'old username: {moderator_username}, new username: {new_username}')
+    print('old username: {moderator_username}, new username: {new_username}')
 
     return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
 

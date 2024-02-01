@@ -46,7 +46,7 @@ const toggleFavorite = (index) => {
 
         
 
-                <div className='mt-20 mb-10'>   
+                <div className='mt-0 mb-10'>   
 
                   {/*Picture*/}
                   <div className='px-3 md:px-14'>
@@ -108,8 +108,6 @@ const toggleFavorite = (index) => {
     </div>
   ))}
 </div>
-
-
 
 
                      <FaFilePdf className='absolute right-3 top-2 text-xl' />

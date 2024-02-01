@@ -1,4 +1,4 @@
-from unidecode import unidecode 
+from unidecode import unidecode
 import spacy
 import re
 import fitz
