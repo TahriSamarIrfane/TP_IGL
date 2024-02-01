@@ -121,7 +121,7 @@ const Moderateur = () =>  {
                               <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.Text}</p>
                               </div>
                               <div className='flex justify-end mb-2'>
-                                         <button onClick={} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Modérer</button>
+                                         <button  className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Modérer</button>
                                   </div>
                               </div>
                            </li>
