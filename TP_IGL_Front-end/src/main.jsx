@@ -12,6 +12,6 @@ import ModérerArticle from './components/ModérerArticle.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ModérerArticle/>
+    <ProfileUser/>
   </React.StrictMode>,
 )
