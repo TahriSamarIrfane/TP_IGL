@@ -56,6 +56,7 @@ function App() {
         <Route path="/SendCode" element={<SendCode />} />
         <Route path="/Moderateur" element={<Moderateur />} />
         <Route path="/ModererArticle" element={<ModérerArticle />} />
+        <Route path="/ModererArticle/:id" element={<ModérerArticle />} />
         <Route path="/HomeGuests" element={<HomeGuests />} />
         <Route path="/Result" element={<Result />} />
         <Route path="/Article" element={<Article />} />
