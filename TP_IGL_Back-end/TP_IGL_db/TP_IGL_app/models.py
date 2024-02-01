@@ -95,6 +95,7 @@ class UploadedFile(Model):
     uploaded_file = models.FileField(upload_to='./',validators=[FileExtensionValidator()])
     def __str__(self):
         return self.id
+    
 #8- article prefere 
 class FavoriteArticle(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -16,6 +16,8 @@ import ProfileUser from './components/ProfileUser.jsx';
 import FooterGeust from './components/FooterGeust.jsx';
 import SendCode from './components/SendCode.jsx';
 import MDP_oublie from './components/MDP_oublie.jsx';
+import Moderateur from './components/Moderateur.jsx';
+import ModérerArticle from './components/ModérerArticle.jsx';
 
 
 
@@ -52,6 +54,8 @@ function App() {
         } />
         <Route path="/MDP_oublie/:Email" element={<MDP_oublie />} />
         <Route path="/SendCode" element={<SendCode />} />
+        <Route path="/Moderateur" element={<HomeGuests />} />
+        <Route path="/ModererArticle" element={<ModérerArticle />} />
         <Route path="/HomeGuests" element={<HomeGuests />} />
         <Route path="/Result" element={<Result />} />
         <Route path="/Article" element={<Article />} />

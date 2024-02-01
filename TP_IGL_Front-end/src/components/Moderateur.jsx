@@ -29,6 +29,32 @@ const Moderateur = () =>  {
     { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
     
   ];
+  const handleArticles = () => {
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+  fetch('http://localhost:8000//article/get-articles/', {
+    method: 'GET',
+    headers: {
+      'Content-Type':'application/json'
+    },
+    body: formData
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error('File upload failed');
+    }
+  })
+  .then(data => {
+    console.log('Server response:', data);
+  })
+  .catch(error => {
+    console.error('Error uploading file:', error);
+  });
+ }
 
   const handleArticle = () => {
     setArticle(true);
@@ -95,7 +121,7 @@ const Moderateur = () =>  {
                               <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.Text}</p>
                               </div>
                               <div className='flex justify-end mb-2'>
-                                         <button className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Modérer</button>
+                                         <button onClick={} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Modérer</button>
                                   </div>
                               </div>
                            </li>

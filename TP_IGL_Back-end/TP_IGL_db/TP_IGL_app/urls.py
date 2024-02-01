@@ -32,6 +32,7 @@ urlpatterns = [
     path('upload-file/',FileUploadAPIView.as_view(),name='upload-file'),
     path('moder/<int:id>/',Article_correct_and_remove,name='moderator-page'),
     path('moder/<int:id>/get/',Article_review,name='moderateur-page-int'),
+    path('get-articles/',get_articles,name='get-articles'),
 
     path('generate-password/',generate_random_password_view, name='generate-password'),
     path('create-moderator/',create_moderator_view, name='create-moderator'),

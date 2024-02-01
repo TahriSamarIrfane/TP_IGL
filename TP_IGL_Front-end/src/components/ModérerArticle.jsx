@@ -30,7 +30,7 @@ const Article = () => {
              <div className='flex flex-row justify-between px-10 mt-5'>{/*Date */}
              <div contentEditable className='text-darkGery'>{date}</div>
              <div className='flex flex-row space-x-3'>
-             <div><MdDeleteForever className='mt-1 text-2xl' /></div>
+             <div><MdDeleteForever onClick={} className='mt-1 text-2xl' /></div>
                  <div><LiaShareSolid className='mt-1 text-2xl text-darkPink'/></div>
                  </div>
              </div>
