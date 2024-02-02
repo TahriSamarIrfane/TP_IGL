@@ -1,4 +1,4 @@
-// userStorage.js
+// userStorage.jsx
 export const saveUser = (user) => {
     localStorage.setItem('authenticatedUser', JSON.stringify(user));
   };

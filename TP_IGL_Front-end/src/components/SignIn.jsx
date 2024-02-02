@@ -5,8 +5,8 @@ import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import axios from 'axios';
-import { useUser } from '../UserContext';
-import { saveUser } from '../userStorage';
+import { useUser } from '../UserContext.jsx';
+import { saveUser } from '../userStorage.jsx';
 
 const apiUrl = "http://localhost:8000";
 

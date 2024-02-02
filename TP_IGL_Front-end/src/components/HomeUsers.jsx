@@ -29,7 +29,7 @@ import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
 import { Link } from 'react-router-dom';
 import { FaFilePdf } from "react-icons/fa6";
-
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -78,7 +78,7 @@ const settings={
 
 const HomeUsers = () => {
 
-  
+  const navigate = useNavigate();
 const[rating,setRating]= useState(null);
 const[hover,setHover]= useState(null);
 
@@ -121,40 +121,12 @@ const [message, setMessage] = useState('');
 
 const [searchTerm, setSearchTerm] = useState('');
 
-const handleSearch = async () => {
-  try {
-    const response = await fetch('http://localhost:8000/rechercher_articles/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        mots_cles: searchTerm,
-      }),
-    });
+const handleSearch = () => {
+  // Perform any necessary actions related to the search term
+  // ...
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Search results:', data.search_results);
-
-            // Update state with search results
-            setSearchResults(data.search_results);
-
-           // Check if there are no search results
-      if (data.search_results.length === 0) {
-        setMessage('No articles found for the given search term.');
-      } else {
-        setMessage('');
-      } 
-      // Handle the received search results as needed
-    } else {
-      console.error('Error:', response.statusText);
-      setMessage(`Error: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    setMessage('An error occurred while fetching data.');
-  }
+  // Navigate to the result page with the search term
+  navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`);
 };
 ////////////////////////////////////////////////////////////////////////////////
     return (
@@ -384,7 +356,7 @@ const handleSearch = async () => {
                 <div className=' text-white  md:block'>
   
                 <div className='hidden md:block flex flex-col px-10'>
-      {faq.map((d, index) => (
+      {faq1.map((d, index) => (
         <div key={index} className='flex flex-col bg-white mt-5  rounded-2xl'>
 <input
   type="checkbox"
@@ -567,24 +539,24 @@ export default HomeUsers;
 //left side questions
 const faq = [
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+    Question:`Comment puis-je effectuer une recherche sur Sufery ?`,
+    Answer:`Sur la page d'accueil, utilisez simplement la barre de recherche en tapant vos mots-clés, puis appuyez sur Entrée.`,
+   },
+    {
+        Question:`Comment filtrer les résultats par date?`,
+        Answer:`Utiliser les filtres dans la barre latérale pour affiner les résultats en fonction de la période souhaitée,les mots clés,les auteurs ou les institutions.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Sufery enregistre-t-il mes recherches ou infos personnelles ?`,
+        Answer:`Non, Sufery respecte la confidentialité des utilisateurs et ne stocke ni n'utilise les données personnelles liées aux recherches.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Y a-t-il une limite au nombre de résultats affichés sur Sufery ?`,
+        Answer:`Actuellement, nous affichons les résultats les plus pertinents, mais vous pouvez utiliser des filtres pour affiner davantage vos résultats.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
-    },
-    {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Puis-je ajouter une page à mes favoris ?`,
+        Answer:`Pour ajouter une page à vos favoris, cliquez sur l'icône coeur à côté du résultat. Vous pouvez ensuite accéder à vos favoris depuis votre compte.`,
     },
 
 ]
@@ -592,24 +564,24 @@ const faq = [
 //right side questions
 const faq1 = [
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Comment puis-je donner des retours sur Sufery?`,
+        Answer:` Utilisez l'option "Que pensiez vous" ci dessous pour partager vos suggestions ou signaler des problèmes.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:` Les résultats de Sufery incluent-ils des publicités?`,
+        Answer:`Non, Sufery propose une expérience de recherche sans publicités intrusives.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:` Sufery est-il gratuit à utiliser ?`,
+        Answer:`Oui, Sufery est entièrement gratuit !`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Sufery est-il disponible dans d'autres langues ?`,
+        Answer:`Actuellement, Sufery est disponible en français, mais de nouvelles langues sont en cours d'ajout !`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Y a-t-il une application mobile pour Sufery?`,
+        Answer:`Non, Sufery n'a pas actuellement d'application mobile, mais notre site est très facile à utiliser sur votre téléphone car il est responsive ! Profitez-en partout !`,
     },
 
 ]
