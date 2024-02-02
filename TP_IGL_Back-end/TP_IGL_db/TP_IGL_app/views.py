@@ -650,7 +650,7 @@ def consulter_articles_preferes(request):
         favorite_articles = []
         for article_id in favorite_article_ids:
             try:
-                article_data = es.get(index=index_name, id=article_id)['_source']
+                article_data = es.get(index=index_name, id=article_id)
                 favorite_articles.append(article_data)
             except ElasticsearchException:
                 # Handle the case where the article doesn't exist in Elasticsearch
