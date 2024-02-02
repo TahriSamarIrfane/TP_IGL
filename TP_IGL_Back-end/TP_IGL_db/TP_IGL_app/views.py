@@ -187,7 +187,8 @@ mapping = {
             "references":{"type":"text"},
             "key_words":{"type":"text"},
             "full_text":{"type":"text"},
-            "pdf_file":{"type":"text"}
+            "pdf_file":{"type":"text"},
+            "publication_date":{"type":"date"}
 
 }
 }
@@ -317,7 +318,8 @@ class FileUploadAPIView(APIView):
                  "references":references,
                  "key_words":key_words.split(),
                  "full_text":full_text,
-                 "pdf_file":pdf_file
+                 "pdf_file":pdf_file,
+                 "publication_date":serializer.data['publication_date']
             }
                 
                 try:
