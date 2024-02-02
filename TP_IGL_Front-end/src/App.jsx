@@ -17,7 +17,6 @@ import FooterGeust from './components/FooterGeust';
 
 
 
-
 function App() {
   return (
     <Router>
@@ -51,7 +50,7 @@ function App() {
 
         <Route path="/HomeGuests" element={<HomeGuests />} />
         <Route path="/Result" element={<Result />} />
-        <Route path="/Article" element={<Article />} />
+        <Route path="/Article/:id" element={<Article />} />
         <Route path="/Admin" element={<Admin />} />
         <Route path="/ProfileAdminMod" element={<ProfileAdminMod />} />
         <Route path="/ProfileUser" element={<ProfileUser />} />

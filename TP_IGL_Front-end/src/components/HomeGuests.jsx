@@ -21,6 +21,12 @@ import icon4 from '../assets/icons/icon4.png';
 import FeedBacks from'../assets/images/FeedBacks.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
+import profile1 from'../assets/images/profile1.jpg';
+import profile2 from'../assets/images/profile2.jpg';
+import profile3 from'../assets/images/profile3.jpg';
+import profile4 from'../assets/images/profile4.jpeg';
+import profile5 from'../assets/images/profile5.jpg';
+import profile6 from'../assets/images/profile6.jpg';
 import { Link } from 'react-router-dom';
 
 
@@ -39,29 +45,30 @@ const CustomPrevArrow = (props) => (
   );
   
 //for the Slick
-const settings={
+const settings = {
   arrows: true,
-  dots :true,
-  infinite:false,
-  speed:500,
-  slidesToShow:3,
-  slidesToScroll:1,
+  dots: true,
+  infinite: false,
+  speed: 500,
+  slidesToShow: 3,
+  slidesToScroll: 1,
   prevArrow: <CustomPrevArrow />,
   nextArrow: <CustomNextArrow />,
   responsive: [
-
-      {
-        breakpoint: 768, // screens between 768px and 1024px
-        settings: {
-          slidesToShow: 1,
-        },
+    {
+      breakpoint: 600, // screens less than 600px wide
+      settings: {
+        slidesToShow: 1, // Display only 1 slide on small devices
       },
-
-
-    ],
-
+    },
+    {
+      breakpoint: 768, // screens between 768px and 1024px
+      settings: {
+        slidesToShow: 3, // Display 3 slides on medium devices
+      },
+    },
+  ],
 };
-
 
 
 
@@ -103,7 +110,7 @@ const HomeGuests = () => {
                <img className='line1-width line1-height' src={Line1} alt=""/>
              <p className='text-black font-bold text-5xl w-3/4 md:w-3/4 ml-40 md:text-4xl md:ml-56'>A Propos</p>
              </div>
-             <p className="md:px-20 text-grey font-Tahoma mt-4 ">Lorem ipsum dolor sit amet consectetur. Neque risus et eget molestie consectetur. Euismod sit ligula commodo cursus. Metus ac dui nunc facilisi a vestibulum non. Tortor et quis ac placerat nisl id. Amet etiam tempus quis lacus. Nibh id in etiam libero nunc enim interdum..</p>
+             <p className="md:px-20 text-grey font-Tahoma mt-4 ">Bienvenue sur Sufery,votre moteur de recherche en ligne rapide et fiable! Notre objectif est de simplifier votre expérience de recherche avec une interface conviviale, sans publicités intrusives. Profitez d'une navigation sans tracas, où chaque recherche devient une expérience plaisante. Découvrez la puissance de la recherche sur Sufery - où la simplicité rencontre l'efficacité.</p>
              </div>
              <img className='h-50 md:h-72 lg:h-72 ' src={TEAMpic} alt=""/>
               </div>
@@ -285,43 +292,43 @@ export default HomeGuests;
 
 const data = [
     {
-        name:`Alex`,
-        photo:`https://placebear.com/300/200`,
+        name:`Karim tofi`,
+        photo:profile2,
         stars:`✱✱✱✱✱`,
         FeedBack:`Je suis impressionné par la facilité avec laquelle je peux télécharger des articles scientifiques sur ce site. Enregistrer mes articles favoris pour y revenir plus tard est un énorme avantage. Hautement recommandé !`,
     },
 
     {
-        name:`Emily`,
-        photo:`https://robohash.org/yourtext.png`,
+        name:`Yasmine ben`,
+        photo:profile5,
         stars:`✱✱✱✱✱`,
         FeedBack:`Une ressource exceptionnelle pour tous les chercheurs. La possibilité de télécharger des articles en PDF illimité simplifie grandement la gestion de ma bibliographie. Bravo pour cette innovation !`,
     },
 
     {
-        name:`Marie`,
-        photo:`https://plus.unsplash.com/premium_photo-1700175395626-360f76faa0c8?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=100&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwMjc2NjQ3NQ&ixlib=rb-4.0.3&q=80&w=100`,
+        name:`Meriem djafer`,
+        photo:profile3,
         stars:`✱✱✱✱✱`,
         FeedBack:`Ce moteur de recherche a vraiment changé la donne pour moi. Non seulement je peux accéder à une multitude d'articles, mais la fonction pour enregistrer mes préférés facilite la relecture. Une excellente ressource pour la communauté scientifique`,
     },
 
     {
-        name:`Alex`,
-        photo:`https://placebear.com/300/200`,
+        name:`Mohammed fayez`,
+        photo:profile1,
         stars:`✱✱✱✱✱`,
         FeedBack:`Je suis impressionné par la facilité avec laquelle je peux télécharger des articles scientifiques sur ce site. Enregistrer mes articles favoris pour y revenir plus tard est un énorme avantage. Hautement recommandé !`,
     },
 
     {
-        name:`Emily`,
-        photo:`https://robohash.org/1.png`,
+        name:`Fateh `,
+        photo:profile6,
         stars:`✱✱✱✱✱`,
         FeedBack:`Une ressource exceptionnelle pour tous les chercheurs. La possibilité de télécharger des articles en PDF illimité simplifie grandement la gestion de ma bibliographie. Bravo pour cette innovation !`,
     },
 
     {
-        name:`Marie`,
-        photo:`https://ui-avatars.com/api/?name=John+Doe&size=100`,
+        name:`Nasser thm`,
+        photo:profile4,
         stars:`✱✱✱✱✱`,
         FeedBack:`Ce moteur de recherche a vraiment changé la donne pour moi. Non seulement je peux accéder à une multitude d'articles, mais la fonction pour enregistrer mes préférés facilite la relecture. Une excellente ressource pour la communauté scientifique`,
     },

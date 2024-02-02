@@ -92,14 +92,9 @@ fetch(url,options)
                     </form>
 
 
-<<<<<<< HEAD
-                    <button className='bg-darkPink w-full h-10 rounded-md mt-5'>
+                    <button className='bg-darkPink w-full h-10 rounded-md mt-5'onClick={handleButton}>
                         <Link to="/user" className='text-white font-bold text-lg'>Se Connecter</Link>
 
-=======
-                    <button className='bg-darkPink w-full h-10 rounded-md mt-5' onClick={handleButton}>
-                        <p className='text-white font-bold text-lg'>Créer Compte</p>
->>>>>>> e7342538b6028f7cf89a367829c6d8d84f9f9438
                     </button>
                     </form>
                     <div className='mt-5 mb-7 md:mb-0 flex flex-col items-center '>

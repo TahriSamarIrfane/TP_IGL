@@ -52,6 +52,7 @@ urlpatterns = [
     path('filtrer_resultats_auteurs/',filtrer_resultats_auteurs,name='filtrer_resultats_auteurs'),
     path('filtrer_resultats_institution/',filtrer_resultats_institution,name='filtrer_resultats_institution'),
     path('filtrer_resultats_date/',filtrer_resultats_date,name='filtrer_resultats_date'),
+    path('get_article_details/<int:article_id>/', views.get_article_details, name='get_article_details'),
 ]
 
     
