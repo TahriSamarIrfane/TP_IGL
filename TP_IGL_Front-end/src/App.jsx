@@ -52,7 +52,7 @@ function App() {
         <Footer/>
       </>
         } />
-        <Route path="/MDP_oublie/:Email" element={<MDP_oublie />} />
+        <Route path="/MDP_oublie" element={<MDP_oublie />} />
         <Route path="/SendCode" element={<SendCode />} />
         <Route path="/Moderateur" element={<Moderateur />} />
         <Route path="/ModererArticle" element={<ModérerArticle />} />

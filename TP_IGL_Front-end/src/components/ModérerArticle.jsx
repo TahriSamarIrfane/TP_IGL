@@ -138,7 +138,7 @@ const Article = () => {
     
     
     const handleEdit = () =>{
-        setEdit(true);
+        setEdit(!Edit);
     }
     const handleInputTitre =(event) => {
         setTitre(event.target.innerHTML);
@@ -205,7 +205,7 @@ const Article = () => {
         <div className='p-2 md:p-20'>
             <div className='flex flex-col  bg-[#FAF9FE] pb-32 rounded-lg'> 
             <img className='w-full h-56 md:h-72 rounded-tr-lg rounded-tl-lg' src={science5} alt=""/>
-           <p contentEditable={Edit} suppressContentEditableWarning={true} onInput={handleInputTitre} className='text-center text-3xl font-bold text-darkPink px-4 md:px-16 my-5' >{id}</p> 
+           <p contentEditable={Edit} suppressContentEditableWarning={true} onInput={handleInputTitre} className='text-center text-3xl font-bold text-darkPink px-4 md:px-16 my-5' >{Titre}</p> 
             <div className='flex flex-row flex-wrap  justify-between px-10'> {/*Authors + institutions */}
             {AuthorsInstitutions.map((d,index) =>(             
             <div contentEditable={Edit} onInput={handleInputAuteur} suppressContentEditableWarning={true} key={index} className='flex-col  text-center mx-1'>
@@ -224,8 +224,8 @@ const Article = () => {
              <div contentEditable={Edit} suppressContentEditableWarning={true} className='text-darkGery'>{date}</div>
              <div className='flex flex-row p-6 justify-center items-center '>
              <div className='flex flex-row space-x-5'>
-                  <MdDeleteForever onClick={handleDeleteArticle(id)} className='mt-1 text-2xl' />
-                 {Edit && (<button onClick={handleEditArticle(id)} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Terminé</button>)}
+             <Link to='/Moderateur'><MdDeleteForever onClick={handleDeleteArticle(id)} className='mt-1 text-2xl' /></Link>
+                 {Edit && (<button onClick={handleEditArticle(id)} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '><p onClick={handleEdit}>Terminé</p></button>)}
                  {!Edit && (<FaEdit onClick={handleEdit} className='mt-1 text-2xl text-darkPink' />)}
                  <Link to='/Moderateur'><LiaShareSolid className='mt-1 text-2xl text-darkPink'/></Link>
                  
