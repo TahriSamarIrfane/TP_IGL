@@ -18,6 +18,7 @@ import { FaAddressBook } from "react-icons/fa";
 import { MdOutlineAddBox } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineDeleteForever } from "react-icons/md";
+import { Link } from 'react-router-dom';
 
 
 const Admin = () =>  {
@@ -33,7 +34,8 @@ const Admin = () =>  {
     const[usernameNew,setusernameNew] =useState('');
     const[email,setemail] =useState('');
     const[password,setpassword] =useState('');
-
+    const[data,setdata] =useState('');
+    const[dataName,setdataName] =useState('');
     
  
   
@@ -55,7 +57,29 @@ const Admin = () =>  {
       console.log(usernameNew);
     };
  
-    
+    const handleLogout = (e) => {
+      e.preventDefault();
+      const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
+     
+      fetch("http://localhost:8000/logout/", {         method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Basic ${basicAuthCredentials}`,
+          },
+      })
+      .then((response) => {
+          if (!response.ok) {             throw new Error(`HTTP error! Status: ${response.status}`);
+          }         return response.json();
+ 
+      })
+      .then((data) => {
+          console.log('Logout Response:', data);
+          // Handle successful response, e.g., redirect to login page
+      })
+      .catch((error) => {         console.error('Logout failed:', error);
+          // Handle errors, e.g., show an error message to the user
+      });
+  };
 const handleNewModInfo = (e) =>{
   const url = "http://localhost:8000/create-moderator/";
   e.preventDefault();
@@ -71,8 +95,11 @@ const handleNewModInfo = (e) =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    console.log(data);
- 
+    if (data.message === 'Moderator created successfully') {
+      setdata(data.message)
+    } else {
+      setdata('Mail Existant')
+    }
   });
 }
 
@@ -91,7 +118,7 @@ const handleModifierModName = () =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    console.log(data);
+    setdataName(data.message)
  
   });
 }
@@ -110,7 +137,7 @@ const handleModifierModPW = (e) =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    console.log(data);
+    setdata(data.message)
  
   });
 }
@@ -128,23 +155,32 @@ const handleDelete = (e) =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    console.log(data);
+    if (data.message === 'Moderator removed successfully') {
+      setdata(data.message)
+    } else {
+      setdata('Modérateur not found')
+    }
+ 
  
   });
 }
 //Wrapper Fucntion
-const handleClick = (e)=>{handleModifierModPW(e);handleModifierModName()}
-const handleButtonClick = (e) => {
-  const compareResult = usernameNew.localeCompare('');
-  const areEqual = compareResult === 0;
-  const compareRes = password.localeCompare('');
-  const isEqual = compareRes === 0;
-  const inter = compareRes + compareResult;
-  {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
-  
-   {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
-   {isEqual && areEqual ? console.log("Pas de modification"): handleButtonClick(e)}
+const handleClick = (e)=>{ 
+  handleModifierModPW(e);
+  handleModifierModName();
   }
+  
+  // const handleButtonClick = (e) => {
+  // const compareResult = usernameNew.localeCompare('');
+  // const areEqual = compareResult === 0;
+  // const compareRes = password.localeCompare('');
+  // const isEqual = compareRes === 0;
+  // const inter = compareRes + compareResult;
+  // {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
+  
+  //  {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
+  //  {isEqual && areEqual ? console.log("Pas de modification"): handleButtonClick(e)}
+  // }
   
 
 
@@ -178,12 +214,16 @@ const handleButtonClick = (e) => {
     setShowItems(!showItems);
   };
   const handleModifierMod= () => {
+    setdata('');
+    setdataName('');
     setModifierMod(true);
     setNewMod(false);
     setUpload(false);
     setDeleteMod(false);
   };
   const handleDeleteMod = () => {
+    setdata('');
+    setdataName('');
     setDeleteMod(true);
     setNewMod(false);
     setUpload(false);
@@ -191,6 +231,8 @@ const handleButtonClick = (e) => {
 
   };
   const handleNewMod = () => {
+    setdata('');
+    setdataName('');
     setNewMod(true);
     setUpload(false);
     setModifierMod(false);
@@ -202,6 +244,8 @@ const handleButtonClick = (e) => {
 
   };
   const handleUpload = () => {
+    setdata('');
+    setdataName('');
     setUpload(true);
     setNewMod(false);
     setDeleteMod(false);
@@ -212,7 +256,8 @@ const handleButtonClick = (e) => {
     setNav(!nav)
   }
   return (
-    <div className='flex flex-col bg-gradient-to-r lg:h-screen h-full w-screen from-GLbleu via-GLpink to-orange-300   '>  <div className='flex flex-row justify-center items-center space-x-8 w-full h-full'> 
+    <div className='flex flex-col bg-gradient-to-r lg:h-screen h-full w-screen from-GLbleu via-GLpink to-orange-300   '>
+      <div className='flex flex-row justify-center items-center space-x-8 w-full h-full'> 
 
        {/*Barre des d'actions (Menu) */}
         <div className='w-[15%] rounded-2xl bg-opacity-30 h-[80%] mt-10  bg-white hidden lg:block '>
@@ -252,7 +297,7 @@ const handleButtonClick = (e) => {
                                  ) }
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut color='#AA336A' className='mt-1 ' size={17}/>
-                <li className=' text-black'>Déconnecter</li>
+                <Link to='/'><li onClick={handleLogout} className=' text-black'>Déconnecter</li></Link>
 
               </div>
               </ul>
@@ -315,6 +360,8 @@ const handleButtonClick = (e) => {
                 value={password}
                 onChange={handleChangePW}
                />
+               <p>{data}</p>
+               <p>{dataName}</p>
                <button type='button' onClick={handleClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
      
               </div>
@@ -341,7 +388,7 @@ const handleButtonClick = (e) => {
                 value={email}
                 onChange={handleChangeE}
                />
-             
+               <p>{data}</p>
                <button type='button' onClick={handleNewModInfo} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Ajouter</button>
      
               </div>
@@ -361,7 +408,7 @@ const handleButtonClick = (e) => {
                 value={username}
                 onChange={handleChangeP}
                />
-            
+                 <p>{data}</p>
                <button type='button' onClick={handleDelete} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
      
               </div>
@@ -378,11 +425,11 @@ const handleButtonClick = (e) => {
            <div className={!nav ? ' fixed left-0 top-20 w-[40%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
                  <div className={Upload ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 '}>
-                    <FiUpload className='mt-1 ' size={17}/>
+                    <FiUpload color='#AA336A' className='mt-1 ' size={17}/>
                   <li onClick={handleUpload} className=' text-black'>Upload</li>
                 </div>
                 <div className={!showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink '}>
-                 <FaAddressBook className='mt-1 ' size={17}/>
+                 <FaAddressBook color='#AA336A' className='mt-1 ' size={17}/>
                   <li onClick={handleListItemClick} className='text-black'>Modérateurs</li>
                 </div>
                 {showItems && (
@@ -404,8 +451,8 @@ const handleButtonClick = (e) => {
 
                                  ) }
                 <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
-                <LuLogOut className='mt-1 ' size={17}/>
-                <p className=' text-black'>Déconnecter</p>
+                <LuLogOut color='#AA336A' className='mt-1 ' size={17}/>
+                <Link to='/'><p onClick={handleLogout} className=' text-black'>Déconnecter</p></Link>
                </div>
               </ul>
               
@@ -416,7 +463,7 @@ const handleButtonClick = (e) => {
 
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
-          <img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/>
+      <Link to='/ProfileAdminMod'><img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/></Link>
           </div>
     </div>
      

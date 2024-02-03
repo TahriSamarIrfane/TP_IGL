@@ -183,6 +183,7 @@ const handleSearch = async () => {
                          placeholder='Search articles...'
                          value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        name='searchBar'
                           />
                     <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
                     onClick={handleSearch}
