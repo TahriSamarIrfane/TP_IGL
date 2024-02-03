@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+</head>
+<body>
+
+<h2>Contact Us</h2>
+
+<form id="ContactForm" method="post" action="{% url 'contact' %}" enctype="multipart/form-data">
+
+    {% csrf_token %}
+    
+    <label for="nom">Name:</label>
+    <input type="text" id="nom" name="nom" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="message">Message:</label>
+    <textarea id="message" name="message" rows="4" required></textarea>
+
+    <button type="submit" name="submit">Submit</button>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('ContactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+    
+            // Retrieve values from the form
+            var nomElement = document.getElementById('nom');
+            var emailElement = document.getElementById('email');
+            var messageElement = document.getElementById('message');
+
+            // Debugging: Log elements to the console
+            console.log("Nom Element:", nomElement);
+            console.log("Email Element:", emailElement);
+            console.log("Message Element:", messageElement);
+
+            // Debugging: Log values to the console
+            var nom = nomElement ? nomElement.value : null;
+            var email = emailElement ? emailElement.value : null;
+            var message = messageElement ? messageElement.value : null;
+        
+            // Debugging: Log values to the console
+            console.log("Nom:", nom);
+            console.log("Email:", email);
+            console.log("Message:", message);
+        
+            // Ajoutez le jeton CSRF à la requête
+            var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Check if all required elements are present
+            if (nomElement && emailElement && messageElement) {
+                // Perform AJAX request
+                fetch('{% url "contact" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    },
+                    body: JSON.stringify({
+                        nom: nom,
+                        email: email,
+                        message: message,
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
+                    // Handle the response data as needed
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            } else {
+                console.error('One or more form elements are missing.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

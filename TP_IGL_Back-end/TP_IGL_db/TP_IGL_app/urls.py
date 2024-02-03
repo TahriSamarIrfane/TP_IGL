@@ -5,7 +5,7 @@ from django.contrib import admin
 from .views import LoginPage ,LogoutPage , change_password , change_username , delete_account , signup_page ,reset_password , request_password_reset_code , home
 from .views import elasticsearch_status_view , ajouter_article_prefere , consulter_articles_preferes
 from .views import consulter_article_pdf , consulter_article_text , afficher_details ,  rechercher_articles
-from .views import filtrer_resultats_key_words, filtrer_resultats_auteurs , filtrer_resultats_institution ,filtrer_resultats_date
+from .views import filtrer_resultats_key_words, filtrer_resultats_auteurs , filtrer_resultats_institution ,filtrer_resultats_date,contact_view
 from .views import *
 urlpatterns = [
     path('',home, name='home'),
@@ -25,6 +25,7 @@ urlpatterns = [
     path('change_moderator_username/',change_moderator_username, name='change_moderator_username'),
     path('change_moderator_password/',change_moderator_password, name='change_moderator_password'),
     path('submit-feedback/', submit_feedback, name='submit-feedback'),
+    path('contact/',contact_view,name='contact'),
     path('contact-us/', contact_us, name='contact-us'),
     path('ajouter_article_prefere/', ajouter_article_prefere, name='ajouter_article_prefere'),
     path('consulter_articles_preferes/',consulter_articles_preferes,name='consulter_articles_preferes'),
@@ -36,6 +37,8 @@ urlpatterns = [
     path('filtrer_resultats_auteurs/',filtrer_resultats_auteurs,name='filtrer_resultats_auteurs'),
     path('filtrer_resultats_institution/',filtrer_resultats_institution,name='filtrer_resultats_institution'),
     path('filtrer_resultats_date/',filtrer_resultats_date,name='filtrer_resultats_date'),
+    path('GetArticlesEnAttente/',get,name='GetArticlesEnAttente'), 
+    path('create_article/',create_article,name='create_article'),
 ]
     
 

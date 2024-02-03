@@ -98,6 +98,8 @@ from .utils import remove_moderator
 from .models import Moderateur
 from django.views.decorators.csrf import csrf_protect
 from .forms import ContactForm
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 
 
 ArticleIndex.init()
@@ -169,14 +171,23 @@ def LoginPage(request):
             username = data.get('username')
             password = data.get('password')
 
-            # Authentification avec Django
+            # Authenticate regular user
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                return JsonResponse({"message": "Authentification réussie"})
+                # Include CSRF token in the response
+                csrf_token = get_token(request)
+                return JsonResponse({"message": "Authentification réussie", "csrftoken": csrf_token})
             else:
-                return JsonResponse({"message": "Nom d'utilisateur ou mot de passe incorrect"}, status=401)
+                # If regular authentication fails, try with Moderateur
+                moderator = Moderateur.objects.filter(username=username).first()
+                if moderator and moderator.check_password(password):
+                    login(request, moderator)
+                    csrf_token = get_token(request)
+                    return JsonResponse({"message": "Authentification en tant que modérateur réussie", "csrftoken": csrf_token})
+                else:
+                    return JsonResponse({"message": "Nom d'utilisateur ou mot de passe incorrect"}, status=401)
 
         except json.JSONDecodeError:
             return JsonResponse({"message": "Format JSON invalide"}, status=400)
@@ -889,7 +900,7 @@ def generate_random_password_view(request):
     else:
         return Response(serializer.errors, status=400)
     
-@csrf_exempt
+#@csrf_exempt
 @api_view(['POST'])
 def create_moderator_view(request):
     if request.method == 'POST':
@@ -1023,7 +1034,6 @@ def submit_feedback(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-
 @csrf_protect
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -1047,3 +1057,170 @@ def contact_us(request):
         return JsonResponse({'message': 'Message submitted successfully'}, status=201)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# @api_view(['GET','POST'])
+# def contact_view(request):
+#     try:
+#         if request.method == 'POST':
+#             # data = json.loads(request.body.decode('utf-8'))
+#             # nom = data.get('nom')
+#             # email = data.get('email')
+#             # message = data.get('message')
+#             print(request.POST)
+#             form = ContactForm(request.POST)
+
+#             if form.is_valid():
+#                 # Le formulaire est valide, vous pouvez maintenant accéder aux données du formulaire
+#                 nom = form.cleaned_data['nom']
+#                 email = form.cleaned_data['email']
+#                 message = form.cleaned_data['message']
+
+#                 # Print statements for debugging
+#                 print(f'nom: {nom}, email: {email} , message: {message}')
+
+#                 # Envoyer un e-mail
+#                 subject = 'Contact Support'
+#                 email_message = f"Nom: {nom}\nMessage: {message}\nEmail: {email}"
+#                 from_email = 'boutheynalaouar7@gmail.com'  # Remplacez par votre adresse e-mail
+#                 to_email = 'lb_laouar@esi.dz'  # Remplacez par l'adresse e-mail de destination
+#                 send_mail(subject, email_message, from_email, [to_email])
+
+#                 # Vous pouvez maintenant utiliser ces données comme vous le souhaitez
+#                 # (par exemple, enregistrer dans la base de données, envoyer un e-mail, etc.)
+
+#                 # Pour cette démonstration, renvoyez simplement une réponse JSON
+#                 response_data = {
+#                     'status': 'Success',
+#                     'message': 'Form submitted successfully!',
+#                     'data': {
+#                         'nom': nom,
+#                         'email': email,
+#                         'message': message,
+#                     }
+#                 }
+#                 return JsonResponse(response_data)
+#             else:
+#                 # Le formulaire n'est pas valide
+#                 response_data = {
+#                     'status': 'Error',
+#                     'message': 'Form validation failed.',
+#                     'errors': form.errors
+#                 }
+#             return JsonResponse(response_data, status=400)
+#         else:
+#             # La requête n'est pas de type POST, renvoyer une page de formulaire vide
+#             # (peut être une page de confirmation)
+#          return render(request, 'contact.html')  # Assurez-vous d'avoir un template HTML pour cette vue
+
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=500)
+    
+@csrf_exempt
+@api_view(['GET', 'POST'])
+def contact_view(request):
+    try:
+        if request.method == 'POST':
+            if request.content_type == 'application/json':
+                # Si les données sont en format JSON, utilisez request.body
+                data = json.loads(request.body.decode('utf-8'))
+                nom = data.get('nom')
+                email = data.get('email')
+                message = data.get('message')
+            else:
+                # Si les données sont en format de formulaire, utilisez request.POST
+                nom = request.POST.get('nom')
+                email = request.POST.get('email')
+                message = request.POST.get('message')
+
+            # Valider et traiter les données
+            if not nom or not email or not message:
+                return JsonResponse({'error': 'Name, email, and message are required fields'}, status=400)
+
+            # Envoyer un e-mail
+            subject = 'Contact Support'
+            email_message = f"Nom: {nom}\nMessage: {message}\nEmail: {email}"
+            from_email = 'boutheynalaouar7@gmail.com'
+            to_email = 'lb_laouar@esi.dz'
+            send_mail(subject, email_message, from_email, [to_email])
+
+            # Répondre avec succès
+            response_data = {
+                'status': 'Success',
+                'message': 'Form submitted successfully!',
+                'data': {
+                    'nom': nom,
+                    'email': email,
+                    'message': message,
+                }
+            }
+            return JsonResponse(response_data)
+        else:
+            # La requête n'est pas de type POST, renvoyer une page de formulaire vide
+            return render(request, 'contactus.jsx')
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@csrf_exempt   
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@login_required    
+def create_article(request, format=None):
+    try:
+        # Get the JSON data from the request
+        article_json = request.data
+
+        # Extract only the relevant attributes for creating the article
+        relevant_attributes = {
+            'titre': article_json.get('titre'),
+            'abstract': article_json.get('abstract'),
+            'key_words': article_json.get('key_words'),
+            'full_text': article_json.get('full_text'),
+            'pdf_file': article_json.get('pdf_file'),
+            'references': article_json.get('references'),
+            'etat': Etat.objects.get(code='A'),  # Use the instance for 'A' (EN_ATTENTE)
+        }
+
+        # Your existing logic to create the article
+        new_article, article_data = create_article_instance(relevant_attributes)
+
+        if new_article:
+            return Response({'message': 'Article created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'message': 'Error creating article'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# Move the create_article logic outside the view function
+def create_article_instance(relevant_attributes):
+    try:
+        # Create a new instance of the Article model with the relevant attributes
+        new_article = Article.objects.create(**relevant_attributes)
+
+        # Add any additional logic for handling authors if needed
+        # authors_list = relevant_attributes.get('auteurs', [])
+        # new_article.auteurs.set(authors_list)
+
+        return new_article, relevant_attributes
+    except Exception as e:
+        # Handle errors when creating the article
+        print(f"Error creating article: {e}")
+        return None, None
+         
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@login_required
+def get(self, request, format=None):
+        try:
+            # Obtenez tous les articles en attente
+            articles_En_Attentes= Article.objects.filter(state='enAttente')
+
+            # Sérialisez les articles pour les renvoyer en réponse
+            serialized_articles = [{'id': article.id, 'other_field': article.other_field} for article in articles_En_Attentes]
+
+            return Response({'articles_En_Attentes': serialized_articles}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
