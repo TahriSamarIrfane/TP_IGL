@@ -88,7 +88,7 @@ const HomeGuests = () => {
                   <img className='h-60 line1-width lg:splach lg:mt-5' src={BlackSplash} alt=""/>
                   <div className='flex  space-x-44 lg:space-x-72'>
                   
-                  <Link to="/SignIn" className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</Link>
+                  <Link to="/SignIn" id='logIn' className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</Link>
                   <Link to="/SignUp" className="text-lg mt-3 bg-pink font-Segoe rounded-3xl py-2 px-7 text-darkPink font-bold absolute top-0 left-0 ">S’Inscrire</Link>
                   </div>
                   </div>

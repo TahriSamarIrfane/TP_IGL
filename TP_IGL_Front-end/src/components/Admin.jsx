@@ -212,12 +212,10 @@ const handleButtonClick = (e) => {
     setNav(!nav)
   }
   return (
-  <div className= ' bg-black w-ful h-full'>
-    <div className='w-full h-full bg-no-repeat max-auto' style={{backgroundImage: `url(${background})`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', width: '100%' , height: '100vh'}}>
-     <div className='flex flex-row justify-center items-center space-x-8 w-full h-full'> 
+    <div className='flex flex-col bg-gradient-to-r lg:h-screen h-full w-screen from-GLbleu via-GLpink to-orange-300   '>  <div className='flex flex-row justify-center items-center space-x-8 w-full h-full'> 
 
        {/*Barre des d'actions (Menu) */}
-        <div className='w-[15%] rounded-sm h-[80%] mt-10 bg-white hidden lg:block '>
+        <div className='w-[15%] rounded-2xl bg-opacity-30 h-[80%] mt-10  bg-white hidden lg:block '>
           <div className='flex flex-col justify-between items-center h-auto w-auto'>
               <div className='flex flex-row justify-center  py-1  mt-4 bg-darkPink rounded-md w-[80%]'>
                < MdOutlineDashboard className='mt-1 ' size={20} color='white'/>
@@ -225,27 +223,27 @@ const handleButtonClick = (e) => {
               </div>
              <ul className=' flex-col mt-5 h-full w-full'>
                  <div className={Upload ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-gray '}>
-                    <FiUpload className='mt-1 ' size={17}/>
+                    <FiUpload color='#AA336A' className='mt-1 ' size={17}/>
                     <li onClick={handleUpload} className=' text-black'>Upload</li>  
                  </div>
                 <div className={!showItems ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                 <FaAddressBook className='mt-1 ' size={17}/>
+                 <FaAddressBook color='#AA336A' className='mt-1 ' size={17}/>
                   <li onClick={handleListItemClick} className='text-black'>Modérateurs</li>
                 </div>
               
-              </ul>
+              
               {showItems && (
                             <ul className='ml-3'>
                                   <div className={!NewMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <MdOutlineAddBox className='mt-1 ' size={17}/>
+                                    <MdOutlineAddBox color='#AA336A' className='mt-1 ' size={17}/>
                                     <li onClick={handleNewMod} className='text-black'>Nouveau</li>
                                  </div>
                                  <div className={!ModifierMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <IoSettingsOutline className='mt-1 ' size={17}/>
+                                    <IoSettingsOutline color='#AA336A' className='mt-1 ' size={17}/>
                                     <li onClick={handleModifierMod}  className='text-black'>Modifier</li>
                                    </div>
                                    <div className={!DeleteMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
-                                    <MdOutlineDeleteForever className='mt-1 ' size={17}/>
+                                    <MdOutlineDeleteForever color='#AA336A' className='mt-1 ' size={17}/>
                                     <li onClick={handleDeleteMod}  className='text-black'>Supprimer</li>
                                    </div>
                               
@@ -253,10 +251,11 @@ const handleButtonClick = (e) => {
 
                                  ) }
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
-                <LuLogOut className='mt-1 ' size={17}/>
-                <p className=' text-black'>Déconnecter</p>
+                <LuLogOut color='#AA336A' className='mt-1 ' size={17}/>
+                <li className=' text-black'>Déconnecter</li>
 
               </div>
+              </ul>
           </div>
         </div> 
 
@@ -268,10 +267,10 @@ const handleButtonClick = (e) => {
            <div onClick={handleNav} className='lg:hidden'>
             {nav ? <IoMenu color='white' size={25}/> : <IoMenu color='white' size={25}/> }
            </div>
-           <h5 className='text-white font-bold text-2xl '>Dashboard</h5>
+           <h5 className='text-white text-opacity-70 font-bold text-2xl '>Dashboard</h5>
           </div>
           
-          <div className="flex flex-col items-center justify-center bg-opacity-10 max-w-auto h-full w-[95%] mt-11 bg-white">
+          <div className="flex flex-col items-center justify-center rounded-2xl max-w-auto h-full w-[95%] mt-11 bg-white">
           {Upload && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
              <div className='flex flex-row  items-center w-[60%] '>
              <form action="http://localhost:8000/upload-file/" method="POST" encType='multipart/form-data'>
@@ -279,10 +278,9 @@ const handleButtonClick = (e) => {
                 type="file"
                 name="uploaded_file"
                 id='uploaded_file'
-                className="py-2 w-[75%] rounded-l-3xl text-white "
-                
+                className=" w-[75%] rounded-l-xl border-b-2 border-t-2 border-l-2  "
                 /> 
-               <button onClick={handleUploadArticle}  style={{ position:'relative',fontSize: 'auto', overflow:'hidden' }} className='fixed h-full py-2 w-[25%] bg-darkPink rounded-r-xl text-white text-size-auto '>Upload</button>
+               <button onClick={handleUploadArticle}  style={{ position:'relative',fontSize: 'auto', overflow:'hidden' }} className='fixed h-full py-[2.1%] w-[25%] border-b-2  border-r-2 bg-darkPink rounded-r-xl text-white text-size-auto '>Upload</button>
                </form>
               </div>
               
@@ -377,7 +375,7 @@ const handleButtonClick = (e) => {
            {/*NavBar for a small frame */}
            
        
-           /* <div className={!nav ? ' fixed left-0 top-20 w-[40%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
+           <div className={!nav ? ' fixed left-0 top-20 w-[40%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
                  <div className={Upload ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 '}>
                     <FiUpload className='mt-1 ' size={17}/>
@@ -422,7 +420,7 @@ const handleButtonClick = (e) => {
           </div>
     </div>
      
- </div>
+
   
     
     

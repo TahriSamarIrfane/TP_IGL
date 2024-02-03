@@ -181,6 +181,6 @@ CORS_ALLOW_HEADERS = [
     'access-control-allow-credentials',
     'content-type',
 ]
-
-SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.
-SELENIUM_EXECUTABLE_PATH = os.path.join(BASE_DIR, 'geckodriver')  # Chemin vers le fichier GeckoDriver
+from selenium import webdriver
+# SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.
+# SELENIUM_EXECUTABLE_PATH = os.path.join(BASE_DIR, 'geckodriver')  # Chemin vers le fichier GeckoDriver
