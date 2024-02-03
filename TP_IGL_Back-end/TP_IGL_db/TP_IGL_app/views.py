@@ -1,4 +1,20 @@
-from django.shortcuts import render,redirect
+import json
+from django.conf import settings
+from rest_framework.viewsets import ModelViewSet
+from elasticsearch import Elasticsearch
+from django.conf import settings
+import os
+from django.shortcuts import render
+from .models import Article,Auteur,Institution,UploadedFile
+from rest_framework.decorators import api_view,parser_classes
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ArticleSerializer,AuteurSerializer,InstitutionSerializer,FileUploadSerializer
+from elasticsearch_dsl import Document, Text, Keyword, Integer, Nested, connections
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser,MultiPartParser,FormParser
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+# Create your views here.from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -101,6 +117,208 @@ from .forms import ContactForm
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from elasticsearch import Elasticsearch
+from django.conf import settings
+from django.shortcuts import render
+from .models import Article,Auteur,Institution,UploadedFile,Profile
+from rest_framework.decorators import api_view,parser_classes
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ArticleSerializer,FileUploadSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser,FormParser
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+# Create your views here.
+from django.core.mail import send_mail
+from . import utils 
+
+def transforme_institution_to_json(institution):
+    dic1={}
+    institutions=[]
+    for ins in institution:
+        dic1={"nom":ins}
+        institutions.append(dic1)
+    return institutions
+
+def transform_auteur_institution_to_json(auteurs,des_institutions):
+    les_institutions=transforme_institution_to_json(des_institutions)
+    dic2={}
+    les_auteurs=[]
+    for auteur in auteurs:
+        dic2={"nom":auteur,"institutions":les_institutions}
+        les_auteurs.append(dic2)
+    return les_auteurs
+
+def create_index(index_nom,map,the_document,the_id):
+    es=Elasticsearch('http://localhost:9200')
+    if not es.indices.exists(index=index_nom):
+        es.indices.create(index=index_nom,mappings=map)
+    es.index(index=index_name,id=the_id,body=the_document)
+
+def delete_index(index_nom,the_id):
+    es=Elasticsearch('http://localhost:9200')
+    es.delete(index=index_name,id=3)        
+
+index_name='index_articles'
+
+mapping = {
+        "properties": {
+            "auteurs" :{"type":"nested",
+                       "properties":{   
+                           "id":{"type":"long"},
+                           "nom":{"type":"text"},
+                           "institutions":{"type":"nested",
+                                             "properties":
+                                                 { "id":{"type":"long"},
+                                                   "nom":{"type":"text"}},
+                                          }}},
+            "titre": {"type": "text"},
+            "abstract":{"type":"text"},
+            "references":{"type":"text"},
+            "key_words":{"type":"text"},
+            "full_text":{"type":"text"},
+            "pdf_file":{"type":"text"}
+
+}
+}
+@api_view(['GET'])
+def get_articles(request, format=None):
+    try:
+        # Obtenez tous les articles en attente
+        articles_en_attente = Article.objects.filter(etat='A')
+
+        # Sérialisez les articles pour les revoyer en réponse
+        serialized_articles = [{"id": article.id, "titre": article.titre, "abstract": article.abstract} for article in articles_en_attente]
+
+        return Response({'articles_en_attente': serialized_articles}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def Article_review(request,id):
+    try:
+      article=Article.objects.get(pk=id)
+    except Article.DoesNotExist:
+        return Response("object doesn't exists",status=status.HTTP_404_NOT_FOUND)
+    serializer= ArticleSerializer(article)
+    return Response(serializer.data)
+
+@api_view(['PATCH','DELETE'])
+def Article_correct_and_remove(request,id):
+    try:
+        
+        article = Article.objects.get(pk=id)
+    except Article.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    le_id=id
+    if request.method == 'PATCH':
+        serializer=ArticleSerializer(article,data=request.data)
+        if serializer.is_valid():
+           serializer.save()
+           le_document={
+                 "auteurs":serializer.data["auteurs"],
+                 "titre": serializer.data['titre'],
+                 "abstract":serializer.data['abstract'],
+                 "references":serializer.data['references'],
+                 "key_words":serializer.data['key_words'],
+                 "full_text":serializer.data['full_text'],
+                 "pdf_file":serializer.data['pdf_file']
+                  }
+           try:
+                create_index(index_name,mapping,le_document,le_id)
+           except:
+                print("erreur lors de l'indexation")
+                return Response("erreur dans elasticsearch",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+           
+           return Response(serializer.data,status=status.HTTP_200_OK)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    elif request.method == 'DELETE':
+        article.delete()
+        try:
+            delete_index(index_name,le_id)
+        except:
+            print("erreur lors de la suppression de l'index")
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class FileUploadAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = FileUploadSerializer
+    
+    def post(self, request, *args, **kwargs):
+        
+        serializer_f = self.serializer_class(data=request.data)
+        
+        if serializer_f.is_valid():
+            
+            serializer_f.save()
+            
+            file_url=serializer_f.data['uploaded_file']
+            
+            pdf_file="http://127.0.0.1:8000"+str(file_url)
+            
+            the_path=str(settings.BASE_DIR)+file_url
+            
+            titre=extract_title(the_path)
+            
+            full_text=extract_article(the_path)
+            
+            abstract=extract_info(the_path,'abstract')
+            
+            key_words=extract_info(the_path,'keywords')
+            
+            references=extract_info(the_path,'references')
+            
+            auteur=[]
+            
+            institution=[]
+            
+            extract_entities(full_text,auteur,institution)
+            
+            les_auteurs=auteur[:4]
+           # print(les_auteurs)
+            les_institutions=institution[:4]
+            
+            auteurs=transform_auteur_institution_to_json(les_auteurs,les_institutions)
+            
+            article_data = {
+                "titre": titre,
+                "abstract": abstract.replace("\n"," "),
+                "key_words": key_words.replace("\n"," "),
+                "full_text": full_text.replace("\n"," "),
+                "pdf_file": pdf_file,
+                "references": references.replace("\n"," "),
+                "auteurs":auteurs,
+            }
+            serializer = ArticleSerializer(data=article_data)
+            if serializer.is_valid():
+                serializer.save()
+                le_id=serializer.data['id']
+                le_document={
+                 "auteurs":serializer.data['auteurs'],
+                 "titre": titre,
+                 "abstract":abstract.replace("\n"," "),
+                 "references":references.replace("\n"," "),
+                 "key_words":key_words.replace("\n"," "),
+                 "full_text":full_text.replace("\n"," "),
+                 "pdf_file":pdf_file
+            }
+                
+                try:
+                    create_index(index_name,mapping,le_document,le_id)
+                except:
+                    print("erreur lors de l'indexation")
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer_f.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 ArticleIndex.init()
 # authentification google 
@@ -162,7 +380,6 @@ def signup_page(request):
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 # 2- fonction se connecter 
-
 @csrf_exempt
 def LoginPage(request):
     if request.method == 'POST':
@@ -366,6 +583,67 @@ def elasticsearch_status_view(request):
 @csrf_exempt
 @permission_classes([IsAuthenticated])
 @login_required
+#def ajouter_article_prefere(request):
+   ## try:
+        # Récupérez l'ID de l'utilisateur authentifié
+       # user_id = request.user.id
+
+        # Récupérez ou créez l'instance FavoriteArticle pour l'utilisateur authentifié
+       # user_pref, created = FavoriteArticle.objects.get_or_create(user_id=user_id)
+
+        # Récupérez l'ID de l'article à partir du corps de la requête JSON
+      #  body = json.loads(request.body.decode('utf-8'))
+      #  article_id = body.get('id')
+
+      #  if article_id is None:
+        #    return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'a pas été fourni dans la requête JSON'})
+
+        # Récupérez les IDs de tous les articles dans l'index Elasticsearch
+       # es = Elasticsearch(['http://localhost:9200'])
+       # index_name = 'index_articles'
+       # print(f'article_id: {article_id}')
+
+      #  search_query = {
+       #     "query": {
+       #         "match_all": {}
+       #     }
+      #  }
+
+      #  result = es.search(index=index_name, body=search_query, size=1000)
+    #    existing_article_ids = [hit['_id'] for hit in result['hits']['hits']]
+
+        # Vérifiez si l'ID de l'article existe dans Elasticsearch
+      #  if article_id not in existing_article_ids:
+        #    return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'existe pas dans Elasticsearch'})
+
+       # try:
+        #    article_data = es.get(index=index_name, id=article_id)['_source']
+      #  except ElasticsearchException as es_error:
+        #    return JsonResponse({'status': 'Error', 'message': "L'ID de l'article n'existe pas dans Elasticsearch"})
+
+        # Vérifiez si l'article est déjà dans la liste d'articles préférés
+        #if article_id not in user_pref.elasticsearch_ids:
+      # Ajoutez l'ID de l'article à la liste d'articles préférés de l'utilisateur
+      ##   user_pref.elasticsearch_ids.append(article_id)
+       #  user_pref.save()
+
+
+       #  return JsonResponse({'status': 'OK', 'message': 'Article ajouté aux favoris avec succès'})
+       # else:
+       #     return JsonResponse({'status': 'Error', 'message': 'Article déjà présent dans les favoris'})
+
+   # except Exception as e:
+        # Print the exception for debugging purposes
+      #  print(f'An error occurred: {e}')
+     #   return JsonResponse({'status': 'Error', 'message': f'Une erreur s\'est produite: {e}'})
+    
+
+
+
+
+
+
+@csrf_exempt
 def ajouter_article_prefere(request):
     try:
         # Récupérez l'ID de l'utilisateur authentifié
@@ -381,9 +659,15 @@ def ajouter_article_prefere(request):
         if article_id is None:
             return JsonResponse({'status': 'Error', 'message': 'L\'ID de l\'article n\'a pas été fourni dans la requête JSON'})
 
+        # Récupérez l'action à partir du corps de la requête JSON
+        action = body.get('action')
+
+        if action not in ['add', 'remove']:
+            return JsonResponse({'status': 'Error', 'message': 'Action not valid'})
+
         # Récupérez les IDs de tous les articles dans l'index Elasticsearch
         es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
+        index_name = 'index_articles'
         print(f'article_id: {article_id}')
 
         search_query = {
@@ -404,23 +688,36 @@ def ajouter_article_prefere(request):
         except ElasticsearchException as es_error:
             return JsonResponse({'status': 'Error', 'message': "L'ID de l'article n'existe pas dans Elasticsearch"})
 
-        # Vérifiez si l'article est déjà dans la liste d'articles préférés
-        if article_id not in user_pref.elasticsearch_ids:
-      # Ajoutez l'ID de l'article à la liste d'articles préférés de l'utilisateur
-         user_pref.elasticsearch_ids.append(article_id)
-         user_pref.save()
+        # Ajouter ou supprimer l'ID de l'article à/from la liste d'articles préférés de l'utilisateur
+        if action == 'add' and article_id not in user_pref.elasticsearch_ids:
+            user_pref.elasticsearch_ids.append(article_id)
+        elif action == 'remove' and article_id in user_pref.elasticsearch_ids:
+            user_pref.elasticsearch_ids.remove(article_id)
 
+        user_pref.save()
 
-         return JsonResponse({'status': 'OK', 'message': 'Article ajouté aux favoris avec succès'})
-        else:
-            return JsonResponse({'status': 'Error', 'message': 'Article déjà présent dans les favoris'})
+        return JsonResponse({'status': 'OK', 'message': 'Article ajouté/retiré des favoris avec succès'})
 
     except Exception as e:
         # Print the exception for debugging purposes
         print(f'An error occurred: {e}')
         return JsonResponse({'status': 'Error', 'message': f'Une erreur s\'est produite: {e}'})
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #10- consulter un article prefere
+
 
 @csrf_exempt
 @login_required
@@ -440,19 +737,27 @@ def consulter_articles_preferes(request):
         # You can now use the list of article IDs to fetch the corresponding articles
         # For example, using Elasticsearch:
         es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
+        index_name = 'index_articles'
 
         favorite_articles = []
         for article_id in favorite_article_ids:
             try:
-                article_data = es.get(index=index_name, id=article_id)['_source']
+                article_data = es.get(index=index_name, id=article_id)
                 favorite_articles.append(article_data)
-            except ElasticsearchException:
-                # Handle the case where the article doesn't exist in Elasticsearch
-                pass
+            except ElasticsearchException as e:
+                # Log the exception for debugging
+                
+                # You may choose to handle the exception differently (e.g., inform frontend)
 
-        return JsonResponse({'status': 'OK', 'favorite_articles': favorite_articles})
+              return JsonResponse({'status': 'OK', 'message': 'Favorite articles fetched successfully', 'favorite_articles': favorite_articles})
 
+        # Return a JSON response with the status, message, and detailed favorite articles
+        return JsonResponse({
+            'status': 'OK',
+            'message': 'Favorite articles fetched successfully',
+            'favorite_articles': favorite_articles
+        })
+    
     except Exception as e:
         # Print the exception for debugging purposes
         print(f'An error occurred: {e}')
@@ -474,7 +779,7 @@ def afficher_details(request):
 
         # Use Elasticsearch to retrieve details for the specified article ID
         es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
+        index_name = 'index_articles'
 
         try:
             article_data = es.get(index=index_name, id=article_id)['_source']
@@ -585,14 +890,13 @@ class AllUsersAPIView(APIView):
 #15- rechercher un article 
 
 @csrf_exempt
-@login_required 
-@permission_classes([IsAuthenticated])
+#@login_required 
+#@permission_classes([IsAuthenticated])
 def rechercher_articles(request):
     try:
         # Récupérez les mots-clés à partir du corps de la requête JSON
         body = json.loads(request.body.decode('utf-8'))
-        keywords =  body.get('mots_cles')
-
+        keywords =  body.get('mots_cles', '')
         if keywords is None:
             return JsonResponse({'status': 'Error', 'message': 'Les mots-clés n\'ont pas été fournis dans la requête JSON'})
 
@@ -601,7 +905,7 @@ def rechercher_articles(request):
 
         # Connectez-vous à Elasticsearch
         es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'article_7'
+        index_name = 'index_articles'
 
         # Construisez une requête de recherche Elasticsearch
         search_query = {
@@ -611,23 +915,21 @@ def rechercher_articles(request):
                 #    "should":[ {"match": {"auteurs": keyword}} for keyword in keywords]
                 #    "should":[  {"match": {"title": keyword}} for keyword in keywords],
                 #    "should":[  {"match": {"text": keyword}} for keyword in keywords],
-                 "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
+                    "should": [
+                        {"match_phrase": {"key_words": keywords}},
+                        {"match_phrase": {"abstract": keywords}},
+                        {"match_phrase": {"titre": keywords}},
+                        {"match_phrase": {"full_text": keywords}},
                     ],
    
-            "minimum_should_match": 1
+            "minimum_should_match": 1,
+
         }
     }
 }
 
         # Exécutez la requête de recherche
-        result = es.search(index=index_name, body=search_query, size=1000)
+        result = es.search(index='index_articles', body=search_query, size=1000)
 
         # Récupérez les résultats de la recherche
         search_results = result['hits']['hits']
@@ -672,24 +974,24 @@ def filtrer_resultats_key_words(request):
             "query": {
                 "bool": {
                     "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
+                        {"match": {"key_words": keyword}} for keyword in keywords
                     ] + [
                         {"match": {"abstract": keyword}} for keyword in keywords
                     ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
+                        {"match": {"titre": keyword}} for keyword in keywords
                     ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
+                        {"match": {"full_text": keyword}} for keyword in keywords
                     ],
                     "minimum_should_match": 1,
                     "filter": [
-                        {"terms": {"keywords": keywords}}
+                        {"terms": {"key_words": keywords}}
                     ]
                 }
             }
         }
 
         # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
+        result = es.search(index='index_articles', body=search_query, size=1000)
 
         # Retrieve search results
         search_results = result['hits']['hits']
@@ -713,15 +1015,15 @@ def filtrer_resultats_auteurs(request):
     try:
         # Get keywords from the request body
         body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
+        Authors = body.get('mots_cles', [])
 
         # Check if no keywords are provided
-        if not keywords:
+        if not Authors:
             return JsonResponse({'status': 'Error', 'message': 'Aucun mot-clé fourni'})
 
         # Ensure that keywords is a list
-        if not isinstance(keywords, list):
-            keywords = [keywords]
+        if not isinstance(Authors, list):
+            Authors = [Authors]
 
         # Define your Elasticsearch connection
         es = Elasticsearch(['http://localhost:9200'])
@@ -731,24 +1033,25 @@ def filtrer_resultats_auteurs(request):
             "query": {
                 "bool": {
                     "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
+                        {"match": {"auteurs.nom": keyword}} for keyword in Authors
                     ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
+                        {"match": {"abstract": keyword}} for keyword in Authors
                     ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
+                        {"match": {"titre": keyword}} for keyword in Authors
                     ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
+                        {"match": {"full_text": keyword}} for keyword in Authors
                     ],
                     "minimum_should_match": 1,
                     "filter": [
-                        {"terms": {"auteurs": keywords}}
+                    {"terms": {"auteurs.nom": Authors}}
                     ]
+
                 }
             }
         }
 
         # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
+        result = es.search(index='index_articles', body=search_query, size=1000)
 
         # Retrieve search results
         search_results = result['hits']['hits']
@@ -771,15 +1074,15 @@ def filtrer_resultats_institution(request):
     try:
         # Get keywords from the request body
         body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
+        Institutions = body.get('mots_cles', [])
 
         # Check if no keywords are provided
-        if not keywords:
+        if not Institutions:
             return JsonResponse({'status': 'Error', 'message': 'Aucun mot-clé fourni'})
 
         # Ensure that keywords is a list
-        if not isinstance(keywords, list):
-            keywords = [keywords]
+        if not isinstance(Institutions, list):
+            Institutions = [Institutions]
 
         # Define your Elasticsearch connection
         es = Elasticsearch(['http://localhost:9200'])
@@ -789,24 +1092,19 @@ def filtrer_resultats_institution(request):
             "query": {
                 "bool": {
                     "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"abstract": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
-                    ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
+                        {"match": {"auteurs.institutions": keyword}} for keyword in Institutions
                     ],
                     "minimum_should_match": 1,
                     "filter": [
-                        {"terms": {"institutions": keywords}}
+                        {"terms": {"auteurs.institutions": Institutions}}
                     ]
+                    
                 }
             }
         }
 
         # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
+        result = es.search(index='index_articles', body=search_query, size=1000)
 
         # Retrieve search results
         search_results = result['hits']['hits']
@@ -831,7 +1129,6 @@ def filtrer_resultats_date(request):
     try:
         # Get keywords and date range from the request body
         body = request.POST or json.loads(request.body.decode('utf-8'))
-        keywords = body.get('mots_cles', [])
         start_date_str = body.get('start_date', '')
         end_date_str = body.get('end_date', '')
 
@@ -844,8 +1141,8 @@ def filtrer_resultats_date(request):
             keywords = [keywords]
 
         # Parse start and end dates
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
+        start_date = datetime.strptime(start_date_str, '%d/%m/%Y').date() if start_date_str else None
+        end_date = datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else None
 
         # Define your Elasticsearch connection
         es = Elasticsearch(['http://localhost:9200'])
@@ -855,25 +1152,32 @@ def filtrer_resultats_date(request):
             "query": {
                 "bool": {
                     "should": [
-                        {"match": {"keywords": keyword}} for keyword in keywords
+                        {"match": {"key_words": keyword}} for keyword in keywords
                     ] + [
                         {"match": {"abstract": keyword}} for keyword in keywords
                     ] + [
-                        {"match": {"title": keyword}} for keyword in keywords
+                        {"match": {"titre": keyword}} for keyword in keywords
                     ] + [
-                        {"match": {"text": keyword}} for keyword in keywords
+                        {"match": {"full_text": keyword}} for keyword in keywords
                     ],
                     "minimum_should_match": 1,
                    
                     "must": [
-                        {"range": {"date": {"gte": start_date, "lte": end_date}}}
+                        {
+                            "range": {
+                                "Date": {
+                                    "gte": start_date.isoformat() if start_date else None,
+                                    "lte": end_date.isoformat() if end_date else None
+                                }
+                            }
+                        }
                     ] if start_date and end_date else []
                 }
             }
         }
 
         # Execute the search
-        result = es.search(index='article_7', body=search_query, size=1000)
+        result = es.search(index='index_articles', body=search_query, size=1000)
 
         # Retrieve search results
         search_results = result['hits']['hits']
@@ -1004,7 +1308,7 @@ def change_moderator_username(request):
     moderator.username = new_username
     moderator.save()
     # Print statements for debugging
-    print(f'old username: {moderator_username}, new username: {new_username}')
+    print('old username: {moderator_username}, new username: {new_username}')
 
     return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
 
@@ -1059,6 +1363,7 @@ def contact_us(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+<<<<<<< HEAD
 # @api_view(['GET','POST'])
 # def contact_view(request):
 #     try:
@@ -1158,10 +1463,48 @@ def contact_view(request):
         else:
             # La requête n'est pas de type POST, renvoyer une page de formulaire vide
             return render(request, 'contactus.jsx')
+=======
+# to bring the article from elastic search using it's ID to display it in the Article page
+
+# Establish connection to your Elasticsearch cluster
+connections.create_connection(hosts=['localhost'])
+
+def article_detail(request, article_id):
+    try:
+        # Fetch article details from Elasticsearch
+        article = Article.get(id=article_id)
+    except Article.DoesNotExist:
+        raise Http404("Article does not exist")
+
+    return render(request, 'article_detail.html', {'article': article})
+
+
+
+
+
+
+es = Elasticsearch(['http://localhost:9200'])
+@csrf_exempt  # For simplicity, you may want to use a more secure approach in a production environment
+def get_article_details(request, article_id):
+    try:
+        print(f"Fetching article details for ID: {article_id}")
+        # Retrieve article details from Elasticsearch
+        article = es.get(index='index_articles', id=article_id)
+        print("Elasticsearch Response:******************************************************************************************************************************", article)
+        # Assuming your article details are stored in the '_source' field
+        article_details = article['_source']
+        
+
+        return JsonResponse({'article_details': article_details})
+
+    except NotFoundError:
+        return JsonResponse({'error': 'Article not found'}, status=404)
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
+<<<<<<< HEAD
 @csrf_exempt   
 @api_view(['POST'])
 @authentication_classes([BasicAuthentication])
@@ -1224,3 +1567,7 @@ def get(self, request, format=None):
             return Response({'articles_En_Attentes': serialized_articles}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+=======
+
+    
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13

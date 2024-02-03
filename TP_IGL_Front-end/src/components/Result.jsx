@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect  } from 'react';
 import'../index.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Import the styles
@@ -8,8 +8,8 @@ import 'slick-carousel/slick/slick-theme.css';
 import { LiaShareSolid } from "react-icons/lia";
 import { FaHeart } from "react-icons/fa";// full heart
 import { TbSearch } from "react-icons/tb";
-
-
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 //import images
 import science4 from'../assets/images/science4.png';
@@ -21,9 +21,35 @@ import { GoPlus } from "react-icons/go";
 import { IoFilter } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaFilePdf } from "react-icons/fa6";
+import { useLocation } from "react-router-dom";
 
 
 const Result = () => {
+
+  const location = useLocation();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [initialSearchDone, setInitialSearchDone] = useState(false);
+
+  useEffect(() => {
+    const searchTermFromQuery = new URLSearchParams(location.search).get('searchTerm');
+
+    // Check if the search term is present in the URL and is different from the current state
+    if (searchTermFromQuery && searchTermFromQuery !== searchTerm && !initialSearchDone) {
+      // If different and initial search not done, update the search term state and trigger the search
+      setSearchTerm(searchTermFromQuery);
+      console.log('-----------------------------',searchTermFromQuery)
+      handleSearch();
+      
+      setInitialSearchDone(true); // Mark initial search as done
+    }
+  }, [location.search, searchTerm, initialSearchDone]);
+  // Trigger the search when searchTerm changes
+useEffect(() => {
+  if (searchTerm) {
+    console.log('Search Term:', searchTerm);
+    handleSearch();
+  }
+}, [searchTerm]);
 
     const [favorite, setFavorite] = useState([]);
     const[hoverFavorite,setHoverFavorite]= useState(false);
@@ -31,16 +57,248 @@ const Result = () => {
 const [startDate, setStartDate] = useState(null);
 const [endDate, setEndDate] = useState(null);
 
-const toggleFavorite = (index) => {
-    if (favorite.includes(index)) {
-      // If index is already in favorites, remove it
-      setFavorite(favorite.filter((favIndex) => favIndex !== index));
-    } else {
-      // If index is not in favorites, add it
-      setFavorite([...favorite, index]);
+
+const handleStartDateChange = (date) => {
+  setStartDate(date);
+  console.log('Start Date:', date);
+};
+
+const handleEndDateChange = (date) => {
+  setEndDate(date);
+  console.log('End Date:', date);
+};
+
+const [keywordsInput, setKeywordsInput] = useState("");
+const [keywords, setKeywords] = useState([]);
+const [authorsInput, setAuthorsInput] = useState("");
+const [Authors, setAuthors] = useState([]);
+const [institutionsInput, setInstitutionsInput] = useState("");
+const [Institutions, setInstitutions] = useState([]);
+
+
+const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+
+
+const toggleFavorite = async (id, index) => {
+  setFavorite((prevFavorites) => {
+    const isFavorite = prevFavorites.some((fav) => fav.id === id);
+
+    // Update the backend
+    const updateBackend = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/ajouter_article_prefere/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: id,
+            action: isFavorite ? 'remove' : 'add',
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Error adding/removing article from favorites:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error adding/removing article from favorites:', error);
+      }
+    };
+
+    updateBackend();
+
+    // Update localStorage with the updated favorites
+    const updatedFavorites = isFavorite
+      ? prevFavorites.filter((fav) => fav.id !== id)
+      : [...prevFavorites, { id, index }];
+
+    localStorage.setItem('favoriteIds', JSON.stringify(updatedFavorites.map((fav) => fav.id)));
+
+    // Update the frontend state
+    return updatedFavorites;
+  });
+};
+
+
+ 
+
+
+  /////////////////////for key words+authors+institutions filter/////////////////////////////////////////////////////////////////////////////////////////////////////
+  const [searchResults, setSearchResults] = useState([]);
+  const [originalSearchResults, setOriginalSearchResults] = useState([]);
+
+  /////////////////////for key words+authors+institutions filter/////////////////////////////////////////////////////////////////////////////////////////////////////
+  const handleFilter = async () => {
+    try {
+
+          // Check if all filter fields are empty
+    if (keywords.length === 0 && Authors.length === 0 && Institutions.length === 0 && !startDate && !endDate) {
+      // If all fields are empty, set the filtered results as the original search results without applying any filters
+      setSearchResults(originalSearchResults);
+      return;
+    }
+      // Apply keyword filter
+      let filteredResults = searchResults.filter(result => {
+        const keywordsInResult = result._source?.key_words;
+        console.log('Result Keywords:', keywordsInResult);
+        console.log('Filter Keywords:', keywords);
+        setSearchResults(originalSearchResults);
+        return keywords.length === 0 || (keywordsInResult && keywordsInResult.some(keyword => keywords.includes(keyword)));
+      });
+  
+// Apply author filter
+filteredResults = filteredResults.filter(result => {
+  const auteursInResult = result._source?.auteurs;
+
+  return Authors.length === 0 || (auteursInResult && auteursInResult.some(auteur => {
+    const authorNamesInAuteur = auteur.nom;
+    return Authors.includes(authorNamesInAuteur);
+  }));
+});
+  
+// Apply institution filter
+filteredResults = filteredResults.filter(result => {
+  const auteursInResult = result._source?.auteurs;
+
+  return Institutions.length === 0 || (auteursInResult && auteursInResult.some(auteur => {
+    const institutionsInAuteur = auteur.institutions.map(institution => institution.nom);
+    return Institutions.length === 0 || institutionsInAuteur.some(institution => Institutions.includes(institution));
+  }));
+});
+  
+// Apply date range filter
+filteredResults = filteredResults.filter(result => {
+  const articleDate = new Date(result._source?.Date.split('/').reverse().join('-'));
+  return (!startDate || articleDate >= startDate) && (!endDate || articleDate <= endDate);
+});
+      
+  
+      // Update your state or do something with the filtered results
+      setSearchResults(filteredResults);
+  
+    } catch (error) {
+      console.error('Error filtering results:', error);
     }
   };
   
+  
+
+  /////for add to favorite
+
+  const isFavorite = favorite.includes(searchResults._id);
+
+  
+  
+  
+  
+  /////////////////////for authours filter/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const handleInputChange = (e, setState) => {
+    setState(e.target.value);
+    console.warn(e.target.value);
+  };
+
+  const addKeyword = (input, setState) => {
+    if (input.trim() !== "") {
+      setState((prevKeywords) => [...prevKeywords, input.trim()]);
+      // Clear input after adding
+      setKeywordsInput("");
+    }
+  };
+
+  const removeKeyword = (index, setState) => {
+    setState((prevKeywords) => prevKeywords.filter((_, i) => i !== index));
+  };
+
+  const removeInstitution = (index, setState) => {
+    setState((prevInstitution) => prevInstitution.filter((_, i) => i !== index));
+  };
+
+  const removeAuthor = (index, setState) => {
+    setState((prevAuthor) => prevAuthor.filter((_, i) => i !== index));
+  };
+
+  const addAuthor = (input, setState) => {
+    if (input.trim() !== "") {
+      setState((prevAuthor) => [...prevAuthor, input.trim()]);
+      // Clear input after adding
+      setAuthorsInput("");
+    }
+  };
+
+  const addInstitutions = (input, setState) => {
+    if (input.trim() !== "") {
+      setState((prevInstitution) => [...prevInstitution, input.trim()]);
+      // Clear input after adding
+      setInstitutionsInput("");
+    }
+  };
+
+
+
+  //remove all tables content when click supprimer tout
+  const clearMap = (input, setState) => {
+    setKeywords([]);
+    setAuthors([]);
+    setInstitutions([]);
+    setStartDate(null);
+    setEndDate(null);
+  };
+  ///////////////////Search bar/////////////////////////////////////////////////////////////////////////////////////////////////
+const [message, setMessage] = useState('');
+
+
+
+const handleSearch = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/rechercher_articles/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mots_cles: searchTerm,
+      }),
+    });
+
+    if (response.ok) {
+      console.log('**********************************');
+      const data = await response.json();
+      ///console.log('Search results:', data.search_results);
+
+            // Update state with search results
+            setSearchResults(data.search_results);
+            setOriginalSearchResults(data.search_results);
+            console.log('*******************************',data.search_results);
+           // Check if there are no search results
+      if (data.search_results.length === 0) {
+        setMessage('No articles found for the given search term.');
+      } else {
+        setMessage('');
+      } 
+      // Handle the received search results as needed
+    } else {
+      console.error('Error:', response.statusText);
+      setMessage(`Error: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    setMessage('An error occurred while fetching data.');
+  }
+};
+
+
+const navigate = useNavigate();
+const handleNavigate = (result) => {
+  console.log('Handling navigation for result:---------------------------', result);
+  console.log('Result _id:', result._id);
+  console.log('Result _source:', result._source);
+  navigate(`/Article/${result._id}`, { state: { article: result._source } });
+};
+  //////////////////////////////////////////////////////////////////////////////
+
   
     return (
 
@@ -52,8 +310,12 @@ const toggleFavorite = (index) => {
                   <div className='flex items-center justify-center mb-5 px-3 md:px-0'>
                  <div className='flex items-center  bg-white w-full md:w-[70%] h-14 rounded-2xl border border-grey'>
                     <TbSearch className='text-4xl ml-2 text-grey'/>
-                        <input type="text" className='focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl' placeholder='Search articles...' />
-                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'>   
+                        <input type="text" className='focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl'
+                         placeholder='Search articles...' 
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl' onClick={handleSearch}>   
                     <h2 className='text-white font-bold text-xl'>Search </h2>                   
                     </button>
                  </div>
@@ -64,58 +326,70 @@ const toggleFavorite = (index) => {
                     <div className='lg:w-3/4 h-[438px] md:h-[438px] lg:show-atricle-scroll px-3 md:px-10 '>
                         
                     <div class="mx-auto h-full  overflow-scroll ">{/*overflow-scroll will add the scoll when overflow */}
-                    {data.map((d,index) =>(
+                    {searchResults && searchResults.length > 0 ? (
+                    searchResults.map((result, index) => (
+
+
                     <div key={index} className=''>
                     <div className='bg-white  h-full  '>
-                        <div className='flex flex-col md:flex-row'>
-                        <img className='h-44 rounded-2xl p-3 mt-3' src={d.photo} alt=""/>
+                        <div className='flex flex-col md:flex-row bg-white'>
+                        <img className='h-44 rounded-2xl p-3 mt-3' src={science3} alt=""/>
                         <div className='mt-3'>
                  <div className='flex flex-col'>
                  <div className='flex flex-row justify-between'>
-                 <h className='text-grey mt-1 text-[12px]'> {d.Date}</h>
-                 <div className=' flex flex-row'>
+                <h className='text-grey mt-1 text-[12px]'> {result._source.Date}</h>
+                 <div className=' flex flex-row md:ml-72 '>
                  <LiaShareSolid className='mt-1 text-2xl'/>
                  <button className='top-0'>Share</button>
                  <label className='flex'>
-                 <input
-  type='checkbox'
-  className='opacity-0'
-  checked={favorite === index}
-  onChange={() => toggleFavorite(index)}
-/> {/* Update the state based on the current value */}
-                 
-<FaHeart
-  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
-  color={(favorite && favorite.includes(index)) || hoverFavorite === index ? "red" : "grey"}
-  onMouseEnter={() => setHoverFavorite(index)}
-  onMouseLeave={() => setHoverFavorite(null)}
-/>
-                 </label>
+                    <input
+                      type='checkbox'
+                      className='opacity-0'
+                      checked={storedFavorites.includes(result._id)}
+                      onChange={() => toggleFavorite(result._id, index)}
+                    />
+                    {/* Update the state based on the current value */}
+                    <FaHeart
+                                  className='text-red-600 mx-3 mt-1 text-2xl cursor-pointer'
+                                  color={
+                                    storedFavorites.includes(result._id) || hoverFavorite === index
+                                      ? 'red'
+                                      : 'grey'
+                                  }
+                                  onMouseEnter={() => setHoverFavorite(index)}
+                                  onMouseLeave={() => setHoverFavorite(null)}
+                                />
+                  </label>
     
     
                  {/*<FaRegHeart /> empty heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
                  </div>
                  </div>
-                 <p className='font-bold text-lg'>{d.title}</p>
+                 <p className='font-bold text-lg'>{result._source.titre}</p>
                  <p className="line-clamp-2 text-darkGery text-sm">
-                  {d.article}</p>
-                       <a href="#" className=" text-black font-bold text-sm">See more</a>
+                 {result._source.full_text}</p>
+
+<p className="text-black font-bold text-sm" onClick={() => navigate(`/Article/${result._id}`, { state: { article: result._source } })}>
+  Voir plus
+</p>
+
                        <div className='relative pr-5 mt-2 md:pr-40'>
                         {/* inline-block will change the container width according to text length */}
   
 
 
                         <div className='flex flex-wrap flex-row'>
-  {d.cle.map((cle) => (
-    <div key={cle} className="bg-white inline-block border rounded-2xl border-darkGery text-center mx-1 my-1">
+  {result._source.key_words.map((cle, cleIndex) => (
+    <div key={cleIndex} className="bg-white inline-block border rounded-2xl border-darkGery text-center mx-1 my-1 ">
       <h className="px-3 text-darkGery">{cle}</h>
     </div>
   ))}
 </div>
 
 
-                     <FaFilePdf className='absolute right-3 top-2 text-xl' />
-
+<a href={result._source.pdf_file} target="_blank" rel="noopener noreferrer">
+                  <FaFilePdf className='absolute right-3 top-2 text-xl cursor-pointer' />
+                </a>
                      </div>
                  </div> 
                  </div>     
@@ -123,8 +397,12 @@ const toggleFavorite = (index) => {
                         </div>
                         </div> 
                     
-                ))
-                }
+                    ))
+                    ) : (
+                      <p>No search results found.</p>
+                    )}
+
+
                     </div>
                  </div>
     
@@ -136,27 +414,49 @@ const toggleFavorite = (index) => {
                     <div className=' flex flex-row mb-5'>   
                     <IoFilter className='font-bold mt-1 mx-1 ml-3'/>
                     <p className='font-bold'> Filtrer</p>
-                    <p className='text-[#5E6DF5] ml-48 md:ml-24'>Tout supprimer</p>
+                    <p className='text-[#5E6DF5] mr-1 ml-48 md:ml-24 cursor-pointer'onClick={clearMap}>Tout supprimer</p>
                    </div>
                     {/*Keywords */}
                     <p className='ml-3 font-bold'>mots clés</p>
-                    <div className='flex flex-row flex-wrap ml-1'>
-                        {keyWords.map((word, index) => (
-                        <div className="relative bg-pink rounded-md flex-shrink-0 mt-2 px-5 mx-1 border-darkPink border-[1px] text-sm text-darkPink "
-                         key={index}>
-                        <IoClose className=' absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1'/>
-                        <IoClose className=' absolute text-darkPink text-sm md:hidden  right-1 top-[4px]'/>
+  
 
-                        {word}
-                        </div>
-                         ))}
-                    </div>    
-                    <div className='flex pr-2  bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
-                    <button >   
-                    <GoPlus className='text-darkPink' />                   
-                    </button>
-                 </div>
+                    
+
+                    <div className='flex flex-row flex-wrap ml-1'>
+  {keywords.map((word, index) => (
+    <div
+      className="relative bg-pink rounded-md flex-shrink-0 mt-2 px-5 mx-1 border-darkPink border-[1px] text-sm text-darkPink "
+      key={index}
+    >
+      <IoClose
+        className='absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1 cursor-pointer'
+        onClick={() => removeKeyword(index, setKeywords)}
+      />
+      <IoClose
+        className='absolute text-darkPink text-sm md:hidden right-1 top-[4px] cursor-pointer'
+        onClick={() => removeKeyword(index, setKeywords)}
+      />
+      {word}
+    </div>
+  ))}
+</div>
+
+
+
+                    
+<div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
+  <input
+    type="text"
+    className='rounded-md w-full h-full outline-none border-none placeholder:text-md'
+    placeholder='Chercher des mots clés'
+    value={keywordsInput}
+    onChange={(e) => handleInputChange(e, setKeywordsInput)}
+  />
+  <button onClick={() => addKeyword(keywordsInput, setKeywords)}>
+    <GoPlus className='text-darkPink' />
+  </button>
+</div>
+
 
                  {/*Authors */}
                  <p className='ml-3 font-bold mt-4'>Auteurs</p>
@@ -164,18 +464,36 @@ const toggleFavorite = (index) => {
                         {Authors.map((word, index) => (
                         <div className="relative bg-pink rounded-md flex-shrink-0 mt-2 px-5 mx-1 border-darkPink border-[1px] text-sm text-darkPink "
                          key={index}>
-                        <IoClose className=' absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1'/>
-                        <IoClose className=' absolute text-darkPink text-sm md:hidden  right-1 top-[4px]'/>
+
+<IoClose
+        className='absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1 cursor-pointer'
+        onClick={() => removeAuthor(index, setAuthors)}
+        
+      />
+      <IoClose
+        className='absolute text-darkPink text-sm md:hidden right-1 top-[4px] cursor-pointer'
+        onClick={() => removeAuthor(index, setAuthors)}
+      />
+
+
                         {word}
                         </div>
                          ))}
                     </div>    
                     <div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
-                    <button >   
-                    <GoPlus className='text-darkPink' />                   
+                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md'
+                         placeholder='Chercher des mots clés'
+                         value={authorsInput}
+                         onChange={(e) => handleInputChange(e, setAuthorsInput)}
+                         />
+
+                    <button onClick={() => addAuthor(authorsInput, setAuthors)}>
+                    <GoPlus className='text-darkPink' />
                     </button>
                  </div>
+
+ 
+
 
                 {/*Institutions */}
                  <p className='ml-3 font-bold mt-4'>Institutions</p>
@@ -183,39 +501,35 @@ const toggleFavorite = (index) => {
                         {Institutions.map((word, index) => (
                         <div className="relative bg-pink rounded-md flex-shrink-0 mt-2 px-5 mx-1 border-darkPink border-[1px] text-sm text-darkPink "
                          key={index}>
-                        <IoClose className=' absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1'/>
-                        <IoClose className=' absolute text-darkPink text-sm md:hidden  right-1 top-[4px]'/>
+                        
+
+                        <IoClose
+        className='absolute text-darkPink text-sm hidden md:block md:right-0 md:top-1 cursor-pointer'
+        onClick={() => removeInstitution(index, setInstitutions)}
+      />
+      <IoClose
+        className='absolute text-darkPink text-sm md:hidden right-1 top-[4px] cursor-pointer'
+        onClick={() => removeInstitution(index, setInstitutions)}
+      />
+
                         {word}
                         </div>
                          ))}
                     </div>    
                     <div className='flex pr-2 bg-white w-full max-w-[95%] h-9 rounded-md border border-grey mt-2 ml-2'>
-                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md' placeholder='Chercher des mots clés' />
-                    <button >   
-                    <GoPlus className='text-darkPink ml-2' />                   
+                        <input type="text" className='rounded-md w-full h-full outline-none border-none placeholder:text-md'
+                         placeholder='Chercher des mots clés'
+                         value={institutionsInput}
+                         onChange={(e) => handleInputChange(e, setInstitutionsInput)}
+                         />
+
+                    
+                    <button onClick={() => addInstitutions(institutionsInput, setInstitutions)}>
+                    <GoPlus className='text-darkPink' />
                     </button>
                  </div>
                  {/*Publication date */}
-                 <p className='ml-3 font-bold mt-4'>Date de publication</p>
 
-                 <div className='ml-3 '>
-                    <form className='flex flex-col'>
-                        <label for="radio1">
-                        <input type='radio' name="Groupe" value="Année actuelle" className=''/>
-                        <h className='ml-2'>Année actuelle</h>
-                        </label>
-
-                        <label for="radio2">
-                        <input type='radio' name="Groupe" value="5 dernières années" className=''/>
-                        <h className='ml-2'>5 dernières années</h>
-                        </label>
-
-                        <label for="radio3" >
-                        <input type='radio' name="Groupe" value="10 dernières années" className=''/>
-                        <h className='ml-2'>10 dernières années</h>
-                        </label>
-                    </form>
-                 </div>
 
                                   {/*Publication date */}
                                   <p className='ml-3 font-bold mt-4 mb-2'>Personnaliser</p>
@@ -224,7 +538,7 @@ const toggleFavorite = (index) => {
                                     <div className='relative border border-grey'>
       <DatePicker
         selected={startDate}
-        onChange={(date) => setStartDate(date)}
+        onChange={handleStartDateChange}
         placeholderText="From"
         className="py-2 px-4 border-none  w-32 rounded focus:outline-none focus:border-blue-500"
       />
@@ -234,7 +548,7 @@ const toggleFavorite = (index) => {
        <div className='relative border border-grey rounded-sm'>
       <DatePicker
         selected={endDate}
-        onChange={(date) => setEndDate(date)}
+        onChange={handleEndDateChange}
         placeholderText="To"
         className="py-2 px-4 border-none  w-32 rounded focus:outline-none focus:border-blue-500"
       />
@@ -243,80 +557,22 @@ const toggleFavorite = (index) => {
 
                                   </div>
 
-                                  <div className='flex items-center justify-center bg-darkPink h-10 w-[95%] rounded-md mt-5 ml-2 mb-10'>
-                                    <h className=' text-lg font-bold text-white'>Filtrer</h>
-
+                                  <div className='flex items-center justify-center bg-darkPink h-10 w-[95%] rounded-md mt-5 ml-2 mb-10 cursor-pointer'onClick={handleFilter}>
+                                    <h className=' text-lg font-bold text-white'  >Filtrer</h>
                                   </div>
                                   </div>
     
                  </div>
                   </div>
+                  
                 </div>
                 
-    )};
+
+    )};              
+
 
 
 export default Result;
 
-const keyWords = ["IOT", "Medicine", "DEGH", "Robotics", "JSQJG"];
-const Authors = ["Name1", "Name2", "Name3", "Name4"];
-const Institutions = ["Institution1", "Institution2", "Institution3", "Institution4"];
 
 
-const data = [
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit `,
-        photo:science3,
-        cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit','Lorem','ipsum','dolor','sit','Lorem','ipsum','dolor','sit'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
-        photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet consectetur`,
-        photo:science1,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
-        photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet consectetur`,
-        photo:science1,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit `,
-        photo:science3,
-        cle:['Lorem','ipsum','dolor','sit'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-
-    {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
-        photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-    },
-]

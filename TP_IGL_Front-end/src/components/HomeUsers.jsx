@@ -22,17 +22,21 @@ import woman1 from'../assets/images/woman1.png';
 import woman2 from'../assets/images/woman2.png';
 import man1 from'../assets/images/man1.png';
 import FAQ from'../assets/images/FAQ.png';
-
-
 import BlackSplash2 from'../assets/images/BlackSplash2.png';
 import email from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
+<<<<<<< HEAD
 
 
 
 const apiurl = "http://127.0.0.1:8000"
+=======
+import { Link } from 'react-router-dom';
+import { FaFilePdf } from "react-icons/fa6";
+import { useNavigate } from 'react-router-dom';
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 
 // Function to get the CSRF token from cookies
@@ -82,7 +86,7 @@ const settings={
 
 const HomeUsers = () => {
 
-  
+  const navigate = useNavigate();
 const[rating,setRating]= useState(null);
 const[hover,setHover]= useState(null);
 
@@ -117,6 +121,7 @@ const handleCheckboxChange1 = (index) => {
   });
 };
 
+<<<<<<< HEAD
 //----------------------FEEDBACKS---------------------------------
 const [comment, setComment] = useState('');
 
@@ -205,6 +210,24 @@ const handleSubmitFeedback = async () => {
   
  
 
+=======
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+const [searchResults, setSearchResults] = useState([]);
+const [message, setMessage] = useState('');
+
+
+const [searchTerm, setSearchTerm] = useState('');
+
+const handleSearch = () => {
+  // Perform any necessary actions related to the search term
+  // ...
+
+  // Navigate to the result page with the search term
+  navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`);
+};
+////////////////////////////////////////////////////////////////////////////////
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
     return (
        <div>
 
@@ -227,17 +250,41 @@ const handleSubmitFeedback = async () => {
                  {/*Search bar */}
                  <div className='flex items-center bg-white w-full h-14 rounded-2xl border border-grey mt-10'>
                     <TbSearch className='text-4xl ml-2 text-grey'/>
-                        <input type="text" className='    focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl' placeholder='Search articles...' />
-                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'>   
+                        <input type="text" className='    focus:ring-darkPink w-full h-full outline-none border-none placeholder:text-xl'
+                         placeholder='Search articles...'
+                         value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                          />
+                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
+                    onClick={handleSearch}
+                    >   
                     <h2 className='text-white font-bold text-xl'>Search </h2>                   
                     </button>
                  </div>
                   </div >
+
+{searchResults.length > 0 && (
+  <div>
+    {/* Display search results as needed */}
+{searchResults.map((result, index) => (
+  <div key={result._id || index}>
+    {/* Render each search result */}
+    <p>{result._source.title}</p>
+    {/* Add more fields as needed */}
+  </div>
+))}
+
+    
+  </div>
+)}
+
+{message && <p>{message}</p>}
                  </div>                 
          </div>
 
         {/* Nos articles populaires*/}
-            <div className='mt-10 '>
+            <div className='mt-10 '
+            id='blog'>
             <h className='font-bold text-2xl md:text-3xl ml-5 md:ml-28 px-2'>Nos articles populaires</h>
 
             <div className='md:ml-20  flex flex-col-reverse md:flex-row-reverse  justify-between'>
@@ -273,6 +320,7 @@ const handleSubmitFeedback = async () => {
   onMouseEnter={() => setHoverFavorite(index)}
   onMouseLeave={() => setHoverFavorite(null)}
 />
+<FaFilePdf className=' right-3 mt-1 text-xl' />
                      </label>
         
         
@@ -282,7 +330,7 @@ const handleSubmitFeedback = async () => {
                      <p className='font-bold text-lg'>{d.title}</p>
                      <p className="line-clamp-2 text-darkGery text-sm">
                       {d.article}</p>
-                           <a href="#" className=" text-black font-bold text-sm">See more</a>
+                      <Link to="/Article" className=" text-black font-bold text-sm">See more</Link>
                            <div className='relative pr-5 mt-2 md:pr-40'>
                             {/* inline-block will change the container width according to text length */}
       
@@ -295,7 +343,7 @@ const handleSubmitFeedback = async () => {
         </div>
       ))}
     </div>
-    
+
     
     
     
@@ -323,7 +371,7 @@ const handleSubmitFeedback = async () => {
              <div className='flex flex-row'>
              <LiaShareSolid className='mt-1 text-2xl'/>
              <button className='top-0'>Share</button>
-
+             
              <label className='flex'>
              <input type='Radio' className='opacity-0'
              onClick={()=>setFavorite1(!favorite1)}/> {/* Update the state based on the current value */}
@@ -332,6 +380,7 @@ const handleSubmitFeedback = async () => {
              onMouseEnter={()=> setHoverFavorite(true)}
              onMouseLeave={()=> setHoverFavorite(false)}
                                          />
+                                         <FaFilePdf className=' right-3 mt-1 text-xl' />
              </label>
              {/*<FaRegHeart /> empry heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
              </div>
@@ -343,7 +392,7 @@ const handleSubmitFeedback = async () => {
                <p className="line-clamp-3 text-darkGery">
                {bigArticle.article}       
                            </p>
-                 <a href="#" className=" text-black font-bold">See more</a>
+                           <Link to="/Article" className=" text-black font-bold">See more</Link>
                  </div>
                  <div className='pr-2'>
                     {/* inline-block will change the container width according to text length */}
@@ -354,6 +403,7 @@ const handleSubmitFeedback = async () => {
         </div>
       ))}
     </div>
+    
                  </div>
              </div>
              </div>
@@ -364,7 +414,7 @@ const handleSubmitFeedback = async () => {
 
 
             {/********** FAQ***********/}
-            <div class="relative flex flex-col items-center justify-center md:ml-32 md:mr-32 px-5 md:px-0">
+            <div id="faq-section" class="relative flex flex-col items-center justify-center md:ml-32 md:mr-32 px-5 md:px-0">
             <img className='absolute top-0 md:h-52 lg:mt-3 ' src={FAQ} alt=""/>
             <img className=' absolute top-0 h-40  lg:mt-24 left-0 hidden' src={woman1} alt=""/>
             <img className='absolute top-0 h-44  lg:mt-1 mr-2 right-0 hidden' src={woman2} alt=""/>
@@ -405,7 +455,7 @@ const handleSubmitFeedback = async () => {
                 <div className=' text-white  md:block'>
   
                 <div className='hidden md:block flex flex-col px-10'>
-      {faq.map((d, index) => (
+      {faq1.map((d, index) => (
         <div key={index} className='flex flex-col bg-white mt-5  rounded-2xl'>
 <input
   type="checkbox"
@@ -440,6 +490,7 @@ const handleSubmitFeedback = async () => {
             </div>
            </div>
 
+<<<<<<< HEAD
          {/* Que Pensiez-Vous ?   -----FEEDBACKS------*/}
          <div className="flex flex-col items-center justify-center mb-5">
         <div className="bg-white flex flex-col md:flex-row items-center justify-between">
@@ -451,6 +502,11 @@ const handleSubmitFeedback = async () => {
               alt=""
             />
           </div>
+=======
+         {/* Que Pensiez-Vous ?*/}
+         <div class="flex flex-col items-center justify-center mb-5"
+         id="Avis">
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 
             {/* the right side */}
@@ -575,6 +631,7 @@ const handleSubmitFeedback = async () => {
               />
             </div>
 
+<<<<<<< HEAD
              {/*Email*/}
              <div className=''>
               <label for="" className='font-bold text-md'>Email</label>
@@ -590,6 +647,80 @@ const handleSubmitFeedback = async () => {
               onChange={(e) => setEmail(e.target.value)}
               required
              />
+=======
+
+            {/* the right side*/}
+            <div className='md:w-1/2 px-2 ml-24 md:ml-0'>
+                <div className=' px-10 pb-5  pt-5 mr-48 md:mr-48 w-[81%] bg-lightGrey md:shadow-xl rounded-2xl '>
+              <p className='font-bold text-black text-4xl text-center'>Que Pensiez-Vous ?</p>
+                <p className='text-black mt-3 ml-4 text-center'>Votre avis est important pour nous aider à mieux comprendre vos besoins et à adapter notre service en conséquence</p>
+                <div className=' mb-10'>
+                    <div className='flex flex-row items-center justify-center mb-7'>
+                        {[...Array(5)].map((star,index)=>{
+                            const currentRating =index+1;
+                        return(
+                            <label>
+                            <input className=' opacity-0'
+                             type="radio" name="ratinf"
+                             value={currentRating}
+                             onClick={()=>setRating(currentRating)}/>
+                            <FaStar size={40} className='text-grey cursor-pointer'
+                            color={currentRating <= (hover|| rating) ?"#ffc107" : "#8A8785"}
+                            onMouseEnter={()=> setHover(currentRating)}
+                            onMouseLeave={()=> setHover(null)}
+                            />
+                            </label>
+                        );
+                    })}
+                </div>
+                  <form action='' className='flex flex-col space-y-4'>
+
+                    {/*Commentaire*/}
+                    <div className=''>
+                      <textarea type='text' placeholder='Ajoutez un Commentaire...' className=' shadow-lg resize-none bg-gray-100 outline-none ring-1 ring-gray-300 w-full h-32 rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'></textarea>
+                    </div>
+
+                    <button className='shadow-md inline-block self-end bg-darkPink text-white font-bold rounded-2xl px-6 py-2 w-full'> Envoyer </button>
+                  </form>
+                </div>
+                  </div >
+
+                 </div>                            
+         </div>
+         </div>
+
+
+
+         {/* Que Pensiez-Vous ?*/}
+         <div class="flex flex-col items-center justify-center"
+         id="contact">
+
+        <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
+          
+            <div className='md:w-1/3 lg:mt-20 flex-shrink-0'>
+
+              {/* the right side*/}
+            <div className='relative '>
+                  <img className=' right-0 lg:mt-5 ml-6 md:ml-0' src={BlackSplash2} alt=""/>
+                  <div className=''>    
+                    <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
+                    <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>
+                    <img className='w-5 h-5 mt-2 mr-1' src={email} alt=""/>
+                    <h className=' mb-3 font-Segoe text-white font-bold text-2xl lg:text-2xl md:text-1xl '>Email :</h>    
+                    </div>
+                    <h className='absolute mx-20 top-32 lg:top-32 lg:mx-20 mb-3 font-Segoe text-white md:text-1xl md:top-16 md:mx-14'>Surfey@gmail.com</h>
+
+                    <div className='absolute flex flex-row mx-16 top-40 lg:top-40 lg:mx16 md:mx-10 md:top-24'>
+                    <img className='w-5 h-5 mt-2 mr-1' src={telephone} alt=""/>
+                    <h className=' mb-3 font-Segoe text-white font-bold text-2xl md:text-1xl '>Numéro de Téléphone :</h>    
+                    </div>
+                    <h className='absolute mx-20 top-48 mb-3 lg:top-48 lg:mx-20 font-Segoe text-white md:text-1xl md:top-40 md:mx-14'>(+213) 123 45 67 89</h>
+
+                  </div>
+                  <img className=' lg:mb-40 float-left' src={bird} alt=""/>
+                  </div>
+                
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
             </div>
 
             {/*text*/}
@@ -641,24 +772,24 @@ export default HomeUsers;
 //left side questions
 const faq = [
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+    Question:`Comment puis-je effectuer une recherche sur Sufery ?`,
+    Answer:`Sur la page d'accueil, utilisez simplement la barre de recherche en tapant vos mots-clés, puis appuyez sur Entrée.`,
+   },
+    {
+        Question:`Comment filtrer les résultats par date?`,
+        Answer:`Utiliser les filtres dans la barre latérale pour affiner les résultats en fonction de la période souhaitée,les mots clés,les auteurs ou les institutions.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Sufery enregistre-t-il mes recherches ou infos personnelles ?`,
+        Answer:`Non, Sufery respecte la confidentialité des utilisateurs et ne stocke ni n'utilise les données personnelles liées aux recherches.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Y a-t-il une limite au nombre de résultats affichés sur Sufery ?`,
+        Answer:`Actuellement, nous affichons les résultats les plus pertinents, mais vous pouvez utiliser des filtres pour affiner davantage vos résultats.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
-    },
-    {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Puis-je ajouter une page à mes favoris ?`,
+        Answer:`Pour ajouter une page à vos favoris, cliquez sur l'icône coeur à côté du résultat. Vous pouvez ensuite accéder à vos favoris depuis votre compte.`,
     },
 
 ]
@@ -666,24 +797,24 @@ const faq = [
 //right side questions
 const faq1 = [
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Comment puis-je donner des retours sur Sufery?`,
+        Answer:` Utilisez l'option "Que pensiez vous" ci dessous pour partager vos suggestions ou signaler des problèmes.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:` Les résultats de Sufery incluent-ils des publicités?`,
+        Answer:`Non, Sufery propose une expérience de recherche sans publicités intrusives.`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:` Sufery est-il gratuit à utiliser ?`,
+        Answer:`Oui, Sufery est entièrement gratuit !`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Sufery est-il disponible dans d'autres langues ?`,
+        Answer:`Actuellement, Sufery est disponible en français, mais de nouvelles langues sont en cours d'ajout !`,
     },
     {
-        Question:`Lorem ipsum dolor sit amet consectetur ?`,
-        Answer:`Lorem ipsum dolor sit amet consectetur. Congue integer tortor vitae posuere nisl quisque enim at. Suspendisse non elit eget penatibus urna facilisi aliquam. Convallis ligula sed potenti tristique risus. Tempor et eleifend sit elit turpis nec. Lectus vel faucibus mattis posuere gravida nullam sagittis.`,
+        Question:`Y a-t-il une application mobile pour Sufery?`,
+        Answer:`Non, Sufery n'a pas actuellement d'application mobile, mais notre site est très facile à utiliser sur votre téléphone car il est responsive ! Profitez-en partout !`,
     },
 
 ]

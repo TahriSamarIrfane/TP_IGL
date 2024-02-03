@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import'../index.css';
 
+
 //importation for the slick-carousel
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -21,6 +22,13 @@ import icon4 from '../assets/icons/icon4.png';
 import FeedBacks from'../assets/images/FeedBacks.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
+import profile1 from'../assets/images/profile1.jpg';
+import profile2 from'../assets/images/profile2.jpg';
+import profile3 from'../assets/images/profile3.jpg';
+import profile4 from'../assets/images/profile4.jpeg';
+import profile5 from'../assets/images/profile5.jpg';
+import profile6 from'../assets/images/profile6.jpg';
+import { Link } from 'react-router-dom';
 
 
 const CustomPrevArrow = (props) => (
@@ -38,31 +46,36 @@ const CustomPrevArrow = (props) => (
   );
   
 //for the Slick
-const settings={
+const settings = {
   arrows: true,
-  dots :true,
-  infinite:false,
-  speed:500,
-  slidesToShow:3,
-  slidesToScroll:1,
+  dots: true,
+  infinite: false,
+  speed: 500,
+  slidesToShow: 3,
+  slidesToScroll: 1,
   prevArrow: <CustomPrevArrow />,
   nextArrow: <CustomNextArrow />,
   responsive: [
-
-      {
-        breakpoint: 768, // screens between 768px and 1024px
-        settings: {
-          slidesToShow: 1,
-        },
+    {
+      breakpoint: 600, // screens less than 600px wide
+      settings: {
+        slidesToShow: 1, // Display only 1 slide on small devices
       },
-
-
-    ],
-
+    },
+    {
+      breakpoint: 768, // screens between 768px and 1024px
+      settings: {
+        slidesToShow: 3, // Display 3 slides on medium devices
+      },
+    },
+  ],
 };
 
 
+<<<<<<< HEAD
 const apiurl = "http://127.0.0.1:8000"
+=======
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 const HomeGuests = () => {
 
@@ -110,7 +123,7 @@ const HomeGuests = () => {
   };
 
     return (
-       <div>
+       <div id="sectionhome">
 
         {/* S'inscrire , Se connecter*/}
         <div className="bg-white mt-20  lg:pr-10 flex flex-col md:flex-row-reverse  items-center justify-between ">
@@ -129,8 +142,9 @@ const HomeGuests = () => {
                   <div className='relative'>
                   <img className='h-60 line1-width lg:splach lg:mt-5' src={BlackSplash} alt=""/>
                   <div className='flex  space-x-44 lg:space-x-72'>
-                  <a href='#' className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</a>
-                  <a href='#' className="text-lg mt-3 bg-pink font-Segoe rounded-3xl py-2 px-7 text-darkPink font-bold absolute top-0 left-0 ">S’Inscrire</a>
+                  
+                  <Link to="/SignIn" className="text-lg mt-3 ml-3 md:ml-16 bg-darkPink font-Segoe rounded-3xl py-2 px-3 text-pink font-bold absolute top-0 left-0 lg:ml-32">Se Connecter</Link>
+                  <Link to="/SignUp" className="text-lg mt-3 bg-pink font-Segoe rounded-3xl py-2 px-7 text-darkPink font-bold absolute top-0 left-0 ">S’Inscrire</Link>
                   </div>
                   </div>
                  </div> 
@@ -145,7 +159,7 @@ const HomeGuests = () => {
                <img className='line1-width line1-height' src={Line1} alt=""/>
              <p className='text-black font-bold text-5xl w-3/4 md:w-3/4 ml-40 md:text-4xl md:ml-56'>A Propos</p>
              </div>
-             <p className="md:px-20 text-grey font-Tahoma mt-4 ">Lorem ipsum dolor sit amet consectetur. Neque risus et eget molestie consectetur. Euismod sit ligula commodo cursus. Metus ac dui nunc facilisi a vestibulum non. Tortor et quis ac placerat nisl id. Amet etiam tempus quis lacus. Nibh id in etiam libero nunc enim interdum..</p>
+             <p className="md:px-20 text-grey font-Tahoma mt-4 ">Bienvenue sur Sufery,votre moteur de recherche en ligne rapide et fiable! Notre objectif est de simplifier votre expérience de recherche avec une interface conviviale, sans publicités intrusives. Profitez d'une navigation sans tracas, où chaque recherche devient une expérience plaisante. Découvrez la puissance de la recherche sur Sufery - où la simplicité rencontre l'efficacité.</p>
              </div>
              <img className='h-50 md:h-72 lg:h-72 ' src={TEAMpic} alt=""/>
               </div>
@@ -201,8 +215,8 @@ const HomeGuests = () => {
          </div>
 
          {/* Feedbacks*/}
-         <div  class="flex flex-col items-center justify-center mt-20 ">
-         <img id="sectionFeedBack" className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
+         <div  id="sectionFeedBack" class="flex flex-col items-center justify-center mt-20 ">
+         <img  className='justify-center h-10 w-72' src={FeedBacks} alt=""/>
          <p className='text-grey mt-5 px-5'>Découvrez ce que disent nos utilisateurs satisfaits à propos de notre application</p>
          </div>
 
@@ -235,7 +249,12 @@ const HomeGuests = () => {
 
 
          {/* Que Pensiez-Vous ?*/}
+<<<<<<< HEAD
      <div class="flex flex-col items-center justify-center">
+=======
+         <div class="flex flex-col items-center justify-center"
+         id="sectionContact">
+>>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
   
@@ -357,43 +376,43 @@ export default HomeGuests;
 
 const data = [
     {
-        name:`Alex`,
-        photo:`https://placebear.com/300/200`,
+        name:`Karim tofi`,
+        photo:profile2,
         stars:`✱✱✱✱✱`,
         FeedBack:`Je suis impressionné par la facilité avec laquelle je peux télécharger des articles scientifiques sur ce site. Enregistrer mes articles favoris pour y revenir plus tard est un énorme avantage. Hautement recommandé !`,
     },
 
     {
-        name:`Emily`,
-        photo:`https://robohash.org/yourtext.png`,
+        name:`Yasmine ben`,
+        photo:profile5,
         stars:`✱✱✱✱✱`,
         FeedBack:`Une ressource exceptionnelle pour tous les chercheurs. La possibilité de télécharger des articles en PDF illimité simplifie grandement la gestion de ma bibliographie. Bravo pour cette innovation !`,
     },
 
     {
-        name:`Marie`,
-        photo:`https://plus.unsplash.com/premium_photo-1700175395626-360f76faa0c8?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=100&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTcwMjc2NjQ3NQ&ixlib=rb-4.0.3&q=80&w=100`,
+        name:`Meriem djafer`,
+        photo:profile3,
         stars:`✱✱✱✱✱`,
         FeedBack:`Ce moteur de recherche a vraiment changé la donne pour moi. Non seulement je peux accéder à une multitude d'articles, mais la fonction pour enregistrer mes préférés facilite la relecture. Une excellente ressource pour la communauté scientifique`,
     },
 
     {
-        name:`Alex`,
-        photo:`https://placebear.com/300/200`,
+        name:`Mohammed fayez`,
+        photo:profile1,
         stars:`✱✱✱✱✱`,
         FeedBack:`Je suis impressionné par la facilité avec laquelle je peux télécharger des articles scientifiques sur ce site. Enregistrer mes articles favoris pour y revenir plus tard est un énorme avantage. Hautement recommandé !`,
     },
 
     {
-        name:`Emily`,
-        photo:`https://robohash.org/1.png`,
+        name:`Fateh `,
+        photo:profile6,
         stars:`✱✱✱✱✱`,
         FeedBack:`Une ressource exceptionnelle pour tous les chercheurs. La possibilité de télécharger des articles en PDF illimité simplifie grandement la gestion de ma bibliographie. Bravo pour cette innovation !`,
     },
 
     {
-        name:`Marie`,
-        photo:`https://ui-avatars.com/api/?name=John+Doe&size=100`,
+        name:`Nasser thm`,
+        photo:profile4,
         stars:`✱✱✱✱✱`,
         FeedBack:`Ce moteur de recherche a vraiment changé la donne pour moi. Non seulement je peux accéder à une multitude d'articles, mais la fonction pour enregistrer mes préférés facilite la relecture. Une excellente ressource pour la communauté scientifique`,
     },
