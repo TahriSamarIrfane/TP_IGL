@@ -5,8 +5,9 @@ import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import axios from 'axios';
-import { useUser } from '../UserContext.jsx';
-import { saveUser } from '../userStorage.jsx';
+import { useUser } from '../UserContext';
+import { saveUser } from '../userStorage';
+import { Link } from 'react-router-dom';
 
 const apiUrl = "http://localhost:8000";
 
@@ -34,7 +35,8 @@ const SignIn = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+        console.log(formData.Pseudo)
+        console.log(formData.MotdePasse)
         fetch(`${apiUrl}/login/`, {
             method: 'POST',
             headers: {
@@ -49,6 +51,7 @@ const SignIn = () => {
             return response.json();
         })
         .then((data) => {
+            console.log(data.message)
           if (data.message === 'Authentification réussie') {
             setjump(true)
           } 
