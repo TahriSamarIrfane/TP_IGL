@@ -72,10 +72,7 @@ const settings = {
 };
 
 
-<<<<<<< HEAD
 const apiurl = "http://127.0.0.1:8000"
-=======
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 const HomeGuests = () => {
 
@@ -249,12 +246,8 @@ const HomeGuests = () => {
 
 
          {/* Que Pensiez-Vous ?*/}
-<<<<<<< HEAD
-     <div class="flex flex-col items-center justify-center">
-=======
          <div class="flex flex-col items-center justify-center"
          id="sectionContact">
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
   

@@ -27,16 +27,13 @@ import email from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
-<<<<<<< HEAD
 
 
 
 const apiurl = "http://127.0.0.1:8000"
-=======
 import { Link } from 'react-router-dom';
 import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 
 // Function to get the CSRF token from cookies
@@ -121,7 +118,6 @@ const handleCheckboxChange1 = (index) => {
   });
 };
 
-<<<<<<< HEAD
 //----------------------FEEDBACKS---------------------------------
 const [comment, setComment] = useState('');
 
@@ -168,7 +164,6 @@ const handleSubmitFeedback = async () => {
 //----------------------CONTACT-US---------------------------------
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
 
   const handleSubmitContactUs = async (event) => {
     event.preventDefault();
@@ -210,7 +205,6 @@ const handleSubmitFeedback = async () => {
   
  
 
-=======
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 const [searchResults, setSearchResults] = useState([]);
@@ -227,7 +221,6 @@ const handleSearch = () => {
   navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`);
 };
 ////////////////////////////////////////////////////////////////////////////////
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
     return (
        <div>
 
@@ -490,9 +483,8 @@ const handleSearch = () => {
             </div>
            </div>
 
-<<<<<<< HEAD
          {/* Que Pensiez-Vous ?   -----FEEDBACKS------*/}
-         <div className="flex flex-col items-center justify-center mb-5">
+         <div className="flex flex-col items-center justify-center mb-5" id="Avis">
         <div className="bg-white flex flex-col md:flex-row items-center justify-between">
           {/* the left side */}
           <div className="md:w-1/2 flex-shrink-0">
@@ -502,11 +494,6 @@ const handleSearch = () => {
               alt=""
             />
           </div>
-=======
-         {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center mb-5"
-         id="Avis">
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
 
             {/* the right side */}
@@ -631,7 +618,6 @@ const handleSearch = () => {
               />
             </div>
 
-<<<<<<< HEAD
              {/*Email*/}
              <div className=''>
               <label for="" className='font-bold text-md'>Email</label>
@@ -647,80 +633,6 @@ const handleSearch = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
              />
-=======
-
-            {/* the right side*/}
-            <div className='md:w-1/2 px-2 ml-24 md:ml-0'>
-                <div className=' px-10 pb-5  pt-5 mr-48 md:mr-48 w-[81%] bg-lightGrey md:shadow-xl rounded-2xl '>
-              <p className='font-bold text-black text-4xl text-center'>Que Pensiez-Vous ?</p>
-                <p className='text-black mt-3 ml-4 text-center'>Votre avis est important pour nous aider à mieux comprendre vos besoins et à adapter notre service en conséquence</p>
-                <div className=' mb-10'>
-                    <div className='flex flex-row items-center justify-center mb-7'>
-                        {[...Array(5)].map((star,index)=>{
-                            const currentRating =index+1;
-                        return(
-                            <label>
-                            <input className=' opacity-0'
-                             type="radio" name="ratinf"
-                             value={currentRating}
-                             onClick={()=>setRating(currentRating)}/>
-                            <FaStar size={40} className='text-grey cursor-pointer'
-                            color={currentRating <= (hover|| rating) ?"#ffc107" : "#8A8785"}
-                            onMouseEnter={()=> setHover(currentRating)}
-                            onMouseLeave={()=> setHover(null)}
-                            />
-                            </label>
-                        );
-                    })}
-                </div>
-                  <form action='' className='flex flex-col space-y-4'>
-
-                    {/*Commentaire*/}
-                    <div className=''>
-                      <textarea type='text' placeholder='Ajoutez un Commentaire...' className=' shadow-lg resize-none bg-gray-100 outline-none ring-1 ring-gray-300 w-full h-32 rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'></textarea>
-                    </div>
-
-                    <button className='shadow-md inline-block self-end bg-darkPink text-white font-bold rounded-2xl px-6 py-2 w-full'> Envoyer </button>
-                  </form>
-                </div>
-                  </div >
-
-                 </div>                            
-         </div>
-         </div>
-
-
-
-         {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center"
-         id="contact">
-
-        <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
-          
-            <div className='md:w-1/3 lg:mt-20 flex-shrink-0'>
-
-              {/* the right side*/}
-            <div className='relative '>
-                  <img className=' right-0 lg:mt-5 ml-6 md:ml-0' src={BlackSplash2} alt=""/>
-                  <div className=''>    
-                    <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
-                    <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>
-                    <img className='w-5 h-5 mt-2 mr-1' src={email} alt=""/>
-                    <h className=' mb-3 font-Segoe text-white font-bold text-2xl lg:text-2xl md:text-1xl '>Email :</h>    
-                    </div>
-                    <h className='absolute mx-20 top-32 lg:top-32 lg:mx-20 mb-3 font-Segoe text-white md:text-1xl md:top-16 md:mx-14'>Surfey@gmail.com</h>
-
-                    <div className='absolute flex flex-row mx-16 top-40 lg:top-40 lg:mx16 md:mx-10 md:top-24'>
-                    <img className='w-5 h-5 mt-2 mr-1' src={telephone} alt=""/>
-                    <h className=' mb-3 font-Segoe text-white font-bold text-2xl md:text-1xl '>Numéro de Téléphone :</h>    
-                    </div>
-                    <h className='absolute mx-20 top-48 mb-3 lg:top-48 lg:mx-20 font-Segoe text-white md:text-1xl md:top-40 md:mx-14'>(+213) 123 45 67 89</h>
-
-                  </div>
-                  <img className=' lg:mb-40 float-left' src={bird} alt=""/>
-                  </div>
-                
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
             </div>
 
             {/*text*/}

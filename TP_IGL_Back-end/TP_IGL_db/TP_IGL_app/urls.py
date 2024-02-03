@@ -3,13 +3,6 @@ from django.urls import path
 from .views import AllUsersAPIView
 from django.contrib import admin
 from .views import LoginPage ,LogoutPage , change_password , change_username , delete_account , signup_page ,reset_password , request_password_reset_code , home
-<<<<<<< HEAD
-from .views import elasticsearch_status_view , ajouter_article_prefere , consulter_articles_preferes
-from .views import consulter_article_pdf , consulter_article_text , afficher_details ,  rechercher_articles
-from .views import filtrer_resultats_key_words, filtrer_resultats_auteurs , filtrer_resultats_institution ,filtrer_resultats_date,contact_view
-=======
-
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 from .views import *
 
 urlpatterns = [
@@ -60,12 +53,9 @@ urlpatterns = [
     path('filtrer_resultats_auteurs/',filtrer_resultats_auteurs,name='filtrer_resultats_auteurs'),
     path('filtrer_resultats_institution/',filtrer_resultats_institution,name='filtrer_resultats_institution'),
     path('filtrer_resultats_date/',filtrer_resultats_date,name='filtrer_resultats_date'),
-<<<<<<< HEAD
     path('GetArticlesEnAttente/',get,name='GetArticlesEnAttente'), 
     path('create_article/',create_article,name='create_article'),
-=======
     path('get_article_details/<int:article_id>/', views.get_article_details, name='get_article_details'),
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 ]
 
     

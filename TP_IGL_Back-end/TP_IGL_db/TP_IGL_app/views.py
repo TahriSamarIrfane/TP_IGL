@@ -1363,7 +1363,6 @@ def contact_us(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-<<<<<<< HEAD
 # @api_view(['GET','POST'])
 # def contact_view(request):
 #     try:
@@ -1424,7 +1423,7 @@ def contact_us(request):
 @csrf_exempt
 @api_view(['GET', 'POST'])
 def contact_view(request):
-    try:
+    
         if request.method == 'POST':
             if request.content_type == 'application/json':
                 # Si les données sont en format JSON, utilisez request.body
@@ -1463,7 +1462,6 @@ def contact_view(request):
         else:
             # La requête n'est pas de type POST, renvoyer une page de formulaire vide
             return render(request, 'contactus.jsx')
-=======
 # to bring the article from elastic search using it's ID to display it in the Article page
 
 # Establish connection to your Elasticsearch cluster
@@ -1499,12 +1497,10 @@ def get_article_details(request, article_id):
 
     except NotFoundError:
         return JsonResponse({'error': 'Article not found'}, status=404)
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-<<<<<<< HEAD
 @csrf_exempt   
 @api_view(['POST'])
 @authentication_classes([BasicAuthentication])
@@ -1567,7 +1563,3 @@ def get(self, request, format=None):
             return Response({'articles_En_Attentes': serialized_articles}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-=======
-
-    
->>>>>>> ee8d921402ff7f82394f83d4c8f9708047642c13
