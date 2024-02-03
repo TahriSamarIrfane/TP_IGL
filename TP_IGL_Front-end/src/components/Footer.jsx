@@ -7,7 +7,8 @@ import {
 } from 'react-icons/fa'
 
 const Footer =() =>{
-    const year = new Date().getFullYear()
+    const year = new Date().getFullYear();
+    
     return(
         <footer className="relative text-white  bg-black flex flex-col">
         <div className="grid lg:grid-cols-4  grid-cols-1 px-10 lg:px-20 py-10 gap-20">
@@ -45,10 +46,10 @@ const Footer =() =>{
                     <h6 className="font-medium py-2 uppercase">Apprendre</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Help Doc</Link>
+                        <Link to="" smooth={true} duration={500}>Help Doc</Link>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Gudies
+                        <Link to="" smooth={true} duration={500}>Gudies
                         </Link>
                         </li>
                     </ul>
@@ -57,19 +58,19 @@ const Footer =() =>{
                     <h6 className="font-medium py-2 uppercase">Légal</h6>
                     <ul>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Conditions générales
+                        <Link to="" smooth={true} duration={500} >Conditions générales
                         </Link>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Politique et confidentialités
+                        <Link to="" smooth={true} duration={500} >Politique et confidentialités
                         </Link>
                         </li>
                         <li className="py-2 text-sm list-none">
-                        <Link to="">Notification de droits d’auteur
+                        <Link to="" smooth={true} duration={500} >Notification de droits d’auteur
                         </Link>
                         </li>
                         <li className="py-2 text-sm list-none">
-                            <Link to="">Cookies settings
+                            <Link to="" smooth={true} duration={500}>Cookies settings
                             </Link>
                             </li>
                     </ul>
