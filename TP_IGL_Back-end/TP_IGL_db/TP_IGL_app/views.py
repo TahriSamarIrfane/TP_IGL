@@ -4,6 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 from elasticsearch import Elasticsearch
 from django.conf import settings
 import os
+from django.middleware.csrf import get_token
 from django.shortcuts import render
 from .models import Article,Auteur,Institution,UploadedFile
 from rest_framework.decorators import api_view,parser_classes
@@ -342,15 +343,16 @@ def home(request):
 # 1- foction sign up 
 
 CustomUser = get_user_model()
+# sign up 
 @csrf_exempt
 def signup_page(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            uname = data.get('username')
-            email = data.get('email')
-            pass1 = data.get('password1')
-            pass2 = data.get('password2')
+            uname = data.get('Pseudo')
+            email = data.get('Email')
+            pass1 = data.get('MotdePasse1')
+            pass2 = data.get('MotdePasse2')
 
             # Vérifier l'unicité du pseudo
             if CustomUser.objects.filter(username=uname).exists():
@@ -358,47 +360,56 @@ def signup_page(request):
 
             # Vérifier si l'e-mail est valide
             if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                return JsonResponse({"error": "Invalid email address"}, status=400)
+                return JsonResponse({"error": "Invalid email address"}, status=401)
 
             # Vérifier si l'e-mail existe déjà dans la base de données
             if CustomUser.objects.filter(email=email).exists():
-                return JsonResponse({"error": "This email is already registered"}, status=400)
+                return JsonResponse({"error": "This email is already registered"}, status=402)
 
             if pass1 != pass2:
-                return JsonResponse({"error": "Your password and confirm password are not the same!!"}, status=400)
+                return JsonResponse({"error": "Your password and confirm password are not the same!!"}, status=403)
+            
 
             my_user = CustomUser.objects.create_user(uname, email, pass1)
             my_user.save()
 
-            return JsonResponse({"success": "User created successfully!"}, status=201)
+            return JsonResponse({"success": "User created successfully!"}, status=200)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
-
-# 2- fonction se connecter 
+# se connecter 
 @csrf_exempt
 def LoginPage(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body.decode('utf-8'))
-            username = data.get('username')
-            password = data.get('password')
+            username = data.get('Pseudo')
+            password = data.get('MotdePasse')
 
-            # Authentification avec Django
+            # Authenticate regular user
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
                 login(request, user)
-                return JsonResponse({"message": "Authentification réussie"})
+                # Include CSRF token and email in the response
+                csrf_token = get_token(request)
+                return JsonResponse({"message": "Authentification réussie", "csrftoken": csrf_token, "email": user.email})
             else:
-                return JsonResponse({"message": "Nom d'utilisateur ou mot de passe incorrect"}, status=401)
+                # If regular authentication fails, try with Moderateur
+                moderator = Moderateur.objects.filter(username=username).first()
+                if moderator and moderator.check_password(password):
+                    login(request, moderator)
+                    csrf_token = get_token(request)
+                    return JsonResponse({"message": "Authentification en tant que modérateur réussie", "csrftoken": csrf_token, "email": moderator.email})
+                else:
+                    return JsonResponse({"message": "Nom d'utilisateur ou mot de passe incorrect"}, status=401)
 
         except json.JSONDecodeError:
             return JsonResponse({"message": "Format JSON invalide"}, status=400)
 
     return JsonResponse({"message": "Méthode non autorisée"}, status=405)
-
+    
 # 3- deconnnexion de l'utilisateur 
 
 @csrf_exempt
