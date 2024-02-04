@@ -83,7 +83,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .serializers import RequestPasswordResetCodeSerializer, ResetPasswordSerializer
 from django.db import models
-from .models import Profile , create_user_profile , save_user_profile ,  FavoriteArticle ,Article
+from .models import Profile , create_user_profile , save_user_profile ,  FavoriteArticle ,Article,ModeratorArticle
 from . import utils 
 from TP_IGL_app.utils import send_email
 from google.oauth2.credentials import Credentials
@@ -129,10 +129,17 @@ from rest_framework import status
 from .serializers import ArticleSerializer,FileUploadSerializer
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
-from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title,write_to_json
 # Create your views here.
 from django.core.mail import send_mail
 from . import utils 
+from .serializers import ProfilePhotoSerializer
+from pathlib import Path
+import json
+import os.path
+BASE_DIR1 = Path(__file__).resolve().parent.parent
+file_path=os.path.join(BASE_DIR1,'/fichier_es.json')
+json_file_path=os.path.abspath('fichier_es.json')
 
 def transforme_institution_to_json(institution):
     dic1={}
@@ -179,10 +186,14 @@ mapping = {
             "references":{"type":"text"},
             "key_words":{"type":"text"},
             "full_text":{"type":"text"},
-            "pdf_file":{"type":"text"}
+            "pdf_file":{"type":"text"},
+            "publication_date":{"type":"date"}
 
 }
 }
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@login_required
 @api_view(['GET'])
 def get_articles(request, format=None):
     try:
@@ -283,8 +294,7 @@ class FileUploadAPIView(APIView):
             les_institutions=institution[:4]
             
             auteurs=transform_auteur_institution_to_json(les_auteurs,les_institutions)
-            
-            article_data = {
+            json_info={
                 "titre": titre,
                 "abstract": abstract.replace("\n"," "),
                 "key_words": key_words.replace("\n"," "),
@@ -293,18 +303,29 @@ class FileUploadAPIView(APIView):
                 "references": references.replace("\n"," "),
                 "auteurs":auteurs,
             }
+            article_data = {
+                "titre": titre,
+                "abstract": abstract,
+                "key_words": key_words,
+                "full_text": full_text,
+                "pdf_file": pdf_file,
+                "references": references,
+                "auteurs":auteurs,
+            }
             serializer = ArticleSerializer(data=article_data)
             if serializer.is_valid():
                 serializer.save()
+                write_to_json(json_info,json_file_path)
                 le_id=serializer.data['id']
                 le_document={
                  "auteurs":serializer.data['auteurs'],
                  "titre": titre,
-                 "abstract":abstract.replace("\n"," "),
-                 "references":references.replace("\n"," "),
-                 "key_words":key_words.replace("\n"," "),
-                 "full_text":full_text.replace("\n"," "),
-                 "pdf_file":pdf_file
+                 "abstract":abstract,
+                 "references":references,
+                 "key_words":key_words.split(),
+                 "full_text":full_text,
+                 "pdf_file":pdf_file,
+                 "publication_date":serializer.data['publication_date']
             }
                 
                 try:
@@ -318,7 +339,32 @@ class FileUploadAPIView(APIView):
             serializer_f.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
-
+class ProfilePhotoAPIView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class=ProfilePhotoSerializer
+    def put(self, request, id, format=None):
+        try:
+            profile = Profile.objects.get(pk=id)
+        
+        except Profile.DoesNotExist:
+            
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer_f = self.serializer_class(data=request.data)
+        
+        if serializer_f.is_valid():
+            
+            serializer_f.save()
+            photo=serializer_f.data['uploaded_photo']
+            photo_url="http://127.0.0.1:8000"+str(photo)
+            setattr(profile,'photo_url',photo_url)
+            profile.save()
+            url={"photo_url":profile.photo_url}
+            return Response('photo successfully changed',status=status.HTTP_200_OK)
+        return Response(
+            serializer_f.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 ArticleIndex.init()
 # authentification google 
 def authenticate_google(request):
@@ -1405,3 +1451,65 @@ def get_article_details(request, article_id):
     
 
     
+@api_view(['GET'])
+def get_moderator_articles(moderator_id):
+    
+    try:
+        # Recherchez l'instance ModeratorArticle correspondante à l'ID du modérateur
+        moderator_article = ModeratorArticle.objects.get(moderator_id=moderator_id)
+
+        # Accédez au tableau elasticsearch_ids
+        elasticsearch_ids = moderator_article.elasticsearch_ids
+
+        # Utilisez ces IDs pour récupérer les données des articles correspondants depuis Elasticsearch
+        es = Elasticsearch(['http://localhost:9200'])
+        index_name = 'index_articles'
+
+        moderator_articles = []
+        for article_id in elasticsearch_ids:
+            try:
+                article_data = es.get(index=index_name, id=article_id)['_source']
+                moderator_articles.append(article_data)
+            except ElasticsearchException:
+                # Gérez le cas où l'article n'existe pas dans Elasticsearch
+                pass
+
+        return moderator_articles
+
+    except ModeratorArticle.DoesNotExist:
+        # Gérez le cas où il n'y a pas d'entrée ModeratorArticle pour cet ID de modérateur
+        return []
+
+    except Exception as e:
+        # Imprimez l'exception à des fins de débogage
+        print(f'An error occurred: {e}')
+        return []
+
+@api_view(['PATCH'])
+def changer_etat_article(article_id, moderateur_id):
+    try:
+        # Rechercher l'instance de ModeratorArticle pour le modérateur donné
+        moderator_article = ModeratorArticle.objects.get(moderator_id=moderateur_id)
+
+        # Vérifier si l'article existe déjà dans elasticsearch_ids
+        if article_id not in moderator_article.elasticsearch_ids:
+            # Ajouter l'article à elasticsearch_ids
+            moderator_article.elasticsearch_ids.append(article_id)
+            moderator_article.save()
+
+        # Mettre à jour l'état de l'article
+        article = Article.objects.get(pk=article_id)
+        article.etat = 'C'  # Mettre à jour l'état à "En Cours"
+        article.save()
+
+    except ModeratorArticle.DoesNotExist:
+        # Si l'instance de ModeratorArticle n'existe pas, la créer
+        new_moderator_article = ModeratorArticle.objects.create(
+            moderator_id=moderateur_id,
+            elasticsearch_ids=[article_id],
+        )
+
+        # Mettre à jour l'état de l'article
+        article = Article.objects.get(pk=article_id)
+        article.etat = 'C'  # Mettre à jour l'état à "En Cours"
+        article.save()

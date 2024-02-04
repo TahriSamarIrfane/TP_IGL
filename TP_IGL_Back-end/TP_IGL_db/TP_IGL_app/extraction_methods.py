@@ -3,6 +3,7 @@ import spacy
 import re
 import fitz
 from pdftitle import get_title_from_file
+import json
 def extract_title(path):
   title=get_title_from_file(path)
   return title
@@ -134,3 +135,12 @@ def extract_entities_from_pdf(path):
 #auth,ins=extract_entities_from_pdf(my_path)
 #print(ins)
 #print(refer)
+
+
+def write_to_json(data,path):
+    json_data=json.dumps(data)
+    with open(path, "r") as json_file:
+       array=json.load(json_file)
+    array["extracted_data"].append(json_data)
+    with open(path,"w") as json_file:
+        json.dump(array,json_file)
