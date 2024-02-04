@@ -182,7 +182,7 @@ const Article = () => {
 
           }),
         }).then(
-          response => {response.json()
+          (response) => {response.json()
           console.log("successfully corrected")}
           )  
         }
@@ -195,7 +195,7 @@ const Article = () => {
             'Content-Type':'application/json'
           },
         }).then(
-          response => {response.json()
+          (response) => {response.json()
           console.log("successfully deleted")}
           )  
         }

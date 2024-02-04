@@ -164,6 +164,8 @@ const SignIn = () => {
     const [jumpA, setjumpA] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+    const [mess, setmess] = useState('');
+
     const [formData, setFormData] = useState({
         Pseudo: '',
         MotdePasse: '',
@@ -174,7 +176,7 @@ const SignIn = () => {
     };
     const handleClick = (e) => {
         handleSubmit(e)
-        navigate('/user');
+      
       };
 
     const handleChange = (e) => {
@@ -192,9 +194,7 @@ const SignIn = () => {
             body: JSON.stringify(formData),
         })
         .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+           
             return response.json();
         })
         .then((data) => {
@@ -204,19 +204,21 @@ const SignIn = () => {
                 Email: data.email,
         };
          saveUser(userData);
-         console.log('User data saved successfully:',userData);
 
         if (data.message === 'Authentification réussie'){
             setjump(true)
-        } 
+            navigate('/user');
+        } else{
         if ( data.message === 'Authentification en tant que modérateur réussie') {
             setjumpM(true)
-        } 
+            navigate('/modérateur');
+        } else{
         if(userData.Pseudo==='SurfeyAdmin' && userData.MotdePasse==='admin'){ 
             setjumpA(true)
-
-        }
-
+            navigate('/admin');
+        }else {
+            setmess("Nom d'utilisateur ou mot de passe incorrect")}}}
+          
         })
         .catch((error) => {
             console.error('Login failed:', error);
@@ -261,12 +263,9 @@ const SignIn = () => {
                             
                     </form>
 
-
+                    <p className='text-darkPink'>{mess}</p>
                     <button id='login' onClick={handleClick} className='bg-darkPink w-full h-10 rounded-md mt-5'>
-                    {jump && <Link to="/user" className='text-white font-bold text-lg'>Se Connecter</Link>}
-                    {jumpM && <Link to="/Moderateur" className='text-white font-bold text-lg'>Se Connecter</Link>}
-                    {jumpA && <Link to="/Admin" className='text-white font-bold text-lg'>Se Connecter</Link>}
-                    {!jumpM && !jumpA && !jump && <a href="" className='text-white font-bold text-lg'>Se Connecter</a>}
+                      <a href="" className='text-white font-bold text-lg'>Se Connecter</a>
                    </button>
                     </form>
                     <div className='mt-5 mb-7 md:mb-0 flex flex-col items-center '>

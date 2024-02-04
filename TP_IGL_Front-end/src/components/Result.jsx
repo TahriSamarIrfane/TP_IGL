@@ -314,8 +314,9 @@ const handleNavigate = (result) => {
                          placeholder='Search articles...' 
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
+                          name='searchBar'
                           />
-                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl' onClick={handleSearch}>   
+                    <button id='search' className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl' onClick={handleSearch}>   
                     <h2 className='text-white font-bold text-xl'>Search </h2>                   
                     </button>
                  </div>
@@ -451,8 +452,9 @@ const handleNavigate = (result) => {
     placeholder='Chercher des mots clés'
     value={keywordsInput}
     onChange={(e) => handleInputChange(e, setKeywordsInput)}
+    name='search_kwords'
   />
-  <button onClick={() => addKeyword(keywordsInput, setKeywords)}>
+  <button id='kw_s' onClick={() => addKeyword(keywordsInput, setKeywords)}>
     <GoPlus className='text-darkPink' />
   </button>
 </div>
@@ -485,9 +487,10 @@ const handleNavigate = (result) => {
                          placeholder='Chercher des mots clés'
                          value={authorsInput}
                          onChange={(e) => handleInputChange(e, setAuthorsInput)}
+                         name='search_auth'
                          />
 
-                    <button onClick={() => addAuthor(authorsInput, setAuthors)}>
+                    <button id='aut_s' onClick={() => addAuthor(authorsInput, setAuthors)}>
                     <GoPlus className='text-darkPink' />
                     </button>
                  </div>
@@ -521,10 +524,11 @@ const handleNavigate = (result) => {
                          placeholder='Chercher des mots clés'
                          value={institutionsInput}
                          onChange={(e) => handleInputChange(e, setInstitutionsInput)}
+                         name='search_instit'
                          />
 
                     
-                    <button onClick={() => addInstitutions(institutionsInput, setInstitutions)}>
+                    <button id='in_s' onClick={() => addInstitutions(institutionsInput, setInstitutions)}>
                     <GoPlus className='text-darkPink' />
                     </button>
                  </div>
@@ -557,7 +561,7 @@ const handleNavigate = (result) => {
 
                                   </div>
 
-                                  <div className='flex items-center justify-center bg-darkPink h-10 w-[95%] rounded-md mt-5 ml-2 mb-10 cursor-pointer'onClick={handleFilter}>
+                                  <div id='filtrer' className='flex items-center justify-center bg-darkPink h-10 w-[95%] rounded-md mt-5 ml-2 mb-10 cursor-pointer'onClick={handleFilter}>
                                     <h className=' text-lg font-bold text-white'  >Filtrer</h>
                                   </div>
                                   </div>

@@ -378,7 +378,7 @@ def signup_page(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
 
-    return JsonResponse({"error": "Method not allowed"}, status=405)
+    return JsonResponse({"message": "Method not allowed"}, status=405)
 # se connecter 
 @csrf_exempt
 def LoginPage(request):

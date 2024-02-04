@@ -157,10 +157,10 @@ const handleSearch = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         name='searchBar'
                           />
-                    <button  className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
+                    <button id='search' className='my_search ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
                     onClick={handleSearch}
                     >   
-                    <h2 className='text-white font-bold text-xl'>Search</h2>                   
+                    <h2  className='text-white font-bold text-xl'>Search</h2>                   
                     </button>
                  </div>
                   </div >

@@ -230,6 +230,7 @@ import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import {  Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -239,8 +240,12 @@ const apiUrl = "http://localhost:8000";  // Remplacez par l'URL de votre backend
 
 const SignUp = () => {
 
+    const navigate = useNavigate();
+
     const [jump, setjump] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [mess, setmess] = useState('');
+
     const [formData, setFormData] = useState({
         Pseudo: '',
         Email: '',
@@ -272,9 +277,7 @@ const SignUp = () => {
             body: JSON.stringify(formData),
         })
         .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+         
            
             return response.json();     
         })
@@ -282,12 +285,15 @@ const SignUp = () => {
            
             if (data.message == 'User created successfully!'){
                 setjump(true)
+                navigate('/user');
                
                  } 
+                 setmess(data.error)
 
         })
         .catch((error) => {
-            console.error('Signup failed:', error);
+            console.error('Signup failed:', error.message);
+             
             // Handle errors
         });
      
@@ -357,10 +363,9 @@ const SignUp = () => {
                                  </button>
                             
                     </form>
-
+                    <p className='text-darkPink'>{mess}</p>
                     <button onClick={handleSubmit} className='bg-darkPink w-full h-10 rounded-md mt-5'>
-                    {jump && <Link to="/user" className='text-white font-bold text-lg'>Créer Compte</Link>}
-                    {!jump && <a href="" className='text-white font-bold text-lg'>Créer Compte</a>}
+                   <a href="" className='text-white font-bold text-lg'>Créer Compte</a>
                         
                     </button>
 
