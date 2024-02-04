@@ -374,7 +374,7 @@ def signup_page(request):
             my_user = CustomUser.objects.create_user(uname, email, pass1)
             my_user.save()
 
-            return JsonResponse({"success": "User created successfully!"}, status=200)
+            return JsonResponse({"message": "User created successfully!"}, status=200)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
 

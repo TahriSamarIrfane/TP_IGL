@@ -152,12 +152,13 @@ import axios from 'axios';
 import { useUser } from '../UserContext';
 import { saveUser } from '../userStorage';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const apiUrl = "http://localhost:8000";
 
 const SignIn = () => {
     
-    
+    const navigate = useNavigate();
     const [jump, setjump] = useState(false);
     const [jumpM, setjumpM] = useState(false);
     const [jumpA, setjumpA] = useState(false);
@@ -171,6 +172,10 @@ const SignIn = () => {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
+    const handleClick = (e) => {
+        handleSubmit(e)
+        navigate('/user');
+      };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -257,7 +262,7 @@ const SignIn = () => {
                     </form>
 
 
-                    <button onClick={handleSubmit} className='bg-darkPink w-full h-10 rounded-md mt-5'>
+                    <button id='login' onClick={handleClick} className='bg-darkPink w-full h-10 rounded-md mt-5'>
                     {jump && <Link to="/user" className='text-white font-bold text-lg'>Se Connecter</Link>}
                     {jumpM && <Link to="/Moderateur" className='text-white font-bold text-lg'>Se Connecter</Link>}
                     {jumpA && <Link to="/Admin" className='text-white font-bold text-lg'>Se Connecter</Link>}

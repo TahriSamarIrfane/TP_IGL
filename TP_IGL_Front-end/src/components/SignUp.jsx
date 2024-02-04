@@ -279,10 +279,10 @@ const SignUp = () => {
             return response.json();     
         })
         .then((data) => {
-
-            if (data=== 'User created successfully!'){
+           
+            if (data.message == 'User created successfully!'){
                 setjump(true)
-                console.log(jump)
+               
                  } 
 
         })
@@ -290,7 +290,7 @@ const SignUp = () => {
             console.error('Signup failed:', error);
             // Handle errors
         });
-        
+     
     };
      
     return (

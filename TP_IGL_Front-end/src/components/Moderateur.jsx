@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import background from "../assets/images/Page-admin.png"
 import avatar from "../assets/images/Avatar.png"
-
+import { Link } from 'react-router-dom';
 import { MdOutlineDashboard } from "react-icons/md";
 import { IoMenu } from "react-icons/io5";
 import { LuLogOut } from "react-icons/lu";
@@ -98,20 +98,7 @@ const Moderateur = () =>  {
       handleNewArticle();
     }
   
-  const data = [
-    { Titre: 'Titre1', Auteur: 'Item 1',Text:'12334' },
-    { Titre: 'Titre2', Auteur: 'Item 2',Text:'Wrting Writing to test the overflow blablabla' },
-    { Titre: 'Titre3', Auteur: 'Item 3',Text:'12334' },
-    { Titre: 'Titre4', Auteur: 'Item 4',Text:'12334' },
-    { Titre: 'Titre5', Auteur: 'Item 5',Text:'12334' },
-    { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
-    { Titre: 'Titre4', Auteur: 'Item 4',Text:'12334' },
-    { Titre: 'Titre5', Auteur: 'Item 5',Text:'12334' },
-    { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
-    { Titre: 'Titre5', Auteur: 'Item 5',Text:'12334' },
-    { Titre: 'Titre6', Auteur: 'Item 6',Text:'12334' },
-    
-  ];
+
 
   const handleArticles = () => {
     const file = fileInput.files[0];
@@ -199,7 +186,7 @@ const Moderateur = () =>  {
           {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6  overflow-auto'>
                               {Data.map((item) => (
                           
-                           <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
+                           <li   className='flex flex-col h-[80%] w-[80%] border-darkPink rounded-md bg-white'>
                              <div className='flex flex-col justify-start '>
                              <p className='px-1 font-medium text-xl'>{item.Titre}</p>
                               <p className='px-2 text-opacity-90 text-lg mb-1'>{item.Auteur}</p>
@@ -213,10 +200,10 @@ const Moderateur = () =>  {
                            
                                 ))}
                                 </ul>)} 
-                    {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 overflow-auto'>
-                              {data.map((item) => (
+                    {Article && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6 overflow-auto'>
+                              {Data.map((item) => (
                           
-                           <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
+                           <li   className='flex flex-col h-[80%] w-[80%] border-2 border-darkPink rounded-md bg-white'>
                              <div className='flex flex-col justify-start '>
                              <p className='px-1 font-medium text-xl'>{item.Titre}</p>
                               <p className='px-2 text-opacity-90 text-lg mb-1'>{item.Auteur}</p>
