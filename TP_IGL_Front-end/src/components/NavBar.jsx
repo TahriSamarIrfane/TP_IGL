@@ -57,12 +57,12 @@ const NavBar =() =>{
       spy={scrollOptions ? scrollOptions.spy : true}
       smooth={scrollOptions ? scrollOptions.smooth : true}
       offset={scrollOptions ? scrollOptions.offset : -100}
-      className='block text-base text-white hover:text-[#FBC5DB] font-Tahoma ml-4'
+      className='block text-base text-white hover:text-[#FBC5DB] font-Tahoma ml-4 cursor-pointer'
     >
       {link}
     </ScrollLink>
   ) : (
-    <RouterLink key={path} to={path} className='block text-base text-white hover:text-[#FBC5DB] font-Tahoma ml-4'>
+    <RouterLink key={path} to={path} className='block text-base text-white hover:text-[#FBC5DB] font-Tahoma ml-4 '>
       {link}
     </RouterLink>
   )
@@ -113,7 +113,7 @@ const NavBar =() =>{
         {link}
       </ScrollLink>
     ) : (
-      <RouterLink key={path} to={path} className='block text-base text-white hover:text-[#FBC5DB] font-Tahoma ml-4'>
+      <RouterLink key={path} to={path} className='block text-base text-white hover:text-[#FBC5DB] font-Tahoma ml-4 cursor-pointer'>
         {link}
       </RouterLink>
     )

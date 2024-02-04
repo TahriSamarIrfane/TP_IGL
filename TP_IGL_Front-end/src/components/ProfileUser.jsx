@@ -7,7 +7,7 @@ import { MdOutlinePersonOutline } from "react-icons/md";
 import { LuKeyRound } from "react-icons/lu";
 import { LuLogOut } from "react-icons/lu";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
-import { saveUser,getUser } from '../userStorage.jsx';
+import { saveUser,getUser } from '../userStorage';
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { Link } from 'react-router-dom';
 
@@ -160,6 +160,7 @@ const handleSubmits = (e) => {
   });
   
 };
+
 
 const fetchUserData = async () => {
   try {

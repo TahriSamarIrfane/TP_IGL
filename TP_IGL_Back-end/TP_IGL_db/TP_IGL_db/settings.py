@@ -180,6 +180,7 @@ CORS_ALLOW_HEADERS = [
     'access-control-allow-origin',
     'access-control-allow-credentials',
     'content-type',
+    'authorization',
 ]
 
 SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.

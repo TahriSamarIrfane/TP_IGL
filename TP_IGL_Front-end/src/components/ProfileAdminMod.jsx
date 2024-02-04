@@ -33,8 +33,8 @@ const ProfileAdminMod = () => {
  
       <div className='flex flex-row p-2 justify-between mt-4 '>
           <div  className='flex flex-row  justify-start space-y-2 space-x-3'>
-          <img  src={logo} style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} alt='/'/>
-          <h className='md:hidden lg:block  font-bold text-gray-600 text-xl'>Surfey</h>  
+          <img  src={logo} style={{ height:'32px',width:'32px',objectFit:'cover'}} alt='/' className=' mt-1'/>
+          <h className='md:hidden lg:block  font-bold text-gray-600 text-xl mb-5'>Surfey</h>  
           </div>
          
         </div>

@@ -61,7 +61,7 @@ const NavBarGuest =() =>{
         {
          /* we generate li by mapping the list ot items*/
         items.map(({link,path}) =><Link to={path} spy={true} smooth={true} 
-        offset={-100} key={path} className='block text-base text-white hover:text-[#FBC5DB]
+        offset={-100} key={path} className='block text-base text-white hover:text-[#FBC5DB] cursor-pointer
         font-Tahoma '>{link}</Link>)
          }
       </ul>
