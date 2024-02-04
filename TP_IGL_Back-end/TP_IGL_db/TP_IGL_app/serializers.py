@@ -2,7 +2,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from django_elasticsearch_dsl import Document, fields
-from .models import CustomUser,ProfilePhoto
+from .models import CustomUser,ProfilePhoto,ModeratorArticle
 
 from .models import Article,Auteur,Institution,UploadedFile
 class ChangePasswordSerializer(serializers.Serializer):
@@ -172,3 +172,8 @@ class PasswordGeneratorSerializer(serializers.Serializer):
 class ModeratorCreationSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
     email = serializers.EmailField()
+class ModeratorArticleSerializer(ModelSerializer):
+    moderator=ModeratorCreationSerializer()
+    class Meta:
+        model=ModeratorArticle
+        fields = '__all__'

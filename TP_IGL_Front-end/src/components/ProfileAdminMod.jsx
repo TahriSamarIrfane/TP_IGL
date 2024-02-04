@@ -9,7 +9,6 @@ import { LuKeyRound } from "react-icons/lu";
 import { LuLogOut } from "react-icons/lu";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { MdOutlineDeleteForever } from "react-icons/md";
-import { Link } from 'react-router-dom';
 
 const ProfileAdminMod = () => {
   const [ModifierInfo,setModifierInfo] = useState(true);
@@ -119,7 +118,7 @@ const ProfileAdminMod = () => {
                     className="rounded-md w-full "
                     placeholder="Jacobi23"
                     />
-                   <Link to='/SendCode'><p className='lg:text-[80%] text-[70%] text-blue-500'>Mot de passe oublié ?</p></Link> 
+                    <p className='lg:text-[80%] text-[70%] text-blue-500'>Mot de passe oublié ?</p>
                     </div>
                     <p>Nouveau mot de passe</p>
                     <input

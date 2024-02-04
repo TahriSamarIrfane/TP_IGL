@@ -81,7 +81,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .serializers import RequestPasswordResetCodeSerializer, ResetPasswordSerializer
 from django.db import models
-from .models import Profile , create_user_profile , save_user_profile ,  FavoriteArticle ,Article
+from .models import Profile , create_user_profile , save_user_profile ,  FavoriteArticle ,Article,ModeratorArticle
 from . import utils 
 from TP_IGL_app.utils import send_email
 from google.oauth2.credentials import Credentials
@@ -299,7 +299,7 @@ class FileUploadAPIView(APIView):
             article_data = {
                 "titre": titre,
                 "abstract": abstract,
-                "key_words": key_words.split(),
+                "key_words": key_words,
                 "full_text": full_text,
                 "pdf_file": pdf_file,
                 "references": references,
@@ -336,9 +336,9 @@ class FileUploadAPIView(APIView):
 class ProfilePhotoAPIView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     serializer_class=ProfilePhotoSerializer
-    def put(self, request, pk, format=None):
+    def put(self, request, id, format=None):
         try:
-            profile = Profile.objects.get(pk=pk)
+            profile = Profile.objects.get(pk=id)
         
         except Profile.DoesNotExist:
             
@@ -354,7 +354,7 @@ class ProfilePhotoAPIView(APIView):
             setattr(profile,'photo_url',photo_url)
             profile.save()
             url={"photo_url":profile.photo_url}
-            return Response(url,status=status.HTTP_200)
+            return Response('photo successfully changed',status=status.HTTP_200_OK)
         return Response(
             serializer_f.errors,
             status=status.HTTP_400_BAD_REQUEST
@@ -1306,11 +1306,11 @@ def contact_us(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 @api_view(['GET'])
-def get_moderator_articles(request,id):
-  if request.method == 'GET':
+def get_moderator_articles(moderator_id):
+    
     try:
         # Recherchez l'instance ModeratorArticle correspondante à l'ID du modérateur
-        moderator_article = ModeratorArticle.objects.get(moderator_id=id)
+        moderator_article = ModeratorArticle.objects.get(moderator_id=moderator_id)
 
         # Accédez au tableau elasticsearch_ids
         elasticsearch_ids = moderator_article.elasticsearch_ids
@@ -1328,20 +1328,19 @@ def get_moderator_articles(request,id):
                 # Gérez le cas où l'article n'existe pas dans Elasticsearch
                 pass
 
-        return Response(moderator_articles,status=status.HTTP_200_OK)
+        return moderator_articles
 
     except ModeratorArticle.DoesNotExist:
         # Gérez le cas où il n'y a pas d'entrée ModeratorArticle pour cet ID de modérateur
-        return Response('il nya pas des articles pour ce modérateur',status=status.HTTP_404_NOT_FOUND)
+        return []
 
     except Exception as e:
         # Imprimez l'exception à des fins de débogage
         print(f'An error occurred: {e}')
-        return Response('an error ocuured',status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        return []
 
 @api_view(['PATCH'])
-def changer_etat_article(request,article_id, moderateur_id):
+def changer_etat_article(article_id, moderateur_id):
     try:
         # Rechercher l'instance de ModeratorArticle pour le modérateur donné
         moderator_article = ModeratorArticle.objects.get(moderator_id=moderateur_id)
@@ -1368,4 +1367,3 @@ def changer_etat_article(request,article_id, moderateur_id):
         article = Article.objects.get(pk=article_id)
         article.etat = 'C'  # Mettre à jour l'état à "En Cours"
         article.save()
-        return Response('état changé',status=status.HTTP_206_PARTIAL_CONTENT)

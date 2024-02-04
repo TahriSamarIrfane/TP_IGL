@@ -17,7 +17,7 @@ import FooterGeust from './components/FooterGeust.jsx';
 import SendCode from './components/SendCode.jsx';
 import MDP_oublie from './components/MDP_oublie.jsx';
 import Moderateur from './components/Moderateur.jsx';
-import ModérerArticle from './components/ModérerArticle.jsx';
+import ModérerArticle from './components/ModérerArticle.jsx';
 
 
 
@@ -52,7 +52,7 @@ function App() {
         <Footer/>
       </>
         } />
-        <Route path="/MDP_oublie" element={<MDP_oublie />} />
+        <Route path="/MDP_oublie/:Email" element={<MDP_oublie />} />
         <Route path="/SendCode" element={<SendCode />} />
         <Route path="/Moderateur" element={<Moderateur />} />
         <Route path="/ModererArticle" element={<ModérerArticle />} />

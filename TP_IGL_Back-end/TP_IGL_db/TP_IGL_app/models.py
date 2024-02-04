@@ -164,4 +164,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
     
-    
+class ModeratorArticle(models.Model):
+    moderator = models.ForeignKey(Moderateur, on_delete=models.CASCADE)
+    elasticsearch_ids = models.JSONField(default=list, blank=True)
+    def __str__(self):
+        return f'Moderator: {self.moderator.username} - Article IDs: {self.elasticsearch_ids}'

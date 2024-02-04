@@ -6,12 +6,18 @@ import Admin from './components/Admin.jsx'
 import ProfileUser from './components/ProfileUser.jsx'
 import ProfileAdminMod from './components/ProfileAdminMod.jsx'
 import Moderateur from './components/Moderateur.jsx'
-import SignIn from './components/SignIn.jsx'
+import SignUp from './components/SignUp.jsx'
 import Article from './components/Article.jsx'
-import ModérerArticle from './components/ModérerArticle.jsx'
+import ModérerArticle from './components/ModérerArticle.jsx'
+import MDP_oublie from './components/MDP_oublie.jsx'
+import SendCode from './components/SendCode.jsx'
+import Result from './components/Result.jsx'
+import HomeGuests from './components/HomeGuests.jsx'
+import SignIn from './components/SignIn.jsx'
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App/>
+    <ModérerArticle/>
   </React.StrictMode>,
 )

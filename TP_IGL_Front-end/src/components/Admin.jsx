@@ -7,7 +7,7 @@ import imageModifierMod from "../assets/images/ModifierMod.png"
 import imageNewMod from "../assets/images/NewMod.png"
 import imageDeleteMod from "../assets/images/DeleteMod.png"
 
-import { Link } from 'react-router-dom';
+
 
 
 import { MdOutlineDashboard } from "react-icons/md";
@@ -33,13 +33,10 @@ const Admin = () =>  {
     const[usernameNew,setusernameNew] =useState('');
     const[email,setemail] =useState('');
     const[password,setpassword] =useState('');
-    const[data,setdata] =useState('');
-    const[dataName,setdataName] =useState('');
 
+    
+ 
   
-
-
-
 
   const handleChangePW = (e) => {
     setpassword(e.target.value);
@@ -58,29 +55,7 @@ const Admin = () =>  {
       console.log(usernameNew);
     };
  
-const handleLogout = (e) => {
-     e.preventDefault();
-     const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
     
-     fetch("http://localhost:8000/logout/", {         method: 'POST',
-         headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Basic ${basicAuthCredentials}`,
-         },
-     })
-     .then((response) => {
-         if (!response.ok) {             throw new Error(`HTTP error! Status: ${response.status}`);
-         }         return response.json();
-
-     })
-     .then((data) => {
-         console.log('Logout Response:', data);
-         // Handle successful response, e.g., redirect to login page
-     })
-     .catch((error) => {         console.error('Logout failed:', error);
-         // Handle errors, e.g., show an error message to the user
-     });
- };
 const handleNewModInfo = (e) =>{
   const url = "http://localhost:8000/create-moderator/";
   e.preventDefault();
@@ -94,14 +69,10 @@ const handleNewModInfo = (e) =>{
       email: email,
     }),
   })
-  .then((response) => response.json(),
-  )
+  .then((response) => response.json())
   .then((data) => {
-    if (data.message === 'Moderator created successfully') {
-      setdata(data.message)
-    } else {
-      setdata('Mail Existant')
-    }
+    console.log(data);
+ 
   });
 }
 
@@ -120,9 +91,7 @@ const handleModifierModName = () =>{
   })
   .then((response) => response.json())
   .then((data) => {
-
-      setdataName(data.message)
-   
+    console.log(data);
  
   });
 }
@@ -141,7 +110,7 @@ const handleModifierModPW = (e) =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    setdata(data.message)
+    console.log(data);
  
   });
 }
@@ -159,30 +128,23 @@ const handleDelete = (e) =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    if (data.message === 'Moderator removed successfully') {
-      setdata(data.message)
-    } else {
-      setdata('Modérateur not found')
-    }
+    console.log(data);
  
   });
 }
 //Wrapper Fucntion
-const handleClick = (e)=>{ 
-handleModifierModPW(e);
-handleModifierModName();
-
- }
-// const handleButtonClick = (e) => {
-//   const compareResult = usernameNew.localeCompare('');
-//   const areEqual = compareResult ===0 ;
-//   const compareRes = password.localeCompare('');
-//   const isEqual = compareRes===0 ;
-//   {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
+const handleClick = (e)=>{handleModifierModPW(e);handleModifierModName()}
+const handleButtonClick = (e) => {
+  const compareResult = usernameNew.localeCompare('');
+  const areEqual = compareResult === 0;
+  const compareRes = password.localeCompare('');
+  const isEqual = compareRes === 0;
+  const inter = compareRes + compareResult;
+  {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
   
-//    {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
-//    {!(areEqual && isEqual) ? console.log("Rien n'a été modifié") :handleButtonClick(e)}
-//   }
+   {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
+   {isEqual && areEqual ? console.log("Pas de modification"): handleButtonClick(e)}
+  }
   
 
 
@@ -207,7 +169,6 @@ handleModifierModName();
   })
   .then(data => {
     console.log('Server response:', data);
-    setdata(data.message);
   })
   .catch(error => {
     console.error('Error uploading file:', error);
@@ -217,16 +178,12 @@ handleModifierModName();
     setShowItems(!showItems);
   };
   const handleModifierMod= () => {
-    setdata('');
-    setdataName('');
     setModifierMod(true);
     setNewMod(false);
     setUpload(false);
     setDeleteMod(false);
   };
   const handleDeleteMod = () => {
-    setdata('');
-    setdataName('');
     setDeleteMod(true);
     setNewMod(false);
     setUpload(false);
@@ -234,8 +191,6 @@ handleModifierModName();
 
   };
   const handleNewMod = () => {
-    setdataName('');
-    setdata('');
     setNewMod(true);
     setUpload(false);
     setModifierMod(false);
@@ -247,8 +202,6 @@ handleModifierModName();
 
   };
   const handleUpload = () => {
-    setdataName('');
-    setdata('');
     setUpload(true);
     setNewMod(false);
     setDeleteMod(false);
@@ -301,7 +254,7 @@ handleModifierModName();
                                  ) }
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
-                <Link to='/HomeGuest'><p onClick={handleLogout} className=' text-black'>Déconnecter</p></Link>
+                <p className=' text-black'>Déconnecter</p>
 
               </div>
           </div>
@@ -364,8 +317,6 @@ handleModifierModName();
                 value={password}
                 onChange={handleChangePW}
                />
-               <p className='text-white'>{data}</p>
-               <p className='text-white'>{dataName}</p>
                <button type='button' onClick={handleClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
      
               </div>
@@ -392,7 +343,7 @@ handleModifierModName();
                 value={email}
                 onChange={handleChangeE}
                />
-               <p className='text-white'>{data}</p>
+             
                <button type='button' onClick={handleNewModInfo} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Ajouter</button>
      
               </div>
@@ -412,7 +363,7 @@ handleModifierModName();
                 value={username}
                 onChange={handleChangeP}
                />
-              <p className='text-white'>{data}</p>
+            
                <button type='button' onClick={handleDelete} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
      
               </div>
@@ -456,7 +407,7 @@ handleModifierModName();
                                  ) }
                 <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
-                <Link to='/HomeGuest'><p onClick={handleLogout} className=' text-black'>Déconnecter</p></Link>
+                <p className=' text-black'>Déconnecter</p>
                </div>
               </ul>
               
@@ -467,7 +418,7 @@ handleModifierModName();
 
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
-          <Link to='/ProfileAdminMod'><img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/></Link>
+          <img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/>
           </div>
     </div>
      

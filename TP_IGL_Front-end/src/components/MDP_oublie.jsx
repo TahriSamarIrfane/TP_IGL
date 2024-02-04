@@ -8,7 +8,7 @@ import halfRobot from'../assets/images/halfRobot.png';
 
 import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
-
+import { IoClose } from "react-icons/io5";
 import { Link } from 'react-router-dom';
 
 import { useParams } from 'react-router-dom';
@@ -22,7 +22,6 @@ const [Email, setEmail] = useState('');
 const [Code, setCode] = useState('');
 const [ConfirmPassword, setConfirmPassword] = useState('');
 
- const email =localStorage.getItem('email');
 const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -77,10 +76,11 @@ const togglePasswordVisibility = () => {
               </div>
             {/* the right part */}
             <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
-               <p className='lg:text-3xl text-md font-bold text-center mb-2 md:mb-9'>Mot De Passe Oublié</p>
+            <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
+                <p className='lg:text-3xl text-md font-bold text-center mb-2 md:mb-9'>Mot De Passe Oublié</p>
                 <form >
                 <form className='relative'>
-                    <input  onChange={e => setEmail(data)} value={email} type='email' className='rounded-md w-full h-7 lg:h-full border-gray-300 '/>
+                    <input  onChange={e => setEmail(data)} value={data} type='email' className='rounded-md w-full h-7 lg:h-full border-gray-300 '/>
                         <label className='absolute placeholder'>Email</label>
                 </form>
 
