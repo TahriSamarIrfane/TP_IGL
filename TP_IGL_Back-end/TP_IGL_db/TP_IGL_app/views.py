@@ -127,7 +127,7 @@ from rest_framework import status
 from .serializers import ArticleSerializer,FileUploadSerializer
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser,FormParser
-from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
+from .extraction_methods import extract_article,extract_entities,extract_info,extract_title,write_to_json
 # Create your views here.
 from django.core.mail import send_mail
 from . import utils 
@@ -136,11 +136,8 @@ from pathlib import Path
 import json
 import os.path
 BASE_DIR1 = Path(__file__).resolve().parent.parent
-json_file_path=os.path.join(BASE_DIR1,'/fichier_es.json')
-file=os.path.abspath('fichier_es.json')
-def write_to_json(data,path):
-    with open(path, "a") as json_file:
-       json.dump(data, json_file)
+file_path=os.path.join(BASE_DIR1,'/fichier_es.json')
+json_file_path=os.path.abspath('fichier_es.json')
 
 def transforme_institution_to_json(institution):
     dic1={}
@@ -295,7 +292,15 @@ class FileUploadAPIView(APIView):
             les_institutions=institution[:4]
             
             auteurs=transform_auteur_institution_to_json(les_auteurs,les_institutions)
-            
+            json_info={
+                "titre": titre,
+                "abstract": abstract.replace("\n"," "),
+                "key_words": key_words.replace("\n"," "),
+                "full_text": full_text.replace("\n"," "),
+                "pdf_file": pdf_file,
+                "references": references.replace("\n"," "),
+                "auteurs":auteurs,
+            }
             article_data = {
                 "titre": titre,
                 "abstract": abstract,
@@ -305,11 +310,10 @@ class FileUploadAPIView(APIView):
                 "references": references,
                 "auteurs":auteurs,
             }
-            donne=article_data
             serializer = ArticleSerializer(data=article_data)
             if serializer.is_valid():
                 serializer.save()
-                write_to_json(donne,json_file_path)
+                write_to_json(json_info,json_file_path)
                 le_id=serializer.data['id']
                 le_document={
                  "auteurs":serializer.data['auteurs'],
