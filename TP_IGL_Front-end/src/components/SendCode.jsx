@@ -152,7 +152,6 @@ const SendCode = () => {
              </div>
             {/* the right part */}
             <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
-            <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
                 <p className='lg:text-2xl text-lg font-bold text-center mb-4 md:mb-9'>Vous avez oublié votre Mot de Passe ?</p>
                 <p className='lg:text-md mb-3 text-center lg:mb-4 md:mb-9'>Un code de reinitialisation vous sera envoyé à ce mail {Email} </p>
                 <form >
@@ -166,7 +165,7 @@ const SendCode = () => {
                 </form>
 
 
-                <button className='bg-darkPink w-full h-8 mb-3 lg:h-10 rounded-md lg:mt-5' onClick={handleCompare}>
+                <button className='bg-darkPink w-full h-8 mb-3 lg:h-10 rounded-md lg:mt-5' onClick={()=>handleCompare()}>
                 {Compare ?  
                          <Link to={{pathname:'/MDP_oublie'}} className='text-white text-md font-bold lg:text-lg'>Envoyer Code</Link>
                          :

@@ -9,14 +9,14 @@ import { LiaShareSolid } from "react-icons/lia";
 import { MdDeleteForever } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { data } from 'autoprefixer';
-
-
-
+import { useNavigate } from 'react-router-dom';
 
 
 
 
 const ModérerArticle = () => {
+
+    const navigate = useNavigate();
     const [Edit, setEdit] = useState(false);   
     const [Auteur, setAuteur] = useState('');
     const [Abstract, setAbstract] = useState('');
@@ -28,9 +28,10 @@ const ModérerArticle = () => {
     const [Etat, setEtat] = useState('T');
     const { id } = useParams();
     
-    
+
     const handleEdit = () =>{
         setEdit(true);
+   
     }
     const handleInputTitre =(event) => {
         setTitre(event.target.innerHTML);
@@ -53,7 +54,7 @@ const ModérerArticle = () => {
         setKeyW(event.target.innerHTML);
         console.log(KeyW);
     }
-
+ // ***********Modérer l'article*********
     const handleEditArticle=(id)=>{
         const url =  `http://localhost:8000/moder/${id}/`
         fetch(url,{
@@ -75,11 +76,13 @@ const ModérerArticle = () => {
           }),
         }).then(
           response => {response.json()
-          console.log("successfully corrected")}
+          console.log("successfully corrected")
+        navigate('/Moderateur')}
           )  
         }
-
+// /***********Supprimer l'article***** */
     const handleDeleteArticle=(id)=>{
+        
         const url =  `http://localhost:8000/moder/${id}/`
         fetch(url,{
           method:'DELETE',
@@ -90,6 +93,7 @@ const ModérerArticle = () => {
           response => {response.json()
           console.log("successfully deleted")}
           )  
+        
         }
     
  
@@ -116,9 +120,9 @@ const ModérerArticle = () => {
              <div contentEditable={Edit} suppressContentEditableWarning={true} className='text-darkGery'>{date}</div>
              <div className='flex flex-row p-6 justify-center items-center '>
              <div className='flex flex-row space-x-5'>
-                  <MdDeleteForever onClick={handleDeleteArticle(id)} className='mt-1 text-2xl' />
-                 {Edit && (<button onClick={handleEditArticle(id)} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Terminé</button>)}
-                 {!Edit && (<FaEdit onClick={handleEdit} className='mt-1 text-2xl text-darkPink' />)}
+                  <MdDeleteForever onClick={()=>handleDeleteArticle(id)} className='mt-1 text-2xl' />
+                 {Edit && (<button onClick={()=>handleEditArticle(id)} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Terminé</button>)}
+                 {!Edit && (<FaEdit onClick={()=>handleEdit()} className='mt-1 text-2xl text-darkPink' />)}
                  <Link to='/Moderateur'><LiaShareSolid className='mt-1 text-2xl text-darkPink'/></Link>
                  
              </div>
@@ -166,7 +170,7 @@ const ModérerArticle = () => {
 const date = '25 December 2023';
 const article =
 {
-    abstract:localStorage.getItem('Abstract'),
+    abstract: localStorage.getItem('Abstract'),
     keyWords : [localStorage.getItem('Reference')],
     paragraph: localStorage.getItem('Text'),
     Reference:[localStorage.getItem('Reference')],

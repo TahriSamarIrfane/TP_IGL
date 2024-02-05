@@ -58,11 +58,11 @@ const ProfileUser = () => {
                 <ul className='flex flex-col'>
                  <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
                     <MdOutlinePersonOutline className='mt-1  ' color='DF1477' size={20}/>
-                    <li onClick={handleModifierInfo}  className={!ModifierInfo ? ' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10' :  'text-black border-b-2  lg:text-md text-10 border-b-darkPink'}>Informations Personnelles</li>  
+                    <li onClick={()=>handleModifierInfo()}  className={!ModifierInfo ? ' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10' :  'text-black border-b-2  lg:text-md text-10 border-b-darkPink'}>Informations Personnelles</li>  
                  </div>
                 <div className= 'flex flex-row mx-8 mb-3 space-x-2 py-1 '>
                  <LuKeyRound  className='mt-1  ' color='DF1477' size={20}/>
-                  <li onClick={handleModifierPwd} className={!ModifierPwd ?'text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10':'text-black border-b-2 border-b-darkPink lg:text-md text-10'} >Modifier Mot de Passe</li>
+                  <li onClick={()=>handleModifierPwd} className={!ModifierPwd ?'text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10':'text-black border-b-2 border-b-darkPink lg:text-md text-10'} >Modifier Mot de Passe</li>
                 </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
               <MdOutlineDeleteForever className='mt-1 ' color='DF1477' size={20} />
@@ -93,14 +93,14 @@ const ProfileUser = () => {
                     className="rounded-md w-full"
                     placeholder="Jacobi23"
                     /> </div> )}
-                    {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={handleModifierPseudo}>Jacobi</p></div>
+                    {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={()=>handleModifierPseudo}>Jacobi</p></div>
                   )}
                     
                     <p >Email</p>
                    <div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p>*******@esi.dz</p></div>
                     </div>
                     {ModifierPseudo &&( <div className='flex justify-end w-full '>
-                    <button onClick={handleModifierPseudo} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
+                    <button onClick={()=>handleModifierPseudo} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
                     </div>)}
                 </div>
                   )}

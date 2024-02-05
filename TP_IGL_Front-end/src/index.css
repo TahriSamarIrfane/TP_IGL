@@ -211,5 +211,11 @@ input[type="radio"]:checked {
   background-color: #DF1477;
   border-color: #666;
 }
+.ellipsis-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
 }

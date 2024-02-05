@@ -1,5 +1,3 @@
-
-
 // export default SignIn;
 
 import React, { useState } from 'react';
@@ -50,7 +48,7 @@ const SignIn = () => {
         e.preventDefault();
         fetch(`${apiUrl}/login/`, {
             method: 'POST',
-            headers: {
+            headers: {       
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(formData),
@@ -67,20 +65,20 @@ const SignIn = () => {
                 id: data.id
         };
          saveUser(userData);
-         storedUser2.id=formData.id 
 
-        if (data.message === 'Authentification réussie'){
-            setjump(true)
-            navigate('/user');
-        } else{
-        if ( data.message === 'Authentification en tant que modérateur réussie') {
-            setjumpM(true)
-            navigate('/moderateur');
-        } else{
-        if(userData.Pseudo==='SurfeyAdmin' && userData.MotdePasse==='admin'){ 
+         if(userData.Pseudo==='SurfeyAdmin'){ 
             setjumpA(true)
             navigate('/admin');
-        }else {
+        }else{
+        if ( data.message === 'Authentification en tant que modérateur réussie') {
+            setjumpM(true)
+            storedUser2.Pseudo=formData.Pseudo
+            navigate('/moderateur');
+        } else{if (data.message === 'Authentification réussie'){
+            setjump(true)
+            navigate('/user');
+        } 
+        else {
             setmess("Nom d'utilisateur ou mot de passe incorrect")}}}
           
         })
@@ -98,11 +96,9 @@ const SignIn = () => {
                 
                 <img className=' width-[900] mb-5 hidden md:block' src={robot} alt=""/>
                 <img className=' width-[900] md:hidden' src={halfRobot} alt=""/>
-                <IoClose className='absolute text-white right-2 top-2 text-4xl md:hidden'/>
-                </div>
+                 </div>
                 {/* the right part */}
                 <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
-                <IoClose  className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
                     <p className='text-3xl font-bold text-center mb-4 md:mb-9'>Se Connecter</p>
                     <form >
                     <form className='relative'>
@@ -119,6 +115,7 @@ const SignIn = () => {
                          name='MotdePasse'  // Make sure 'name' matches the property in formData
                          value={formData.MotdePasse}
                          onChange={handleChange}
+                        
                          className='rounded-md w-full border-gray-300 '/>
                             <label className='absolute placeholder'>Mot de Passe</label>
                             <button  type='button' onClick={togglePasswordVisibility}>

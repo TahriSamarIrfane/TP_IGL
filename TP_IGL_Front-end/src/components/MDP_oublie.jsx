@@ -74,8 +74,7 @@ const togglePasswordVisibility = () => {
               </div>
             {/* the right part */}
             <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
-            <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
-                <p className='lg:text-3xl text-md font-bold text-center mb-2 md:mb-9'>Mot De Passe Oublié</p>
+               <p className='lg:text-3xl text-md font-bold text-center mb-2 md:mb-9'>Mot De Passe Oublié</p>
                 <form >
                 <form className='relative'>
                     <input  onChange={e => setEmail(Email)} value={Email} type='email' className='rounded-md w-full h-7 lg:h-full border-gray-300 '/>

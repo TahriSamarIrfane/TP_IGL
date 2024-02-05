@@ -90,7 +90,6 @@ const SignUp = () => {
                 </div>
                 {/* the right part */}
                 <div className='relative flex flex-col justify-center md:w-2/3 px-3 md:px-10'>
-                <IoClose className='absolute text-grey text-2xl hidden md:block right-4 top-4'/>
                     <p className='text-3xl font-bold text-center mb-4 md:mb-9'>S'inscrire</p>
                     <form  className='relative'>
                     <input
@@ -142,7 +141,7 @@ const SignUp = () => {
                             
                     </form>
                     <p className='text-darkPink'>{mess}</p>
-                    <button onClick={handleSubmit} className='bg-darkPink w-full h-10 rounded-md mt-5'>
+                    <button onClick={()=>handleSubmit()} className='bg-darkPink w-full h-10 rounded-md mt-5'>
                    <a href="" className='text-white font-bold text-lg'>Créer Compte</a>
                         
                     </button>
