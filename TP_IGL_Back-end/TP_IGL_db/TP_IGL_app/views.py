@@ -581,8 +581,8 @@ def elasticsearch_status_view(request):
 #9- ajouter article prefere 
 
 @csrf_exempt
-@permission_classes([IsAuthenticated])
-@login_required
+#@permission_classes([IsAuthenticated])
+#@login_required
 #def ajouter_article_prefere(request):
    ## try:
         # Récupérez l'ID de l'utilisateur authentifié
@@ -647,8 +647,9 @@ def elasticsearch_status_view(request):
 def ajouter_article_prefere(request):
     try:
         # Récupérez l'ID de l'utilisateur authentifié
-        user_id = request.user.id
+        #user_id = request.user.id
 
+        user_id =2
         # Récupérez ou créez l'instance FavoriteArticle pour l'utilisateur authentifié
         user_pref, created = FavoriteArticle.objects.get_or_create(user_id=user_id)
 
@@ -720,15 +721,17 @@ def ajouter_article_prefere(request):
 
 
 @csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
+#@login_required
+#@permission_classes([IsAuthenticated])
 def consulter_articles_preferes(request):
     try:
         # Ensure user is authenticated
-        if not request.user.is_authenticated:
-            return JsonResponse({'status': 'Error', 'message': 'User not authenticated'})
+        #if not request.user.is_authenticated:
+          #  return JsonResponse({'status': 'Error', 'message': 'User not authenticated'})
 
+        user_id_to_test = 2 
         # Retrieve the FavoriteArticle instance for the authenticated user
+        request.user = User.objects.get(id=user_id_to_test)
         user_pref, created = FavoriteArticle.objects.get_or_create(user=request.user)
 
         # Retrieve the list of favorite article IDs from elasticsearch_ids
@@ -759,15 +762,16 @@ def consulter_articles_preferes(request):
         })
     
     except Exception as e:
-        # Print the exception for debugging purposes
-        print(f'An error occurred: {e}')
+       
         return JsonResponse({'status': 'Error', 'message': 'Une erreur s\'est produite'})
+    
+    
     
 #11- view article details 
 
 @csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
+#@login_required
+#@permission_classes([IsAuthenticated])
 def afficher_details(request):
     try:
         # Parse JSON data from the request body
@@ -1141,8 +1145,13 @@ def filtrer_resultats_date(request):
             keywords = [keywords]
 
         # Parse start and end dates
-        start_date = datetime.strptime(start_date_str, '%d/%m/%Y').date() if start_date_str else None
-        end_date = datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else None
+           # Parse start and end dates
+        start_date = datetime.strptime(start_date_str, '%a %b %d %Y %H:%M:%S GMT%z').date() if start_date_str else None
+        end_date = datetime.strptime(end_date_str, '%a %b %d %Y %H:%M:%S GMT%z').date() if end_date_str else None
+
+        # Format dates as 'yyyy-mm-dd'
+        formatted_start_date = start_date.strftime('%Y-%m-%d') if start_date else None
+        formatted_end_date = end_date.strftime('%Y-%m-%d') if end_date else None
 
         # Define your Elasticsearch connection
         es = Elasticsearch(['http://localhost:9200'])
@@ -1166,12 +1175,12 @@ def filtrer_resultats_date(request):
                         {
                             "range": {
                                 "Date": {
-                                    "gte": start_date.isoformat() if start_date else None,
-                                    "lte": end_date.isoformat() if end_date else None
+                                    "gte": formatted_start_date .isoformat() if formatted_start_date  else None,
+                                    "lte": formatted_end_date .isoformat() if formatted_end_date  else None
                                 }
                             }
                         }
-                    ] if start_date and end_date else []
+                    ] if formatted_start_date  and formatted_end_date  else []
                 }
             }
         }
@@ -1315,10 +1324,13 @@ def change_moderator_username(request):
 
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@login_required
+#@permission_classes([IsAuthenticated])
+#@login_required
 def submit_feedback(request):
     try:
+        #user_id_to_test = 2 
+        # Retrieve the FavoriteArticle instance for the authenticated user
+       # request.user = User.objects.get(id=user_id_to_test)
         user = request.user
         stars = request.data.get('stars')
         comment = request.data.get('comment')
@@ -1330,7 +1342,7 @@ def submit_feedback(request):
         # Sending email
         subject = 'Feedback from User'
         message = f"Stars: {stars}\nComment: {comment}\nUser: {user.username}\nEmail: {user.email}"
-        from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
+        from_email = 'ls_tahri@esi.dz'  # Replace with your email
         to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
         send_mail(subject, message, from_email, [to_email])
 
@@ -1420,7 +1432,7 @@ def contact_us(request):
 #     except Exception as e:
 #         return JsonResponse({'error': str(e)}, status=500)
     
-@csrf_exempt
+#@csrf_exempt
 @api_view(['GET', 'POST'])
 def contact_view(request):
     
