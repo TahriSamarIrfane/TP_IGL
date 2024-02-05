@@ -10,7 +10,7 @@ import { FaHeart } from "react-icons/fa";// full heart
 import { FaRegHeart } from "react-icons/fa";//empty heart
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
-
+import { useLocation } from 'react-router-dom';
 
 //import images
 import Pc from'../assets/images/Pc.png';
@@ -27,7 +27,7 @@ import emailPic from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
-
+import NavBar from './NavBar.jsx';
 
 
 const apiurl = "http://127.0.0.1:8000"
@@ -79,6 +79,8 @@ const settings={
 
 const HomeUsers = () => {
 
+  const location = useLocation();
+  const user = location.state?.user;
   const navigate = useNavigate();
 const[rating,setRating]= useState(null);
 const[hover,setHover]= useState(null);
@@ -127,7 +129,7 @@ const handleCommentChange = (event) => {
 
 const handleSubmitFeedback = async () => {
   try {
-
+    console.log('User Information:', user.Pseudo);
     const response = await fetch(`${apiurl}/submit-feedback/`, {
       method: 'POST',
       headers: {
@@ -136,9 +138,11 @@ const handleSubmitFeedback = async () => {
       body: JSON.stringify({
         stars: rating,
         comment: comment,
+        email: user.Email, // Add the user email to the request payload
+        pseudo:user.Pseudo,
       }),
     });
-    
+
     if (response.ok) {
       console.log('Feedback submitted successfully');
     } else {
@@ -146,6 +150,7 @@ const handleSubmitFeedback = async () => {
       // Handle error and provide feedback to the user
     }
   } catch (error) {
+    
     console.error('Error submitting feedback:', error.message);
     // Handle error and provide feedback to the user
   }
@@ -158,8 +163,8 @@ const handleSubmitFeedback = async () => {
   const [email, setEmail] = useState('');
 
   const handleSubmitContactUs = async (event) => {
+    
     event.preventDefault();
-    console.log('User ID:', userId);
     // Check if all required elements are present
     if (!nom || !email || !message) {
       console.error('One or more form elements are missing.');
@@ -189,7 +194,7 @@ const handleSubmitFeedback = async () => {
       console.log(data);
       // Handle the response data as needed
     } catch (error) {
-      console.error('Errorj:', error);
+      console.error('Error:', error);
     }
   };
   
@@ -203,21 +208,28 @@ const [message, setMessage] = useState('');
 
 const [searchTerm, setSearchTerm] = useState('');
 
-const handleSearch = () => {
+const handleFav = () => {
   // Perform any necessary actions related to the search term
   // ...
 
+  // Navigate to the MyCollection page with the user information
+  navigate('/MyCollection', { state: { user } });
+};
+
+const handleSearch = () => {
+
+
   // Navigate to the result page with the search term
-  navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`);
+  navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`, { state: { user } });
 };
 ////////////////////////////////////////////////////////////////////////////////
     return (
        <div>
-
+         {user && <NavBar user={user} />}
         {/* La premiere partie : pour la recherche*/}
         <div className="bg-white mt-20  lg:pr-10 flex flex-col md:flex-row-reverse   justify-between ">
             <div className='mt-20'>
-                <img className='lg:custom-PC mb-10   lg:mt-0 float-left' src={Pc} alt=""/>
+              <button onClick={handleFav}>  <img className='lg:custom-PC mb-10   lg:mt-0 float-left' src={Pc} alt=""/></button>
             </div>
             {/*  Text */}
             <div className='md:mt-20'>

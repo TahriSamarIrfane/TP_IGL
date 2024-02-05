@@ -19,9 +19,11 @@ import { MdOutlineAddBox } from "react-icons/md";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { Link } from 'react-router-dom';
+import { getUser } from '../userStorage'
 
 
 const Admin = () =>  {
+
   const [nav, setNav] =useState(false);
   const [showItems, setShowItems] = useState(false);
   const [ImShift, setImShift] = useState(false);
@@ -41,7 +43,7 @@ const Admin = () =>  {
   
 
 
-
+    const storedUser2 =getUser();
 
   const handleChangePW = (e) => {
     setpassword(e.target.value);
@@ -99,10 +101,12 @@ const handleNewModInfo = (e) =>{
   .then((response) => response.json(),
   )
   .then((data) => {
+  storedUser2.id=data.id
+  console.log(data.id)
     if (data.message === 'Moderator created successfully') {
       setdata(data.message)
     } else {
-      setdata('Mail Existant')
+      setdata('Mail ou Pseudo éxistent déjà')
     }
   });
 }
@@ -154,7 +158,7 @@ const handleDelete = (e) =>{
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username: username,
+      username:username,
     }),
   })
   .then((response) => response.json())
@@ -162,7 +166,7 @@ const handleDelete = (e) =>{
     if (data.message === 'Moderator removed successfully') {
       setdata(data.message)
     } else {
-      setdata('Modérateur not found')
+      setdata(data.error)
     }
  
  
@@ -174,20 +178,6 @@ const handleClick = (e)=>{
   handleModifierModName();
   }
   
-  // const handleButtonClick = (e) => {
-  // const compareResult = usernameNew.localeCompare('');
-  // const areEqual = compareResult === 0;
-  // const compareRes = password.localeCompare('');
-  // const isEqual = compareRes === 0;
-  // const inter = compareRes + compareResult;
-  // {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
-  
-  //  {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
-  //  {isEqual && areEqual ? console.log("Pas de modification"): handleButtonClick(e)}
-  // }
-  
-
-
  const handleUploadArticle = () => {
     const file = fileInput.files[0];
     const formData = new FormData();
@@ -260,8 +250,24 @@ const handleClick = (e)=>{
   const handleNav = () =>{
     setNav(!nav)
   }
+  const handlenotifiermoderateur = () => {
+  
+  
+    const csrfToken = getCSRFTokenFromCookies();
+
+   fetch('http://localhost:8000/notify-moderators/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFTokenFromCookies(),
+          },
+  });
+  
+        
+}  
   return (
-    <div className='flex flex-col bg-gradient-to-r lg:h-screen h-full w-screen from-GLbleu via-GLpink to-orange-300   '>
+    
+    <div className='flex flex-col bg-gradient-to-r lg:h-screen h-screen w-screen from-GLbleu via-GLpink to-orange-300   '>
       <div className='flex flex-row justify-center items-center space-x-8 w-full h-full'> 
 
        {/*Barre des d'actions (Menu) */}
@@ -311,7 +317,7 @@ const handleClick = (e)=>{
 
         {/*La fenêtre des actions et résultats*/}
        
-       <div className='flex flex-col justify-center w-full h-[80%] space-y-2   lg:w-[60%]'>
+       <div className='flex flex-col justify-center w-full h-[95%] space-y-2  lg:w-[60%]'>
           <div className='flex-row '>
            {/*Boutton Menu dans le cas mobile*/}
            <div onClick={handleNav} className='lg:hidden'>
@@ -320,7 +326,7 @@ const handleClick = (e)=>{
            <h5 className='text-white text-opacity-70 font-bold text-2xl '>Dashboard</h5>
           </div>
           
-          <div className="flex flex-col items-center justify-center rounded-2xl max-w-auto h-full w-[95%] mt-11 bg-white">
+          <div className="flex flex-col items-center justify-center rounded-2xl max-w-auto h-[80%] w-[95%] mt-11 bg-white">
           {Upload && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
              <div className='flex flex-row  items-center w-[60%] '>
              <form action="http://localhost:8000/upload-file/" method="POST" encType='multipart/form-data'>
@@ -338,9 +344,9 @@ const handleClick = (e)=>{
              
             </div>
              )}
-             {ModifierMod && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
-             <div className='flex flex-col justify-center items-center space-y-5 w-[80%] mt-[-5%]'>
-             <img className='h-[20%]' src={imageModifierMod} alt='/' />
+             {ModifierMod && ( <div className="flex flex-col justify-center items-center space-y-3 max-h-[80%]">
+             <div className='flex flex-col justify-center items-center space-y-4  max-h-full w-[80%] mt-[-5%]'>
+             <img className='h-[35%]' src={imageModifierMod} alt='/' />
                <input
                 type="text"
                 className="py-2 w-[75%] rounded-md text-black"
@@ -365,8 +371,8 @@ const handleClick = (e)=>{
                 value={password}
                 onChange={handleChangePW}
                />
-               <p>{data}</p>
-               <p>{dataName}</p>
+               <p className='text-darkPink'>{data}</p>
+               <p className='text-darkPink'>{dataName}</p>
                <button type='button' onClick={handleClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
      
               </div>
@@ -393,7 +399,7 @@ const handleClick = (e)=>{
                 value={email}
                 onChange={handleChangeE}
                />
-               <p>{data}</p>
+               <p className='text-darkPink'>{data}</p>
                <button type='button' onClick={handleNewModInfo} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Ajouter</button>
      
               </div>
@@ -402,7 +408,7 @@ const handleClick = (e)=>{
              )}
 
           {DeleteMod && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
-             <div className='flex flex-col justify-center items-center space-y-5 w-[80%] mt-[-5%]'>
+             <div className='flex flex-col justify-center items-center space-y-5 h-full w-[80%] mt-[-5%]'>
                <img className='h-[33%]' src={imageDeleteMod} alt='/' />
              
                <input
@@ -413,7 +419,7 @@ const handleClick = (e)=>{
                 value={username}
                 onChange={handleChangeP}
                />
-                 <p>{data}</p>
+                 <p className='text-darkPink'>{data}</p>
                <button type='button' onClick={handleDelete} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
      
               </div>
@@ -462,10 +468,8 @@ const handleClick = (e)=>{
               </ul>
               
               
-            </div>
-      
+            </div> 
       </div>  
-
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
       <Link to='/ProfileAdminMod'><img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/></Link>

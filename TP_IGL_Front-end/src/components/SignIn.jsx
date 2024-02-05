@@ -67,7 +67,9 @@ const SignIn = () => {
 
         if (data.message === 'Authentification réussie'){
             setjump(true)
-            navigate('/user');
+            console.log("*******************",userData)
+
+            navigate('/user', { state: { user: userData } });
         } else{
         if ( data.message === 'Authentification en tant que modérateur réussie') {
             setjumpM(true)

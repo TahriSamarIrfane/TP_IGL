@@ -23,8 +23,12 @@ import { IoFilter } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 const MyCollection = () => {
 
+  const location = useLocation();
+  const user = location.state?.user;
+  console.log("µµµµµµµµµµµµµµµµµµµµ",user);
     const [favorite, setFavorite] = useState([]);
     const[hoverFavorite,setHoverFavorite]= useState(false);
 
@@ -51,10 +55,12 @@ const toggleFavorite = async (id, index) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+
           },
           body: JSON.stringify({
             id: id,
             action: isFavorite ? 'remove' : 'add',
+            email:user.Email,
           }),
         });
 
@@ -88,12 +94,14 @@ const toggleFavorite = async (id, index) => {
 
   const fetchFavoriteArticles = async () => {
     try {
-      const response = await fetch('http://localhost:8000/consulter_articles_preferes/');
+      const userEmail = user.Email;
+      const response = await fetch(`http://localhost:8000/consulter_articles_preferes/?email=${encodeURIComponent(userEmail)}`);
+      
       if (response.ok) {
         const data = await response.json();
+        
         if (data.status === 'OK') {
           // Set the list of favorite articles
-          favoriteArticles
           setSearchResults(data.favorite_articles);
           setOriginalSearchResults(data.favorite_articles);
         } else {
@@ -109,11 +117,12 @@ const toggleFavorite = async (id, index) => {
       console.error('Error fetching favorite articles:', error.message);
     }
   };
-
+  
   useEffect(() => {
     // Fetch favorite articles on component mount
     fetchFavoriteArticles();
-  }, []);
+  }, [user.Email, setSearchResults, setOriginalSearchResults]);
+  
  
 
   const navigate = useNavigate();

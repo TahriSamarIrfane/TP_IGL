@@ -23,6 +23,8 @@ import science3 from'../assets/images/science3.png';
 const Result = () => {
 
   const location = useLocation();
+  const user = location.state?.user;
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [initialSearchDone, setInitialSearchDone] = useState(false);
 
@@ -95,6 +97,7 @@ const toggleFavorite = async (id, index) => {
           body: JSON.stringify({
             id: id,
             action: isFavorite ? 'remove' : 'add',
+            email:user.Email,
           }),
         });
 
@@ -269,20 +272,22 @@ const [message, setMessage] = useState('');
 const handleSearch = async () => {
   try {
     const response = await fetch('http://localhost:8000/rechercher_articles/', {
+      
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         mots_cles: searchTerm,
+
       }),
     });
+    
 
     if (response.ok) {
-      console.log('**********************************');
+      
       const data = await response.json();
       ///console.log('Search results:', data.search_results);
-
             // Update state with search results
             setSearchResults(data.search_results);
             setOriginalSearchResults(data.search_results);

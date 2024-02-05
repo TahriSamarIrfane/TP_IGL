@@ -98,7 +98,7 @@ class UploadedFile(Model):
     
 #8- article prefere 
 class FavoriteArticle(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    email = models.EmailField(unique=True)
     elasticsearch_ids = models.JSONField(default=list, blank=True)
 
     def __str__(self):

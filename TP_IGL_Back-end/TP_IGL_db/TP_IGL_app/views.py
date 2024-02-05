@@ -4,6 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 from elasticsearch import Elasticsearch
 from django.conf import settings
 import os
+import hashlib
 from django.middleware.csrf import get_token
 from django.shortcuts import render
 from .models import Article,Auteur,Institution,UploadedFile
@@ -17,6 +18,7 @@ from rest_framework.parsers import FileUploadParser,MultiPartParser,FormParser
 from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
 # Create your views here.from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
+import uuid
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
@@ -459,10 +461,11 @@ def LoginPage(request):
 
     return JsonResponse({"message": "Méthode non autorisée"}, status=405)
     
+    
 # 3- deconnnexion de l'utilisateur 
 
 @csrf_exempt
-@login_required
+#@login_required
 def LogoutPage(request):
     if request.method == 'POST':
         try:
@@ -694,12 +697,19 @@ def elasticsearch_status_view(request):
 @csrf_exempt
 def ajouter_article_prefere(request):
     try:
+        if request.method == 'POST':
+        # Decode the request body based on the content type
+         content_type = request.content_type
+        if content_type == 'application/json':
+                body = json.loads(request.body.decode('utf-8'))
+                user_email = body.get('email')
+        
         # Récupérez l'ID de l'utilisateur authentifié
-        user_id = request.user.id
-
+        # user_id = request.user_id
+        print("******",user_email)
         #user_id =2
         # Récupérez ou créez l'instance FavoriteArticle pour l'utilisateur authentifié
-        user_pref, created = FavoriteArticle.objects.get_or_create(user_id=user_id)
+        user_pref, created = FavoriteArticle.objects.get_or_create(email=user_email)
 
         # Récupérez l'ID de l'article à partir du corps de la requête JSON
         body = json.loads(request.body.decode('utf-8'))
@@ -765,23 +775,12 @@ def ajouter_article_prefere(request):
 
 
 
-#10- consulter un article prefere
-
-
-@csrf_exempt
-#@login_required
-#@permission_classes([IsAuthenticated])
 def consulter_articles_preferes(request):
     try:
         # Ensure user is authenticated
-        if not request.user.is_authenticated:
-            return JsonResponse({'status': 'Error', 'message': 'User not authenticated'})
-
-        # user_id_to_test = 2 
+        user_email_to_test = request.GET.get('email', '')  # Replace with the desired email
         # Retrieve the FavoriteArticle instance for the authenticated user
-        # request.user = User.objects.get(id=user_id_to_test)
-        
-        user_pref, created = FavoriteArticle.objects.get_or_create(user=request.user)
+        user_pref, created = FavoriteArticle.objects.get_or_create(email=user_email_to_test)
 
         # Retrieve the list of favorite article IDs from elasticsearch_ids
         favorite_article_ids = user_pref.elasticsearch_ids
@@ -798,10 +797,8 @@ def consulter_articles_preferes(request):
                 favorite_articles.append(article_data)
             except ElasticsearchException as e:
                 # Log the exception for debugging
-                
                 # You may choose to handle the exception differently (e.g., inform frontend)
-
-              return JsonResponse({'status': 'OK', 'message': 'Favorite articles fetched successfully', 'favorite_articles': favorite_articles})
+                pass
 
         # Return a JSON response with the status, message, and detailed favorite articles
         return JsonResponse({
@@ -811,9 +808,9 @@ def consulter_articles_preferes(request):
         })
     
     except Exception as e:
-       
-        return JsonResponse({'status': 'Error', 'message': 'Une erreur s\'est produite'})
-    
+        return JsonResponse({'status': 'Error', 'message': f'Une erreur s\'est produite: {str(e)}'})
+
+
     
     
 #11- view article details 
@@ -1371,34 +1368,34 @@ def change_moderator_username(request):
     return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-@login_required
-def submit_feedback(request):
-    try:
-        user = request.user
-        user_id = user.id 
-        print(user_id)
-        print(request.user.is_authenticated)
 
-        # Retrieve the FavoriteArticle instance for the authenticated user
-        # request.user = User.objects.get(id=user_id)
-        # user = request.user
+@api_view(['POST'])
+#@login_required
+def submit_feedback(request):
+
+    try:
+        
+        user = request.user
         stars = request.data.get('stars')
         comment = request.data.get('comment')
+        user_email = request.data.get('email')  # Retrieve user email from the request data
+        user_pseudo = request.data.get('pseudo')
 
-        # Validate stars and comment
-        if stars is None or not (0 <= stars <= 5):
-            return JsonResponse({'error': 'Invalid stars value'}, status=400)
+        # Validate stars, comment, and user email
+        if stars is None or not (0 <= stars <= 5) or not user_email:
+            return JsonResponse({'error': 'Invalid input values'}, status=400)
 
         # Sending email
         subject = 'Feedback from User'
-        message = f"Stars: {stars}\nComment: {comment}\nUser: {user.username}\nEmail: {user.email}"
-        from_email = 'samarirfane@gmail.com'  # Replace with your email
-        to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
+        message = f"Stars: {stars}\nComment: {comment}\nUser: {user_pseudo}\nEmail: {user_email}"
+        from_email = user_email  # Use the email provided in the payload
+        to_email = 'ls_tahri@esi.dz'  # Replace with the destination email
         send_mail(subject, message, from_email, [to_email])
 
         return JsonResponse({'message': 'Feedback submitted successfully'}, status=201)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_protect
@@ -1416,7 +1413,7 @@ def contact_us(request):
 
         # Sending email
         subject = 'Contact Support'
-        message = f"Nom: {name}\nMessage: {message}\nEmail: {email}"
+        message = f"Nom: {name}\nEmail: {email}\nMessage: {message}"
         from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
         to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
         send_mail(subject, message, from_email, [to_email])
@@ -1506,9 +1503,9 @@ def contact_view(request):
 
             # Envoyer un e-mail
             subject = 'Contact Support'
-            email_message = f"Nom: {nom}\nMessage: {message}\nEmail: {email}"
+            email_message = f"Email: {email}\nNom: {nom}\nMessage: {message}"
             from_email = 'boutheynalaouar7@gmail.com'
-            to_email = 'lb_laouar@esi.dz'
+            to_email = 'ls_tahri@esi.dz'
             send_mail(subject, email_message, from_email, [to_email])
 
             # Répondre avec succès
