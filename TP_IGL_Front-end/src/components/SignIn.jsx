@@ -1,3 +1,7 @@
+
+
+// export default SignIn;
+
 import React, { useState } from 'react';
 import robot from'../assets/images/robot.png';
 import halfRobot from'../assets/images/halfRobot.png';
@@ -5,18 +9,22 @@ import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import axios from 'axios';
-import { useUser } from '../UserContext.jsx';
-import { saveUser } from '../userStorage.jsx';
+import { useUser } from '../UserContext';
+import { saveUser } from '../userStorage';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const apiUrl = "http://localhost:8000";
 
 const SignIn = () => {
     
-    
+    const navigate = useNavigate();
     const [jump, setjump] = useState(false);
     const [jumpM, setjumpM] = useState(false);
     const [jumpA, setjumpA] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    const [mess, setmess] = useState('');
 
     const [formData, setFormData] = useState({
         Pseudo: '',
@@ -26,6 +34,10 @@ const SignIn = () => {
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
+    const handleClick = (e) => {
+        handleSubmit(e)
+      
+      };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,7 +46,6 @@ const SignIn = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         fetch(`${apiUrl}/login/`, {
             method: 'POST',
             headers: {
@@ -43,34 +54,35 @@ const SignIn = () => {
             body: JSON.stringify(formData),
         })
         .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+           
             return response.json();
         })
         .then((data) => {
-          if (data.message === 'Authentification réussie') {
-            setjump(true)
-          } 
-          if (data.message === 'Authentification en tant que modérateur réussie') {
-            setjumpM(true)
-          } 
-          if(formData.Pseudo=formData.MotdePasse='admin'){
-            setjumpA(true)
-          }
-
-            const userData = {
+        const userData = {
                 Pseudo: formData.Pseudo,
                 MotdePasse: formData.MotdePasse,
                 Email: data.email,
-            };
-            saveUser(userData);
-            console.log('User data saved successfully:',userData);
-     
+        };
+         saveUser(userData);
+
+        if (data.message === 'Authentification réussie'){
+            setjump(true)
+            navigate('/user');
+        } else{
+        if ( data.message === 'Authentification en tant que modérateur réussie') {
+            setjumpM(true)
+            navigate('/modérateur');
+        } else{
+        if(userData.Pseudo==='SurfeyAdmin' && userData.MotdePasse==='admin'){ 
+            setjumpA(true)
+            navigate('/admin');
+        }else {
+            setmess("Nom d'utilisateur ou mot de passe incorrect")}}}
+          
         })
         .catch((error) => {
             console.error('Login failed:', error);
-        });
+        });  
     }; 
 
     return (
@@ -105,27 +117,25 @@ const SignIn = () => {
                          onChange={handleChange}
                          className='rounded-md w-full border-gray-300 '/>
                             <label className='absolute placeholder'>Mot de Passe</label>
-                            <button type='button' onClick={togglePasswordVisibility}>
+                            <button  type='button' onClick={togglePasswordVisibility}>
                             {showPassword ? <IoEyeOffSharp className='showPasswordEye'/> : <IoEyeSharp   className='showPasswordEye' />}
                                  </button>
                             
                     </form>
 
-
-                    <button  onClick={handleSubmit} className='bg-darkPink w-full h-10 rounded-md mt-5'>
-                        <p className='text-white font-bold text-lg'>Se Connecter</p>
-                    </button>
+                    <p className='text-darkPink'>{mess}</p>
+                    <button id='login' onClick={handleClick} className='bg-darkPink w-full h-10 rounded-md mt-5'>
+                      <a href="" className='text-white font-bold text-lg'>Se Connecter</a>
+                   </button>
                     </form>
                     <div className='mt-5 mb-7 md:mb-0 flex flex-col items-center '>
                     <div className='flex flex-row'>
-                    <p className='text-center mr-1 text-grey text-sm'>Vous avez déjà un compte ?</p>
-                    {!jumpM && !jumpA && !jump &&(<a href="" className='text-[#5E6DF5] text-sm'>Se Connecter</a>)}
-                    {jump &&(<Link to='/HomeUsers'><a href="" className='text-[#5E6DF5] text-sm'>Se Connecter</a></Link>)}
-                    {jumpM &&(<Link to='/Moderateur'><a href="" className='text-[#5E6DF5] text-sm'>Se Connecter</a></Link>)}
-                    {jumpA &&(<Link to='/Admin'><a href="" className='text-[#5E6DF5] text-sm'>Se Connecter</a></Link>)}
+                    <p className='text-center mr-1 text-grey text-sm'>Vous n'avez pas un compte?</p>
+                    {/* <p className='text-[#5E6DF5] text-sm'>S'inscrire</p> */}
+                    <Link to="/SignUp"><a href="" className='text-[#5E6DF5] text-sm '>S'inscrire</a></Link>
                     </div>   
                     <a href="" className='text-lightGrey font-bold text-lg'>__________________________</a>
-                    <Link to="/SendCode"><a href="" className='text-[#5E6DF5] text-sm '>Mot de passe oublier ?</a></Link>
+                    <Link to="/SendCode"><a href="" className='text-[#5E6DF5] text-sm '>Mot de passe Oublié ?</a></Link>
                     </div>
 
                 </div>

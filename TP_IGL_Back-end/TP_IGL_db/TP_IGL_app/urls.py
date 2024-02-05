@@ -56,6 +56,10 @@ urlpatterns = [
     path('GetArticlesEnAttente/',get,name='GetArticlesEnAttente'), 
     path('create_article/',create_article,name='create_article'),
     path('get_article_details/<int:article_id>/', views.get_article_details, name='get_article_details'),
+    path('get-moder-articles/',get_moderator_articles,name='get-moder-articles'),
+    path('modify-pohto/<int:id>/',ProfilePhotoAPIView.as_view(),name='modify-photo'),
+    path('change-etat/',changer_etat_article,name='change-etat')
+    
 ]
 
     

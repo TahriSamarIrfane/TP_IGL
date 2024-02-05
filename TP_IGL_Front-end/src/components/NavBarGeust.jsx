@@ -17,23 +17,6 @@ const NavBarGuest =() =>{
     setIsMenuOpen(!isMenuOpen);
   }
 
- /* to keep the bar ,but the problem is that once i 
- decommente i recive a white page
-   useEffect (() => {
-    const handleScroll =() =>{
-      if(window.scrollY>100){
-        setIsSticky(true);
-      }
-      else{
-        setIsSticky(false);
-      }
-    };
-    window.addEventListener('scroll',handleScroll);
-    return () =>{
-      window.removeEventListener('scroll',handleScroll);
-    }
-  });
-*/
   //navItems array
   const items = [
     {link :"Accueil",path:"/HomeGuest"},

@@ -104,7 +104,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': '123456789',
+        'PASSWORD': 'hadjoura28',
         'HOST': 'localhost',  # Ou l'adresse IP de votre serveur PostgreSQL
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }
@@ -184,3 +184,15 @@ CORS_ALLOW_HEADERS = [
 
 SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.
 SELENIUM_EXECUTABLE_PATH = os.path.join(BASE_DIR, 'geckodriver')  # Chemin vers le fichier GeckoDriver
+
+
+#Email credentials for notify moderator () 
+"""
+EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_USE_TLS= True
+EMAIL_PORT=587
+EMAIL_HOST_USER="ly_naoui@esi.dz"
+#EMAIL_HOST_PASSWORD="Yacinenaoui2003@"
+EMAIL_HOST_PASSWORD="s g x c h i h w i a n r f y z z"
+"""

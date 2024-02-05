@@ -1,3 +1,4 @@
+// export default Moderateur
 import React, {useState} from 'react'
 import background from "../assets/images/Page-admin.png"
 import avatar from "../assets/images/Avatar.png"
@@ -76,11 +77,36 @@ const Moderateur = () =>  {
       handleNewArticle();
     }
   
-  const handleArticle = () => {
+  const handleArticle = () => { // les articles choisi par le moderateur
+    const url='http://localhost:8000/get-moder-articles/'
+    fetch(url,{
+      method:'GET',
+      headers: {
+        'Content-Type':'application/json'
+      },body:{
+        moderateur_id,  // j'ai besoin le id du moderateur courant 
+      }
+    }).then(response => response.json()
+    ).then(
+      data => console.log(data)
+    )
     setArticle(true);
     setMesArticles(false);
   };
   const handleMesArticles = () => {
+    const url='http://localhost:8000/change-etat/'
+    fetch(url,{
+      method:'PATCH',
+      headers: {
+        'Content-Type':'application/json'
+      },body:{
+        moderateur_id,  // j'ai besoin le id du moderateur courant et le id de l'article choisis
+        article_id
+      }
+    }).then(response => response.json()
+    ).then(
+      data => console.log(data)
+    )
     setMesArticles(true);
     setArticle(false);
   };
@@ -114,7 +140,7 @@ const Moderateur = () =>  {
              
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
-              <p className=' text-black'>Déconnecter</p>
+                <Link to="/ModererArticle"><p className=' text-black'>Déconnecter</p></Link>
               </div>
           </div>
         </div> 
@@ -156,7 +182,7 @@ const Moderateur = () =>  {
                               <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.abstract}</p>
                               </div>
                               <div className='flex justify-end mb-3 mr-1'>
-                            <Link to={`/ModererArticle/${item.id}`}><IoIosAddCircleOutline onClick={handleMesArticle(item.id)}  size={23} color='#DF1477' /></Link>
+                            <Link to={`/ModererArticle/${item.id}`}><IoIosAddCircleOutline onClick={handleMesArticle}  size={23} color='#DF1477' /></Link>
                                            </div>
                               </div>
                            </li>
@@ -173,7 +199,7 @@ const Moderateur = () =>  {
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
                  <div className={Article ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'}>
                     <GrArticle className='mt-1 ' size={17}/>
-                  <li onClick={handleWrapper}  className=' text-black lg:text-xl text-[80%]'>Articles</li>
+                  <li onClick={handleArticle} className=' text-black lg:text-xl text-[80%]'>Articles</li>
                 </div>
                 <div className={!MesArticles ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink '}>
                  <BiSolidEdit className='mt-1 ' size={17}/>
@@ -193,7 +219,7 @@ const Moderateur = () =>  {
 
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
-         <Link to='/ProfileAdminMod'> <img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}}  src={avatar} alt='/'/></Link>
+          <img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}}  src={avatar} alt='/'/>
           </div>
     </div>
      

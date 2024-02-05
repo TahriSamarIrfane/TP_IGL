@@ -1,26 +1,28 @@
-import React, { useState } from 'react';
 
+// export default SignUp;
 
-import robot from'../assets/images/robot.png';
-import halfRobot from'../assets/images/halfRobot.png';
-
-
-
+import React, { useState, useContext } from 'react';
+import robot from '../assets/images/robot.png';
+import halfRobot from '../assets/images/halfRobot.png';
 import { IoEyeSharp } from "react-icons/io5";
 import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
-
+import {  Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 
 const apiUrl = "http://localhost:8000";  // Remplacez par l'URL de votre backend Django
 
 
+
 const SignUp = () => {
 
+    const navigate = useNavigate();
 
-
+    const [jump, setjump] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [mess, setmess] = useState('');
 
     const [formData, setFormData] = useState({
         Pseudo: '',
@@ -43,7 +45,7 @@ const SignUp = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
+        console.log(formData);
         fetch(`${apiUrl}/signup/`, {
             method: 'POST',
             headers: {
@@ -53,21 +55,28 @@ const SignUp = () => {
             body: JSON.stringify(formData),
         })
         .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.text();
+         
+           
+            return response.json();     
         })
         .then((data) => {
-            console.log('Server Response:', data);
-            // Handle successful response
+           
+            if (data.message == 'User created successfully!'){
+                setjump(true)
+                navigate('/user');
+               
+                 } 
+                 setmess(data.error)
+
         })
         .catch((error) => {
-            console.error('Signup failed:', error);
+            console.error('Signup failed:', error.message);
+             
             // Handle errors
         });
-        
+     
     };
+     
     return (
         <div>
         <div className='flex items-center justify-center h-screen w-screen bg-gradient-to-r from-GLbleu via-GLpink to-orange-300 '>
@@ -132,14 +141,16 @@ const SignUp = () => {
                                  </button>
                             
                     </form>
-
+                    <p className='text-darkPink'>{mess}</p>
                     <button onClick={handleSubmit} className='bg-darkPink w-full h-10 rounded-md mt-5'>
-                       <p className='text-white font-bold text-lg'>Créer Compte</p>
+                   <a href="" className='text-white font-bold text-lg'>Créer Compte</a>
+                        
                     </button>
 
                     <div className='mt-4 mb-7 md:mb-0 flex flex-row justify-center'>
                         <p className='text-center mr-1 text-grey text-sm'>Vous avez déjà un compte ?</p>
-                        <a href="#" className='text-[#5E6DF5] text-sm'>Se Connecter</a>
+                        {/* <a href="#" className='text-[#5E6DF5] text-sm'>Se Connecter</a> */}
+                        <Link to="/SignIn"><a href="" className='text-[#5E6DF5] text-sm '>Se Connecter</a></Link>
                     </div>
                     
                 </div>

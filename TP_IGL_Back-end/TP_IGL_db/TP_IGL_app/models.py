@@ -140,6 +140,12 @@ class Article(Model):
         return [auteur.institution for auteur in self.auteurs.all()]  
 #10- modele articleauteur 
 #11- modele profile 
+class ProfilePhoto(Model):
+    id = models.BigAutoField(primary_key=True)
+    uploaded_photo=models.ImageField(upload_to='./photo_profile')
+
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     reset_code = models.CharField(max_length=32, blank=True, null=True)
@@ -158,4 +164,8 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
     
-    
+class ModeratorArticle(models.Model):
+    moderator = models.ForeignKey(Moderateur, on_delete=models.CASCADE)
+    elasticsearch_ids = models.JSONField(default=list, blank=True)
+    def __str__(self):
+        return f'Moderator: {self.moderator.username} - Article IDs: {self.elasticsearch_ids}'
