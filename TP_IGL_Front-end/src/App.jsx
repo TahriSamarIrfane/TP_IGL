@@ -74,26 +74,3 @@ function App() {
 }
 
 export default App;
-
-/*
-
-
-function App() {
-  return (
-    <div>
-    <SignIn/>
-    <SignUp/>
-    </div>
-  
-  )
-}
-
-/*   <NavBar/>
-<HomeUsers/>
-<HomeGuests/>
-<Result/>
-    <SignUp/>
-    <SignIn/>
-     <Article/>
-    <MyCollection/>
-<Footer/>*/

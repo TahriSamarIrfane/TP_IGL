@@ -2,7 +2,7 @@ from . import views
 from django.urls import path 
 from .views import AllUsersAPIView
 from django.contrib import admin
-from .views import LoginPage ,LogoutPage , change_password , change_username , delete_account , signup_page ,reset_password , request_password_reset_code , home
+from .views import LoginPage ,LogoutPage , change_password , change_username , delete_account , signup_page ,reset_password , request_password_reset_code
 
 from .views import *
 
@@ -54,6 +54,10 @@ urlpatterns = [
     path('filtrer_resultats_institution/',filtrer_resultats_institution,name='filtrer_resultats_institution'),
     path('filtrer_resultats_date/',filtrer_resultats_date,name='filtrer_resultats_date'),
     path('get_article_details/<int:article_id>/', views.get_article_details, name='get_article_details'),
+    path('get-moder-articles/',get_moderator_articles,name='get-moder-articles'),
+    path('modify-pohto/<int:id>/',ProfilePhotoAPIView.as_view(),name='modify-photo'),
+    path('change-etat/',changer_etat_article,name='change-etat')
+    
 ]
 
     
