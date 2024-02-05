@@ -23,7 +23,7 @@ import woman2 from'../assets/images/woman2.png';
 import man1 from'../assets/images/man1.png';
 import FAQ from'../assets/images/FAQ.png';
 import BlackSplash2 from'../assets/images/BlackSplash2.png';
-import email from '../assets/icons/@.png';
+import emailPic from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
@@ -36,11 +36,7 @@ import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 
 
-// Function to get the CSRF token from cookies
-const getCookie = (name) => {
-  const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-};
+
 
 const CustomPrevArrow = (props) => (
     <div {...props} className=" absolute top-60 slick-arrow-custom  left-3 bottom-0 items-center cursor-pointer">
@@ -131,15 +127,11 @@ const handleCommentChange = (event) => {
 
 const handleSubmitFeedback = async () => {
   try {
-    const username = 'boutylao';
-    const password = '1234567';
 
-    const basicAuthCredentials = btoa(`${username}:${password}`);
     const response = await fetch(`${apiurl}/submit-feedback/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${basicAuthCredentials}`,
       },
       body: JSON.stringify({
         stars: rating,
@@ -167,7 +159,7 @@ const handleSubmitFeedback = async () => {
 
   const handleSubmitContactUs = async (event) => {
     event.preventDefault();
-
+    console.log('User ID:', userId);
     // Check if all required elements are present
     if (!nom || !email || !message) {
       console.error('One or more form elements are missing.');
@@ -176,13 +168,11 @@ const handleSubmitFeedback = async () => {
 
     // Perform AJAX request
     try {
-      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
       const response = await fetch(`${apiurl}/contact/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify({
           nom: nom,
@@ -199,7 +189,7 @@ const handleSubmitFeedback = async () => {
       console.log(data);
       // Handle the response data as needed
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Errorj:', error);
     }
   };
   
@@ -252,7 +242,7 @@ const handleSearch = () => {
                     <button id='search' className='my_search ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
                     onClick={handleSearch}
                     >   
-                    <h2  className='text-white font-bold text-xl'>Search</h2>                   
+                    <h2 className='text-white font-bold text-xl'>Surf</h2>                   
                     </button>
                  </div>
                   </div >
@@ -533,7 +523,7 @@ const handleSearch = () => {
                   })}
                 </div>
                 <form className="flex flex-col space-y-4" id="FeedbackForm" onSubmit={(e) => { e.preventDefault(); handleSubmitFeedback(); }}>
-                <input type="hidden" name="csrfmiddlewaretoken" value={getCookie('csrftoken')} />
+                <input type="hidden"  />
                   <div className="">
                     <textarea
                       type="text"
@@ -562,7 +552,7 @@ const handleSearch = () => {
 
 
          {/* Que Pensiez-Vous ?   ------CONTACT-US--------*/}
-     <div class="flex flex-col items-center justify-center">
+     <div class="flex flex-col items-center justify-center " id="contact">
 
 <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
   
@@ -574,7 +564,7 @@ const handleSearch = () => {
           <div className=''>    
             <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
             <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>
-            <img className='w-5 h-5 mt-2 mr-1' src={email} alt=""/>
+            <img className='w-5 h-5 mt-2 mr-1' src={emailPic} alt=""/>
             <h className=' mb-3 font-Segoe text-white font-bold text-2xl lg:text-2xl md:text-1xl '>Email :</h>    
             </div>
             <h className='absolute mx-20 top-32 lg:top-32 lg:mx-20 mb-3 font-Segoe text-white md:text-1xl md:top-16 md:mx-14'>Surfey@gmail.com</h>
@@ -601,7 +591,7 @@ const handleSearch = () => {
         <p className='text-black mt-5 mb-5 ml-4'>Nous sommes à votre écoute...Votre avis compte !</p>
         <div className=' mb-10'>
         <form id="ContactForm" onSubmit={handleSubmitContactUs} encType="multipart/form-data" action='' className='flex flex-col space-y-4'>
-        <input type="hidden" name="csrfmiddlewaretoken" value="{% csrf_token %}" />
+        <input type="hidden"  />
             {/* Nom*/}
             <div className=''>
               <label for="" className='font-bold text-md'>Nom Complet</label>
@@ -734,54 +724,54 @@ const faq1 = [
 
 // For the big articles
 const bigArticle = 
-  {
-      Date:`11 Novembre 2023`,
-      title:`Lorem ipsum dolor sit `,
-      photo:science3,
-      cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit',],
-      article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-  };
+{
+  Date:`26/01/2024`,
+  title:`How to Teach Software Modeling`,
+  photo:science2,
+  cle:['software modeling','UML'],
+  article:`Software engineering education at universities faces a common problem; that is regular students do not usually have experience of developing software for practical use and thus are not motivated for software engineering aiming at high quality software production by a project team or a persistent organization. Software projects `,
+};
 
 // For articles
 const data = [
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit `,
+        Date:`01/02/2024`,
+        title:`ModelGame: A Quality Model for Gamified Software Modeling Learning `,
         photo:science3,
-        cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit',],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['Model design','learning model',],
+        article:`Gamification has been adopted in software development tasks in recent years. This adoption seeks, for example, to improve the en- gagement of developers while creating UML models or writing code. Empirical studies [7, 9, 14] report that UML models suffer from incompleteness and inconsistency problems. Lange [14] rein- forces that these defects bring potential risks that can cause mis- interpretation and communication failure, representing a risk to `,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
+        Date:`26/01/2024`,
+        title:`How to Teach Software Modeling`,
         photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['software modeling','UML'],
+        article:`Software engineering education at universities faces a common problem; that is regular students do not usually have experience of developing software for practical use and thus are not motivated for software engineering aiming at high quality software production by a project team or a persistent organization. Software projects `,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet consectetur`,
+        Date:`12/01/2024`,
+        title:`Towards a Quantum Software Modeling Language`,
         photo:science1,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['quantum computing','UML','software engineering'],
+        article:`Quantum computation rose to prominence after the discovery of quantum algorithms[5, 7] that can efficiently perform tasks that are intractable classically. These discoveries propelled research and interest in quantum computation. Today, there exists prototype`,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
+        Date:`28/12/2023`,
+        title:`Numerical computing in engineering mathematics`,
         photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['engineering mathematics','Industry 4.0'],
+        article:`The 4th Industrial Revolution has had a dramatic impact on the engineering profession. The modern technologies such as artificial intelligence, the internet of things, and advanced robotics have altered engineering systems and processes. To- day’s engineers are expected to be able to leverage these`,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet consectetur`,
+        Date:`20/12/2023`,
+        title:`A Prototype Implementation of an Orthographic Software Modeling Environment`,
         photo:science1,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['View-based Modeling','Orthographic Software Modeling'],
+        article:`Orthographic Software Modeling (OSM) is a view-centric software engineering approach that aims to leverage the or- thographic projection metaphor used in the visualization of physical objects to visualize software systems. Although the general concept of OSM does not prescribe specific sets of views, a concrete OSM environment has to be specific about`,
     },
 
 ]
