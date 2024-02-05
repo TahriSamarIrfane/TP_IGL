@@ -39,8 +39,8 @@ const ProfileAdminMod = () => {
           </div>
          
         </div>
-        <div className='flex justify-center w-full h-[75%] '>
-        <div className=' border-2 border-grey w-[80%] lg:h-full bg-white h-screen'>
+        <div className='flex justify-center w-full h-[76%] '>
+        <div className=' rounded-2xl w-[80%] lg:h-full bg-white h-screen'>
 
         <div className='flex flex-row justify-center items-center h-full  '>
        
@@ -52,7 +52,7 @@ const ProfileAdminMod = () => {
     
                   <div className='flex p-4 justify-center  items-center '>
                     <img className='opacity-70 p-2 ' style={{borderRadius:'50%', height:'120px',width:'120px',objectFit:'cover'}}  src={avatar} alt='/'/>
-                        <p className='lg:px-7 font-bold lg:text-xl px-3 text-black text-opacity-80 text-[80%]' style={{position:'absolute'}}>Modifier</p>
+                        <p className='lg:px-7 font-bold lg:text-xl px-3 text-black text-opacity-40 text-[80%]' style={{position:'absolute'}}>Modifier</p>
                         </div> 
                         </div>
                 <ul className='flex flex-col'>

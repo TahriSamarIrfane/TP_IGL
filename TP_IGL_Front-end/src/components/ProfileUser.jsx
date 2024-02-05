@@ -39,8 +39,8 @@ const ProfileUser = () => {
           </div>
          
         </div>
-        <div className='flex justify-center w-full h-[75%] '>
-        <div className=' border-2 border-grey w-[80%] lg:h-full bg-white h-screen'>
+        <div className='flex justify-center w-full h-[76%]  '>
+        <div className='  w-[80%] lg:h-full bg-white h-screen rounded-2xl'>
 
         <div className='flex flex-row justify-center items-center h-full  '>
        
@@ -52,7 +52,7 @@ const ProfileUser = () => {
     
                   <div className='flex p-4 justify-center  items-center '>
                     <img className='opacity-70 p-2 ' style={{borderRadius:'50%', height:'120px',width:'120px',objectFit:'cover'}}  src={avatar} alt='/'/>
-                        <p className='lg:px-7 font-bold lg:text-xl px-3 text-black text-opacity-80 text-[80%]' style={{position:'absolute'}}>Modifier</p>
+                        <p className='lg:px-7 font-bold lg:text-xl px-3 text-black text-opacity-40 text-[80%]' style={{position:'absolute'}}>Modifier</p>
                         </div> 
                         </div>
                 <ul className='flex flex-col'>
@@ -77,7 +77,7 @@ const ProfileUser = () => {
             </div>
              
              
-                <div className='flex flex-col space-y-2   h-[80%] border-l-grey border-l-2 px-[1%]  w-[50%]' >
+                <div className='flex flex-col space-y-2   h-[80%] border-l-grey border-opacity-35  border-l-2 px-[1%]  w-[50%]' >
                 {/* /*******Modifier Informations********** */}
                   {ModifierInfo && (<div className='flex flex-col h-full space-y-8  px-[10%] '>
                   <div className='flex flex-row space-x-2 lg:px-[4%] py-3 px-[6%] text-center mt-5 '>

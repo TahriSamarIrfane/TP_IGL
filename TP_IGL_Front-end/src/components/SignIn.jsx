@@ -10,10 +10,9 @@ import { IoEyeOffSharp } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import axios from 'axios';
 import { useUser } from '../UserContext';
-import { saveUser } from '../userStorage';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-// import { saveUser,getUser } from '../userStorage';
+import { saveUser,getUser } from '../userStorage';
 
 const apiUrl = "http://localhost:8000";
 
@@ -76,7 +75,7 @@ const SignIn = () => {
         } else{
         if ( data.message === 'Authentification en tant que modérateur réussie') {
             setjumpM(true)
-            navigate('/modérateur');
+            navigate('/moderateur');
         } else{
         if(userData.Pseudo==='SurfeyAdmin' && userData.MotdePasse==='admin'){ 
             setjumpA(true)
@@ -134,10 +133,10 @@ const SignIn = () => {
                    </button>
                     </form>
                     <div className='mt-5 mb-7 md:mb-0 flex flex-col items-center '>
-                    <div className='flex flex-row'>
+                    <div className='flex flex-row '>
                     <p className='text-center mr-1 text-grey text-sm'>Vous n'avez pas un compte?</p>
                     {/* <p className='text-[#5E6DF5] text-sm'>S'inscrire</p> */}
-                    <Link to="/SignUp"><a href="" className='text-[#5E6DF5] text-sm '>S'inscrire</a></Link>
+                    <Link to="/SignUp"><p href="" className='text-[#5E6DF5] text-sm '>S'inscrire</p></Link>
                     </div>   
                     <a href="" className='text-lightGrey font-bold text-lg'>__________________________</a>
                     <Link to="/SendCode"><a href="" className='text-[#5E6DF5] text-sm '>Mot de passe Oublié ?</a></Link>

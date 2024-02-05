@@ -4,21 +4,18 @@ import React, { useState } from 'react'
 import robot from'../assets/images/robot.png';
 import halfRobot from'../assets/images/halfRobot.png';
 
-
-
-import { IoEyeSharp } from "react-icons/io5";
-import { IoEyeOffSharp } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
 import { IoClose } from "react-icons/io5";
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
-import { useParams } from 'react-router-dom';
+
 
 const MDP_oublie = () => {
-  const { data } = useParams();
- 
-    const [showPassword, setShowPassword] = useState(false);
+const email  = localStorage.getItem('email');
+const navigate = useNavigate();
+const [showPassword, setShowPassword] = useState(false);
 const [Password, setPassword] = useState('');
-const [Email, setEmail] = useState('');
+const [Email, setEmail] = useState(email);
 const [Code, setCode] = useState('');
 const [ConfirmPassword, setConfirmPassword] = useState('');
 
@@ -58,6 +55,7 @@ const togglePasswordVisibility = () => {
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
+      navigate('/SignIn')
    
     }); 
  } 
@@ -80,7 +78,7 @@ const togglePasswordVisibility = () => {
                 <p className='lg:text-3xl text-md font-bold text-center mb-2 md:mb-9'>Mot De Passe Oublié</p>
                 <form >
                 <form className='relative'>
-                    <input  onChange={e => setEmail(data)} value={data} type='email' className='rounded-md w-full h-7 lg:h-full border-gray-300 '/>
+                    <input  onChange={e => setEmail(Email)} value={Email} type='email' className='rounded-md w-full h-7 lg:h-full border-gray-300 '/>
                         <label className='absolute placeholder'>Email</label>
                 </form>
 
@@ -110,7 +108,7 @@ const togglePasswordVisibility = () => {
                     <p className='text-white font-bold text-[90%] lg:text-lg'>Valider</p>
                 </button> : <p>Mot de passe pas conforment</p>}
                 <div className=' flex flex-row justify-center items-center space-x-2 '>
-                    <p>Donner Email pour </p> 
+                    <p>Vous n'avez pas reçu le code ? </p> 
                     <Link to="/SendCode" className=' mr-4 text-sd text-darkPink'  style={{ textDecoration: 'underline' }} >Renvoyer le code</Link>
                 </div>
                 
