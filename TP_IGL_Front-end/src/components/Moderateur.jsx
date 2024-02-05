@@ -463,19 +463,20 @@ import { GrArticle } from "react-icons/gr";
 import { BiSolidEdit } from "react-icons/bi";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { Link } from 'react-router-dom';
+import { saveUser,getUser } from '../userStorage';
 
 
 const Moderateur = () =>  {
   const [nav, setNav] =useState(false);
   const [Article, setArticle] = useState(true);
   const [MesArticles, setMesArticles] = useState(false);
-
-  const [Data, setData] = useState([]);
-
  
+  const [Data, setData] = useState([]);
+  const [Data2, setData2] = useState([]);
 
-  const handleNewArticle=()=>{
-    const url = 'http://localhost:8000/get-articles/'
+  const storedUser2=getUser()
+  const handleArticleEnCours=()=>{
+    const url = ''
     fetch(url,{
       method:'GET',
       headers: {
@@ -498,13 +499,32 @@ const Moderateur = () =>  {
   
         // Now you can use the formattedArticles variable as needed
         console.log(formattedArticles);
-        setData(JSON.stringify(formattedArticles, null, 2));
+        setData2(JSON.stringify(formattedArticles, null, 2));
       })
       .catch((error) => {
         console.error('Error fetching articles:', error);
       });
     
   }
+  const handleNewArticle= async ()=>{
+    const url = 'http://localhost:8000/get-articles/'
+    const response = await fetch(url,{
+      method:'GET',
+      headers: {
+        'Content-Type':'application/json'
+      },
+    }) 
+    const data = await response.json();
+
+        // Extract articles_en_attente array from the data
+        const articlesAttente = data.articles_en_attente;
+  
+        setData(articlesAttente);
+        console.log(Data)
+      }
+   
+    
+  
   const handleModerArticle=(id)=>{
     const url =  `http://localhost:8000/moder/${id}/get/`
     fetch(url,{
@@ -544,7 +564,10 @@ const Moderateur = () =>  {
       handleArticle();
       handleNewArticle();
     }
-  
+    const handleWrapper2=()=>{
+      handleMArticles();
+      handleArticleEnCours();
+    }
   const handleArticle = () => {
     setArticle(true);
     setMesArticles(false);
@@ -576,14 +599,14 @@ const Moderateur = () =>  {
                  </div>
                 <div className={!MesArticles? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
                  <BiSolidEdit className='mt-1 ' size={17}/>
-                  <li onClick={handleMArticles} className='text-black'>Mes Articles</li>
+                  <li onClick={handleWrapper2} className='text-black'>Mes Articles</li>
                 </div>
               
               </ul>
              
               <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>
                 <LuLogOut className='mt-1 ' size={17}/>
-                <Link to="/ModererArticle"><p className=' text-black'>Déconnecter</p></Link>
+                <p className=' text-black'>Déconnecter</p>
               </div>
           </div>
         </div> 
@@ -597,11 +620,12 @@ const Moderateur = () =>  {
           {nav ? <IoMenu color='white' size={25}/> : <IoMenu color='white' size={25}/> }
           </div>
          <h5 className='text-white font-bold text-2xl '>Dashboard</h5>
+         <p>{storedUser2.id}</p>
          </div>
           
           <div className="flex flex-col items-center justify-center bg-opacity-10 max-w-auto h-full w-[95%] mt-11 bg-white">
           {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6  overflow-auto'>
-                              {Data.map((item) => (
+                              {Data2.map((item) => (
                           
                            <li   className='flex flex-col h-[80%] w-[80%] rounded-md bg-white'>
                              <div className='flex flex-col justify-start '>
@@ -642,11 +666,11 @@ const Moderateur = () =>  {
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
                  <div className={Article ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'}>
                     <GrArticle className='mt-1 ' size={17}/>
-                  <li onClick={handleArticle} className=' text-black lg:text-xl text-[80%]'>Articles</li>
+                  <li onClick={handleWrapper} className=' text-black lg:text-xl text-[80%]'>Articles</li>
                 </div>
                 <div className={!MesArticles ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink '}>
                  <BiSolidEdit className='mt-1 ' size={17}/>
-                  <li onClick={handleMArticles} className='text-black lg:text-xl text-[80%]'>Mes Articless</li>
+                  <li onClick={handleWrapper2} className='text-black lg:text-xl text-[80%]'>Mes Articless</li>
                 </div>
                 
                 <div className='flex flex-row mx-8 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'>

@@ -541,6 +541,7 @@ const handleNavigate = (result) => {
                                   <div className="  flex justify-center items-center space-x-4 ">
                                     <div className='relative border border-grey'>
       <DatePicker
+        id='dateF_s'
         selected={startDate}
         onChange={handleStartDateChange}
         placeholderText="From"
@@ -551,6 +552,7 @@ const handleNavigate = (result) => {
 
        <div className='relative border border-grey rounded-sm'>
       <DatePicker
+        id='dateT_s'
         selected={endDate}
         onChange={handleEndDateChange}
         placeholderText="To"

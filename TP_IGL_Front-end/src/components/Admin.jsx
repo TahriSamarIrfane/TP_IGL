@@ -99,6 +99,7 @@ const handleNewModInfo = (e) =>{
   .then((response) => response.json(),
   )
   .then((data) => {
+    storedUser2.id=formData.id
     if (data.message === 'Moderator created successfully') {
       setdata(data.message)
     } else {

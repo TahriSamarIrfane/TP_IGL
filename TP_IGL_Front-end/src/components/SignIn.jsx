@@ -153,6 +153,7 @@ import { useUser } from '../UserContext';
 import { saveUser } from '../userStorage';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+// import { saveUser,getUser } from '../userStorage';
 
 const apiUrl = "http://localhost:8000";
 
@@ -165,6 +166,8 @@ const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const [mess, setmess] = useState('');
+    const storedUser = getUser();
+    const storedUser2=getUser()
 
     const [formData, setFormData] = useState({
         Pseudo: '',
@@ -196,14 +199,16 @@ const SignIn = () => {
         .then((response) => {
            
             return response.json();
-        })
+        }) 
         .then((data) => {
         const userData = {
                 Pseudo: formData.Pseudo,
                 MotdePasse: formData.MotdePasse,
                 Email: data.email,
+                id: data.id
         };
          saveUser(userData);
+         storedUser2.id=formData.id 
 
         if (data.message === 'Authentification réussie'){
             setjump(true)

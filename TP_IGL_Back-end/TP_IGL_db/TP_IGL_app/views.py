@@ -395,7 +395,7 @@ def LoginPage(request):
                 login(request, user)
                 # Include CSRF token and email in the response
                 csrf_token = get_token(request)
-                return JsonResponse({"message": "Authentification réussie", "csrftoken": csrf_token, "email": user.email})
+                return JsonResponse({"message": "Authentification réussie", "csrftoken": csrf_token, "email": user.email, "id": user.id})
             else:
                 # If regular authentication fails, try with Moderateur
                 moderator = Moderateur.objects.filter(username=username).first()
