@@ -445,7 +445,7 @@ def LoginPage(request):
                 login(request, user)
                 # Include CSRF token and email in the response
                 csrf_token = get_token(request)
-                return JsonResponse({"message": "Authentification réussie", "csrftoken": csrf_token, "email": user.email})
+                return JsonResponse({"message": "Authentification réussie", "csrftoken": csrf_token, "email": user.email, "id": user.id})
             else:
                 # If regular authentication fails, try with Moderateur
                 moderator = Moderateur.objects.filter(username=username).first()
@@ -1389,7 +1389,7 @@ def submit_feedback(request):
         subject = 'Feedback from User'
         message = f"Stars: {stars}\nComment: {comment}\nUser: {user_pseudo}\nEmail: {user_email}"
         from_email = user_email  # Use the email provided in the payload
-        to_email = 'ls_tahri@esi.dz'  # Replace with the destination email
+        to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
         send_mail(subject, message, from_email, [to_email])
 
         return JsonResponse({'message': 'Feedback submitted successfully'}, status=201)

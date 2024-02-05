@@ -130,9 +130,9 @@ const handleModifierModName = () =>{
  
   });
 }
-const handleModifierModPW = (e) =>{
+const handleModifierModPW = () =>{
   const url = "http://localhost:8000/change_moderator_password/";
-  e.preventDefault();
+
   fetch(url, {
     method: 'POST',
     headers: {
@@ -149,9 +149,8 @@ const handleModifierModPW = (e) =>{
  
   });
 }
-const handleDelete = (e) =>{
+const handleDelete = () =>{
   const url = "http://localhost:8000/remove-moderator/";
-  e.preventDefault();
   fetch(url, {
     method: 'POST',
     headers: {
@@ -292,15 +291,15 @@ const handleClick = (e)=>{
                             <ul className='ml-3'>
                                   <div className={!NewMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
                                     <MdOutlineAddBox color='#AA336A' className='mt-1 ' size={17}/>
-                                    <li onClick={handleNewMod} className='text-black'>Nouveau</li>
+                                    <li onClick={()=>handleNewMod} className='text-black'>Nouveau</li>
                                  </div>
                                  <div className={!ModifierMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
                                     <IoSettingsOutline color='#AA336A' className='mt-1 ' size={17}/>
-                                    <li onClick={handleModifierMod}  className='text-black'>Modifier</li>
+                                    <li onClick={()=>handleModifierMod}  className='text-black'>Modifier</li>
                                    </div>
                                    <div className={!DeleteMod ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer' : 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink' }>
                                     <MdOutlineDeleteForever color='#AA336A' className='mt-1 ' size={17}/>
-                                    <li onClick={handleDeleteMod}  className='text-black'>Supprimer</li>
+                                    <li onClick={()=>handleDeleteMod()}  className='text-black'>Supprimer</li>
                                    </div>
                               
                             </ul>
