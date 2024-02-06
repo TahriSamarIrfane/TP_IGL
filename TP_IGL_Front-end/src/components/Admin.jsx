@@ -150,24 +150,25 @@ const handleModifierModPW = () =>{
 }
 const handleDelete = () =>{
   const url = "http://localhost:8000/remove-moderator/";
-  fetch(url, {
+  fetch(url,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      username:username,
+      username: username
     }),
   })
-  .then((response) => response.json())
+  .then((response) =>{ 
+    console.log(response.json())})
   .then((data) => {
-    if (data.message === 'Moderator removed successfully') {
+    console.log(data)
+    if (data.message == 'Moderator removed successfully') {
       setdata(data.message)
     } else {
       setdata(data.error)
     }
- 
- 
+
   });
 }
 //Wrapper Fucntion
