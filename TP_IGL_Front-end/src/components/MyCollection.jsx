@@ -23,8 +23,12 @@ import { IoFilter } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 const MyCollection = () => {
 
+  const location = useLocation();
+  const user = location.state?.user;
+  console.log("µµµµµµµµµµµµµµµµµµµµ",user);
     const [favorite, setFavorite] = useState([]);
     const[hoverFavorite,setHoverFavorite]= useState(false);
 
@@ -33,6 +37,12 @@ const [endDate, setEndDate] = useState(null);
 
 const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
 
+
+useEffect(() => {
+  const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+
+  setFavorite(storedFavorites.map(id => ({ id })));
+}, []);
 
 const toggleFavorite = async (id, index) => {
   setFavorite((prevFavorites) => {
@@ -45,10 +55,12 @@ const toggleFavorite = async (id, index) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+
           },
           body: JSON.stringify({
             id: id,
             action: isFavorite ? 'remove' : 'add',
+            email:user.Email,
           }),
         });
 
@@ -65,7 +77,7 @@ const toggleFavorite = async (id, index) => {
     // Update localStorage with the updated favorites
     const updatedFavorites = isFavorite
       ? prevFavorites.filter((fav) => fav.id !== id)
-      : [...prevFavorites, { id, index }];
+      : [...prevFavorites, { id }];
 
     localStorage.setItem('favoriteIds', JSON.stringify(updatedFavorites.map((fav) => fav.id)));
 
@@ -74,18 +86,22 @@ const toggleFavorite = async (id, index) => {
   });
 };
 
+
+
   const [favoriteArticles, setFavoriteArticles] = useState([]);  // Add favoriteArticles to state
   const [searchResults, setSearchResults] = useState([]);
   const [originalSearchResults, setOriginalSearchResults] = useState([]);
 
   const fetchFavoriteArticles = async () => {
     try {
-      const response = await fetch('http://localhost:8000/consulter_articles_preferes/');
+      const userEmail = user.Email;
+      const response = await fetch(`http://localhost:8000/consulter_articles_preferes/?email=${encodeURIComponent(userEmail)}`);
+      
       if (response.ok) {
         const data = await response.json();
+        
         if (data.status === 'OK') {
           // Set the list of favorite articles
-          favoriteArticles
           setSearchResults(data.favorite_articles);
           setOriginalSearchResults(data.favorite_articles);
         } else {
@@ -101,11 +117,12 @@ const toggleFavorite = async (id, index) => {
       console.error('Error fetching favorite articles:', error.message);
     }
   };
-
+  
   useEffect(() => {
     // Fetch favorite articles on component mount
     fetchFavoriteArticles();
-  }, []);
+  }, [user.Email, setSearchResults, setOriginalSearchResults]);
+  
  
 
   const navigate = useNavigate();
@@ -256,7 +273,7 @@ const clearMap = (input, setState) => {
                         
                     <div class="mx-auto h-full  overflow-scroll ">{/*overflow-scroll will add the scoll when overflow */}
                     {searchResults.map((article,index) =>(
-                      console.log('favoriteArticles:***********', favoriteArticles),
+                      console.log('favoriteArticles:***********', article._id),
                     <div key={article.id} className=''>
                     <div className='bg-white  h-full  '>
                         <div className='flex flex-col md:flex-row'>
@@ -266,7 +283,7 @@ const clearMap = (input, setState) => {
                  <div className='flex flex-row justify-between'>
                  <h className='text-grey mt-1 text-[12px]'> {article._source.Date}</h>
                  <div className=' flex flex-row'>
-                 <LiaShareSolid className='mt-1 text-2xl'/>
+                 <LiaShareSolid className='mt-1 text-2xl cursor-pointer'/>
                  <button className='top-0'>Share</button>
                  <label className='flex'>
                  <input
@@ -293,10 +310,10 @@ const clearMap = (input, setState) => {
                  {/*<FaRegHeart /> empty heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
                  </div>
                  </div>
-                 <p className='font-bold text-lg'>{article._source.titre}</p>
+                 <p className='font-bold text-lg cursor-pointer' onClick={() => navigate(`/Article/${article._id}`, { state: { article: article._source } })}>{article._source.titre}</p>
                  <p className="line-clamp-2 text-darkGery text-sm">
                   {article._source.full_text}</p>
-                  <p className="text-black font-bold text-sm" onClick={() => navigate(`/Article/${article._id}`, { state: { article: article._source } })}>
+                  <p className="text-black font-bold text-sm cursor-pointer" onClick={() => navigate(`/Article/${article._id}`, { state: { article: article._source } })}>
   Voir plus
 </p>
                        <div className='relative pr-5 mt-2 md:pr-40'>

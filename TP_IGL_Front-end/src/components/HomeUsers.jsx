@@ -10,7 +10,7 @@ import { FaHeart } from "react-icons/fa";// full heart
 import { FaRegHeart } from "react-icons/fa";//empty heart
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
-
+import { useLocation } from 'react-router-dom';
 
 //import images
 import Pc from'../assets/images/Pc.png';
@@ -23,16 +23,17 @@ import woman2 from'../assets/images/woman2.png';
 import man1 from'../assets/images/man1.png';
 import FAQ from'../assets/images/FAQ.png';
 import BlackSplash2 from'../assets/images/BlackSplash2.png';
-import email from '../assets/icons/@.png';
+import emailPic from '../assets/icons/@.png';
 import telephone from '../assets/icons/telephone.png';
 import quePensiezVous from'../assets/images/QuePensiez-Vous.png';
 import bird from'../assets/images/bird.png';
+import NavBar from './NavBar.jsx';
+
+
+const apiurl = "http://127.0.0.1:8000"
 import { Link } from 'react-router-dom';
 import { FaFilePdf } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
-
-
-
 
 
 
@@ -78,6 +79,8 @@ const settings={
 
 const HomeUsers = () => {
 
+  const location = useLocation();
+  const user = location.state?.user;
   const navigate = useNavigate();
 const[rating,setRating]= useState(null);
 const[hover,setHover]= useState(null);
@@ -113,6 +116,90 @@ const handleCheckboxChange1 = (index) => {
   });
 };
 
+//----------------------FEEDBACKS---------------------------------
+const [comment, setComment] = useState('');
+
+const handleRatingChange = (currentRating) => {
+  setRating(currentRating);
+};
+
+const handleCommentChange = (event) => {
+  setComment(event.target.value);
+};
+
+const handleSubmitFeedback = async () => {
+  try {
+    console.log('User Information:', user.Pseudo);
+    const response = await fetch(`${apiurl}/submit-feedback/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        stars: rating,
+        comment: comment,
+        email: user.Email, // Add the user email to the request payload
+        pseudo:user.Pseudo,
+      }),
+    });
+
+    if (response.ok) {
+      console.log('Feedback submitted successfully');
+    } else {
+      console.error('Error submitting feedback:', response.statusText);
+      // Handle error and provide feedback to the user
+    }
+  } catch (error) {
+    
+    console.error('Error submitting feedback:', error.message);
+    // Handle error and provide feedback to the user
+  }
+};
+
+    
+
+//----------------------CONTACT-US---------------------------------
+  const [nom, setNom] = useState('');
+  const [email, setEmail] = useState('');
+
+  const handleSubmitContactUs = async (event) => {
+    
+    event.preventDefault();
+    // Check if all required elements are present
+    if (!nom || !email || !message) {
+      console.error('One or more form elements are missing.');
+      return;
+    }
+
+    // Perform AJAX request
+    try {
+
+      const response = await fetch(`${apiurl}/contact/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nom: nom,
+          email: email,
+          message: message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      // Handle the response data as needed
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+ 
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 const [searchResults, setSearchResults] = useState([]);
@@ -121,21 +208,28 @@ const [message, setMessage] = useState('');
 
 const [searchTerm, setSearchTerm] = useState('');
 
-const handleSearch = () => {
+const handleFav = () => {
   // Perform any necessary actions related to the search term
   // ...
 
+  // Navigate to the MyCollection page with the user information
+  navigate('/MyCollection', { state: { user } });
+};
+
+const handleSearch = () => {
+
+
   // Navigate to the result page with the search term
-  navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`);
+  navigate(`/result?searchTerm=${encodeURIComponent(searchTerm)}`, { state: { user } });
 };
 ////////////////////////////////////////////////////////////////////////////////
     return (
        <div>
-
+         {user && <NavBar user={user} />}
         {/* La premiere partie : pour la recherche*/}
         <div className="bg-white mt-20  lg:pr-10 flex flex-col md:flex-row-reverse   justify-between ">
             <div className='mt-20'>
-                <img className='lg:custom-PC mb-10   lg:mt-0 float-left' src={Pc} alt=""/>
+              <button onClick={handleFav}>  <img className='lg:custom-PC mb-10   lg:mt-0 float-left' src={Pc} alt=""/></button>
             </div>
             {/*  Text */}
             <div className='md:mt-20'>
@@ -160,7 +254,7 @@ const handleSearch = () => {
                     <button id='search' className='my_search ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl'
                     onClick={handleSearch}
                     >   
-                    <h2  className='text-white font-bold text-xl'>Search</h2>                   
+                    <h2 className='text-white font-bold text-xl'>Surf</h2>                   
                     </button>
                  </div>
                   </div >
@@ -392,147 +486,200 @@ const handleSearch = () => {
             </div>
            </div>
 
-         {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center mb-5"
-         id="Avis">
+         {/* Que Pensiez-Vous ?   -----FEEDBACKS------*/}
+         <div className="flex flex-col items-center justify-center mb-5" id="Avis">
+        <div className="bg-white flex flex-col md:flex-row items-center justify-between">
+          {/* the left side */}
+          <div className="md:w-1/2 flex-shrink-0">
+            <img
+              className="right-0 lg:mt-5 w-[320px] h-[300px] md:h-[570px] md:w-[600px]"
+              src={man1}
+              alt=""
+            />
+          </div>
 
-        <div className="bg-white flex flex-col  md:flex-row  items-center justify-between ">
-          
-          {/* the left side*/}
-            <div className='md:w-1/2  flex-shrink-0'>         
-                  <img className=' right-0 lg:mt-5 w-[320px] h-[300px] md:h-[570px] md:w-[600px]' src={man1} alt=""/>               
+
+            {/* the right side */}
+          <div className="md:w-1/2 px-2 ml-24 md:ml-0">
+            <div className="px-10 pb-5 pt-5 mr-48 md:mr-48 w-[81%] bg-lightGrey md:shadow-xl rounded-2xl">
+              <p className="font-bold text-black text-4xl text-center">Que Pensiez-Vous ?</p>
+              <p className="text-black mt-3 ml-4 text-center">
+                Votre avis est important pour nous aider à mieux comprendre vos besoins et à adapter
+                notre service en conséquence
+              </p>
+              <div className="mb-10">
+                <div className="flex flex-row items-center justify-center mb-7">
+                  {[...Array(5)].map((star, index) => {
+                    const currentRating = index + 1;
+                    return (
+                      <label key={index}>
+                        <input
+                          className="opacity-0"
+                          type="radio"
+                          name="rating"
+                          value={currentRating}
+                          onClick={() => handleRatingChange(currentRating)}
+                        />
+                        <FaStar
+                          size={40}
+                          className="text-grey cursor-pointer"
+                          id="stars"
+                          name="stars"
+                          color={currentRating <= (hover || rating) ? '#ffc107' : '#8A8785'}
+                          onMouseEnter={() => setHover(currentRating)}
+                          onMouseLeave={() => setHover(null)}
+                          required
+                        />
+                      </label>
+                    );
+                  })}
+                </div>
+                <form className="flex flex-col space-y-4" id="FeedbackForm" onSubmit={(e) => { e.preventDefault(); handleSubmitFeedback(); }}>
+                <input type="hidden"  />
+                  <div className="">
+                    <textarea
+                      type="text"
+                      id="comment"
+                      name="comment"
+                      placeholder="Add a Comment..."
+                      value={comment}
+                      onChange={handleCommentChange}
+                      className="shadow-lg resize-none bg-gray-100 outline-none ring-1 ring-gray-300 w-full h-32 rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200"
+                    ></textarea>
+                  </div>
+                  <button
+                    className="shadow-md inline-block self-end bg-darkPink text-white font-bold rounded-2xl px-6 py-2 w-full"
+                    type="submit"
+                    name="submit"
+                  >
+                    Envoyer
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+         {/* Que Pensiez-Vous ?   ------CONTACT-US--------*/}
+     <div class="flex flex-col items-center justify-center " id="contact">
+
+<div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
+  
+    <div className='md:w-1/3 lg:mt-20 flex-shrink-0'>
+
+      {/* the right side*/}
+    <div className='relative '>
+          <img className=' right-0 lg:mt-5 ml-6 mf:ml-0' src={BlackSplash2} alt=""/>
+          <div className=''>    
+            <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
+            <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>
+            <img className='w-5 h-5 mt-2 mr-1' src={emailPic} alt=""/>
+            <h className=' mb-3 font-Segoe text-white font-bold text-2xl lg:text-2xl md:text-1xl '>Email :</h>    
+            </div>
+            <h className='absolute mx-20 top-32 lg:top-32 lg:mx-20 mb-3 font-Segoe text-white md:text-1xl md:top-16 md:mx-14'>Surfey@gmail.com</h>
+
+            <div className='absolute flex flex-row mx-16 top-40 lg:top-40 lg:mx16 md:mx-10 md:top-24'>
+            <img className='w-5 h-5 mt-2 mr-1' src={telephone} alt=""/>
+            <h className=' mb-3 font-Segoe text-white font-bold text-2xl md:text-1xl '>Numéro de Téléphone :</h>    
+            </div>
+            <h className='absolute mx-20 top-48 mb-3 lg:top-48 lg:mx-20 font-Segoe text-white md:text-1xl md:top-40 md:mx-14'>(+213) 123 45 67 89</h>
+
+          </div>
+          <img className=' lg:mb-40 float-left' src={bird} alt=""/>
+          </div>
+        
+    </div>
+
+
+
+
+    {/* the left side*/}
+    <div className='px-5 md:w-2/3'>
+        <div className='lg:px-24 pr-0 lg:mr-48 md:mr-48'>
+        <img className='justify-center' src={quePensiezVous} alt=""/>
+        <p className='text-black mt-5 mb-5 ml-4'>Nous sommes à votre écoute...Votre avis compte !</p>
+        <div className=' mb-10'>
+        <form id="ContactForm" onSubmit={handleSubmitContactUs} encType="multipart/form-data" action='' className='flex flex-col space-y-4'>
+        <input type="hidden"  />
+            {/* Nom*/}
+            <div className=''>
+              <label for="" className='font-bold text-md'>Nom Complet</label>
+            </div>
+            <div className=''>
+              <input 
+               type='text' 
+               placeholder='Entrez votre nom complet' 
+               className='bg-lightGrey outline-none ring-1 ring-gray-300 w-full rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'
+               id="nom"
+               name="nom"
+               value={nom}
+               onChange={(e) => setNom(e.target.value)}
+               required
+              />
             </div>
 
-
-            {/* the right side*/}
-            <div className='md:w-1/2 px-2 ml-24 md:ml-0'>
-                <div className=' px-10 pb-5  pt-5 mr-48 md:mr-48 w-[81%] bg-lightGrey md:shadow-xl rounded-2xl '>
-              <p className='font-bold text-black text-4xl text-center'>Que Pensiez-Vous ?</p>
-                <p className='text-black mt-3 ml-4 text-center'>Votre avis est important pour nous aider à mieux comprendre vos besoins et à adapter notre service en conséquence</p>
-                <div className=' mb-10'>
-                    <div className='flex flex-row items-center justify-center mb-7'>
-                        {[...Array(5)].map((star,index)=>{
-                            const currentRating =index+1;
-                        return(
-                            <label>
-                            <input className=' opacity-0'
-                             type="radio" name="ratinf"
-                             value={currentRating}
-                             onClick={()=>setRating(currentRating)}/>
-                            <FaStar size={40} className='text-grey cursor-pointer'
-                            color={currentRating <= (hover|| rating) ?"#ffc107" : "#8A8785"}
-                            onMouseEnter={()=> setHover(currentRating)}
-                            onMouseLeave={()=> setHover(null)}
-                            />
-                            </label>
-                        );
-                    })}
-                </div>
-                  <form action='' className='flex flex-col space-y-4'>
-
-                    {/*Commentaire*/}
-                    <div className=''>
-                      <textarea type='text' placeholder='Ajoutez un Commentaire...' className=' shadow-lg resize-none bg-gray-100 outline-none ring-1 ring-gray-300 w-full h-32 rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'></textarea>
-                    </div>
-
-                    <button className='shadow-md inline-block self-end bg-darkPink text-white font-bold rounded-2xl px-6 py-2 w-full'> Envoyer </button>
-                  </form>
-                </div>
-                  </div >
-
-                 </div>                            
-         </div>
-         </div>
-
-
-
-         {/* Que Pensiez-Vous ?*/}
-         <div class="flex flex-col items-center justify-center"
-         id="contact">
-
-        <div className="bg-white flex flex-col  md:flex-row-reverse  items-center justify-between ">
-          
-            <div className='md:w-1/3 lg:mt-20 flex-shrink-0'>
-
-              {/* the right side*/}
-            <div className='relative '>
-                  <img className=' right-0 lg:mt-5 ml-6 md:ml-0' src={BlackSplash2} alt=""/>
-                  <div className=''>    
-                    <h className='absolute mx-8 top-8 right-0 text-4xl lg:text-4xl md:text-2xl  font-Segoe py-2 px-7 lg:px-7 lg:top-8 md:px-2 md:top-1 text-white font-bold  '>Contactez-nous</h>
-                    <div className='absolute flex flex-row mx-16 top-24 lg:top-24 lg:mx-16 md:top-10 md:mx-10'>
-                    <img className='w-5 h-5 mt-2 mr-1' src={email} alt=""/>
-                    <h className=' mb-3 font-Segoe text-white font-bold text-2xl lg:text-2xl md:text-1xl '>Email :</h>    
-                    </div>
-                    <h className='absolute mx-20 top-32 lg:top-32 lg:mx-20 mb-3 font-Segoe text-white md:text-1xl md:top-16 md:mx-14'>Surfey@gmail.com</h>
-
-                    <div className='absolute flex flex-row mx-16 top-40 lg:top-40 lg:mx16 md:mx-10 md:top-24'>
-                    <img className='w-5 h-5 mt-2 mr-1' src={telephone} alt=""/>
-                    <h className=' mb-3 font-Segoe text-white font-bold text-2xl md:text-1xl '>Numéro de Téléphone :</h>    
-                    </div>
-                    <h className='absolute mx-20 top-48 mb-3 lg:top-48 lg:mx-20 font-Segoe text-white md:text-1xl md:top-40 md:mx-14'>(+213) 123 45 67 89</h>
-
-                  </div>
-                  <img className=' lg:mb-40 float-left' src={bird} alt=""/>
-                  </div>
-                
+             {/*Email*/}
+             <div className=''>
+              <label for="" className='font-bold text-md'>Email</label>
+            </div>
+            <div className=''>
+              <input 
+              type='email' 
+              placeholder='Entrez votre mail' 
+              className='bg-lightGrey outline-none ring-1 ring-gray-300 w-full rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'
+              id="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+             />
             </div>
 
-    
+            {/*text*/}
+            <div className=''>
+              <label for="" className='font-bold text-mds'>Commentaire</label>
+            </div>
+            <div className=''>
+              <textarea 
+              type='text' 
+              placeholder='Ajoutez un Commentaire...' 
+              className='resize-none bg-lightGrey outline-none ring-1 ring-gray-300 w-full rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'
+              id="message"
+              name="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+              />
+            </div>
 
+            <button 
+            className='shadow-md inline-block self-end bg-darkPink text-white font-bold rounded-2xl px-6 py-2 w-full'
+            type="submit"
+            name="submit"
+            > Envoyer 
+            </button>
+          </form>
+        </div>
+          </div >
 
-            {/* the left side*/}
-            <div className='px-5 md:w-2/3'>
-                <div className='lg:px-24 pr-0 lg:mr-48 md:mr-48'>
-                <img className='justify-center' src={quePensiezVous} alt=""/>
-                <p className='text-black mt-5 mb-5 ml-4'>Nous sommes à votre écoute...Votre avis compte !</p>
-                <div className=' mb-10'>
-                  <form action='' className='flex flex-col space-y-4'>
-                    {/* Nom*/}
-                    <div className=''>
-                      <label for="" className='font-bold text-md'>Nom Complet</label>
-                    </div>
-                    <div className=''>
-                      <input type='text' placeholder='Entrez votre nom complet' className='bg-lightGrey outline-none ring-1 ring-gray-300 w-full rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'></input>
-                    </div>
-
-                     {/*Email*/}
-                     <div className=''>
-                      <label for="" className='font-bold text-md'>Email</label>
-                    </div>
-                    <div className=''>
-                      <input type='email' placeholder='Entrez votre mail' className='bg-lightGrey outline-none ring-1 ring-gray-300 w-full rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'></input>
-                    </div>
-
-                    {/*text*/}
-                    <div className=''>
-                      <label for="" className='font-bold text-mds'>Commentaire</label>
-                    </div>
-                    <div className=''>
-                      <textarea type='text' placeholder='Ajoutez un Commentaire...' className='resize-none bg-lightGrey outline-none ring-1 ring-gray-300 w-full rounded-2xl px-4 py-2 focus:ring-2 focus:ring-rose-200'></textarea>
-                    </div>
-
-                    <button className='shadow-md inline-block self-end bg-darkPink text-white font-bold rounded-2xl px-6 py-2 w-full'> Envoyer </button>
-                  </form>
-                </div>
-                  </div >
-
-                 </div> 
+         </div> 
 
 
 
-                 
-                 
+         
+         
 
 
-                             
-         </div>
-         </div>
+                     
+ </div>
+ </div>
 
 
-       </div>
-   
-       
-    );
+</div>
+);
 };
 
 export default HomeUsers;
@@ -589,54 +736,54 @@ const faq1 = [
 
 // For the big articles
 const bigArticle = 
-  {
-      Date:`11 Novembre 2023`,
-      title:`Lorem ipsum dolor sit `,
-      photo:science3,
-      cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit',],
-      article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
-  };
+{
+  Date:`26/01/2024`,
+  title:`How to Teach Software Modeling`,
+  photo:science2,
+  cle:['software modeling','UML'],
+  article:`Software engineering education at universities faces a common problem; that is regular students do not usually have experience of developing software for practical use and thus are not motivated for software engineering aiming at high quality software production by a project team or a persistent organization. Software projects `,
+};
 
 // For articles
 const data = [
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit `,
+        Date:`01/02/2024`,
+        title:`ModelGame: A Quality Model for Gamified Software Modeling Learning `,
         photo:science3,
-        cle:['Lorem','ipsum','Lorem','ipsum','dolor','sit',],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['Model design','learning model',],
+        article:`Gamification has been adopted in software development tasks in recent years. This adoption seeks, for example, to improve the en- gagement of developers while creating UML models or writing code. Empirical studies [7, 9, 14] report that UML models suffer from incompleteness and inconsistency problems. Lange [14] rein- forces that these defects bring potential risks that can cause mis- interpretation and communication failure, representing a risk to `,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
+        Date:`26/01/2024`,
+        title:`How to Teach Software Modeling`,
         photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['software modeling','UML'],
+        article:`Software engineering education at universities faces a common problem; that is regular students do not usually have experience of developing software for practical use and thus are not motivated for software engineering aiming at high quality software production by a project team or a persistent organization. Software projects `,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet consectetur`,
+        Date:`12/01/2024`,
+        title:`Towards a Quantum Software Modeling Language`,
         photo:science1,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['quantum computing','UML','software engineering'],
+        article:`Quantum computation rose to prominence after the discovery of quantum algorithms[5, 7] that can efficiently perform tasks that are intractable classically. These discoveries propelled research and interest in quantum computation. Today, there exists prototype`,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet `,
+        Date:`28/12/2023`,
+        title:`Numerical computing in engineering mathematics`,
         photo:science2,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['engineering mathematics','Industry 4.0'],
+        article:`The 4th Industrial Revolution has had a dramatic impact on the engineering profession. The modern technologies such as artificial intelligence, the internet of things, and advanced robotics have altered engineering systems and processes. To- day’s engineers are expected to be able to leverage these`,
     },
 
     {
-        Date:`11 Novembre 2023`,
-        title:`Lorem ipsum dolor sit amet consectetur`,
+        Date:`20/12/2023`,
+        title:`A Prototype Implementation of an Orthographic Software Modeling Environment`,
         photo:science1,
-        cle:['Lorem','ipsum','dolor','sit','Lorem'],
-        article:` Lorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in  PlusLorem ipsum dolor sit amet consectetur. Orci volutpat mauris arcu non dictum elit sagittis. Mauris ullamcorper ac orci at sollicitudin integer tortor. Eget lacus est in duis vitae et..        `,
+        cle:['View-based Modeling','Orthographic Software Modeling'],
+        article:`Orthographic Software Modeling (OSM) is a view-centric software engineering approach that aims to leverage the or- thographic projection metaphor used in the visualization of physical objects to visualize software systems. Although the general concept of OSM does not prescribe specific sets of views, a concrete OSM environment has to be specific about`,
     },
 
 ]

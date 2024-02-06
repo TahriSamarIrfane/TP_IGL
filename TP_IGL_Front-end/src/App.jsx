@@ -17,7 +17,7 @@ import FooterGeust from './components/FooterGeust.jsx';
 import SendCode from './components/SendCode.jsx';
 import MDP_oublie from './components/MDP_oublie.jsx';
 import Moderateur from './components/Moderateur.jsx';
-import ModérerArticle from './components/ModérerArticle.jsx';
+import ModérerArticle from './components/ModererArticle.jsx';
 
 
 
@@ -56,7 +56,12 @@ function App() {
         <Route path="/Moderateur" element={<Moderateur />} />
         <Route path="/ModererArticle" element={<ModérerArticle />} />
         <Route path="/ModererArticle/:id" element={<ModérerArticle />} />
-        <Route path="/HomeGuests" element={<HomeGuests />} />
+        <Route path="/HomeGuests" element={
+          <>
+          <NavBarGuest/>
+        <HomeGuests />
+        <FooterGeust/>
+        </>} />
         <Route path="/Result" element={<Result />} />
         <Route path="/Article/:id" element={<Article />} />
         <Route path="/Admin" element={<Admin />} />

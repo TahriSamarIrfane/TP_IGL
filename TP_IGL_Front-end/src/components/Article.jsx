@@ -30,41 +30,45 @@ const { auteurs, titre, abstract, references, key_words, full_text, pdf_file, Da
 
   const [favoriteIds, setFavoriteIds] = useState(storedFavorites);
 
-useEffect(() => {
-  // Load favorite article IDs from localStorage
-  const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
-  setFavoriteIds(storedFavorites);
-
-  // Check if the current article ID is in the favorites
-  const isFavorite = storedFavorites.includes(id);
-  setFavorite(isFavorite);
-}, [id]); // Dependency on id so that it updates when the id changes
+  useEffect(() => {
+    const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+    setFavoriteIds(storedFavorites);
+  
+    const isFavorite = storedFavorites.includes(id);
+    setFavorite(isFavorite);
+  }, []);
 /////////////////////////// for add to favorite
 const toggleFavorite = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/ajouter_article_prefere/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id:id,
-          action: favorite ? 'remove' : 'add',
-        }),
-      });
-  
-      if (response.ok) {
-        setFavorite(!favorite); // Toggle the local favorite state
-  
-        // Print the current list of favorites
-        console.log('Current favorites:', favorite);
-      } else {
-        console.error('Error adding/removing article from favorites:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error adding/removing article from favorites:', error);
+  try {
+    const response = await fetch('http://localhost:8000/ajouter_article_prefere/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+        action: favorite ? 'remove' : 'add',
+      }),
+    });
+
+    if (response.ok) {
+      setFavorite(!favorite);
+
+      // Update localStorage with the current list of favorites
+      const updatedFavorites = favorite
+        ? favoriteIds.filter(favId => favId !== id)
+        : [...favoriteIds, id];
+      localStorage.setItem('favoriteIds', JSON.stringify(updatedFavorites));
+
+      console.log('Current favorites:', updatedFavorites);
+    } else {
+      console.error('Error adding/removing article from favorites:', response.statusText);
     }
-  };
+  } catch (error) {
+    console.error('Error adding/removing article from favorites:', error);
+  }
+};
+
   
   // Call this function when the heart icon is clicked
   const handleToggleFavorite = () => {
@@ -85,7 +89,7 @@ const toRoman = (num) => {
     return (
         <div className='p-2 md:p-20'>
           
-            <div className='flex flex-col  bg-[#FAF9FE] pb-32 rounded-lg'> 
+            <div className='flex flex-col  bg-[#fef9fe] pb-32 rounded-lg'> 
             <img className='w-full h-56 md:h-72 rounded-tr-lg rounded-tl-lg' src={science5} alt=""/>
             <h className='text-center text-3xl font-bold text-darkPink px-4 md:px-16 my-5' >{titre}</h>
             <div className='flex flex-row flex-wrap  justify-between px-10'> {/*Authors + institutions */}

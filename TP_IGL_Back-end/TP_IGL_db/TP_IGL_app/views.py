@@ -4,6 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 from elasticsearch import Elasticsearch
 from django.conf import settings
 import os
+import hashlib
 from django.middleware.csrf import get_token
 from django.shortcuts import render
 from .models import Article,Auteur,Institution,UploadedFile
@@ -17,6 +18,7 @@ from rest_framework.parsers import FileUploadParser,MultiPartParser,FormParser
 from .extraction_methods import extract_article,extract_entities,extract_info,extract_title
 # Create your views here.from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
+import uuid
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
@@ -115,6 +117,8 @@ from .utils import remove_moderator
 from .models import Moderateur
 from django.views.decorators.csrf import csrf_protect
 from .forms import ContactForm
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -457,10 +461,11 @@ def LoginPage(request):
 
     return JsonResponse({"message": "Méthode non autorisée"}, status=405)
     
+    
 # 3- deconnnexion de l'utilisateur 
 
 @csrf_exempt
-@login_required
+#@login_required
 def LogoutPage(request):
     if request.method == 'POST':
         try:
@@ -627,8 +632,8 @@ def elasticsearch_status_view(request):
 #9- ajouter article prefere 
 
 @csrf_exempt
-@permission_classes([IsAuthenticated])
-@login_required
+#@permission_classes([IsAuthenticated])
+#@login_required
 #def ajouter_article_prefere(request):
    ## try:
         # Récupérez l'ID de l'utilisateur authentifié
@@ -692,11 +697,19 @@ def elasticsearch_status_view(request):
 @csrf_exempt
 def ajouter_article_prefere(request):
     try:
+        if request.method == 'POST':
+        # Decode the request body based on the content type
+         content_type = request.content_type
+        if content_type == 'application/json':
+                body = json.loads(request.body.decode('utf-8'))
+                user_email = body.get('email')
+        
         # Récupérez l'ID de l'utilisateur authentifié
-        user_id = request.user.id
-
+        # user_id = request.user_id
+        print("******",user_email)
+        #user_id =2
         # Récupérez ou créez l'instance FavoriteArticle pour l'utilisateur authentifié
-        user_pref, created = FavoriteArticle.objects.get_or_create(user_id=user_id)
+        user_pref, created = FavoriteArticle.objects.get_or_create(email=user_email)
 
         # Récupérez l'ID de l'article à partir du corps de la requête JSON
         body = json.loads(request.body.decode('utf-8'))
@@ -762,20 +775,12 @@ def ajouter_article_prefere(request):
 
 
 
-#10- consulter un article prefere
-
-
-@csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
 def consulter_articles_preferes(request):
     try:
         # Ensure user is authenticated
-        if not request.user.is_authenticated:
-            return JsonResponse({'status': 'Error', 'message': 'User not authenticated'})
-
+        user_email_to_test = request.GET.get('email', '')  # Replace with the desired email
         # Retrieve the FavoriteArticle instance for the authenticated user
-        user_pref, created = FavoriteArticle.objects.get_or_create(user=request.user)
+        user_pref, created = FavoriteArticle.objects.get_or_create(email=user_email_to_test)
 
         # Retrieve the list of favorite article IDs from elasticsearch_ids
         favorite_article_ids = user_pref.elasticsearch_ids
@@ -792,10 +797,8 @@ def consulter_articles_preferes(request):
                 favorite_articles.append(article_data)
             except ElasticsearchException as e:
                 # Log the exception for debugging
-                
                 # You may choose to handle the exception differently (e.g., inform frontend)
-
-              return JsonResponse({'status': 'OK', 'message': 'Favorite articles fetched successfully', 'favorite_articles': favorite_articles})
+                pass
 
         # Return a JSON response with the status, message, and detailed favorite articles
         return JsonResponse({
@@ -805,15 +808,16 @@ def consulter_articles_preferes(request):
         })
     
     except Exception as e:
-        # Print the exception for debugging purposes
-        print(f'An error occurred: {e}')
-        return JsonResponse({'status': 'Error', 'message': 'Une erreur s\'est produite'})
+        return JsonResponse({'status': 'Error', 'message': f'Une erreur s\'est produite: {str(e)}'})
+
+
+    
     
 #11- view article details 
 
 @csrf_exempt
-@login_required
-@permission_classes([IsAuthenticated])
+#@login_required
+#@permission_classes([IsAuthenticated])
 def afficher_details(request):
     try:
         # Parse JSON data from the request body
@@ -1187,8 +1191,13 @@ def filtrer_resultats_date(request):
             keywords = [keywords]
 
         # Parse start and end dates
-        start_date = datetime.strptime(start_date_str, '%d/%m/%Y').date() if start_date_str else None
-        end_date = datetime.strptime(end_date_str, '%d/%m/%Y').date() if end_date_str else None
+           # Parse start and end dates
+        start_date = datetime.strptime(start_date_str, '%a %b %d %Y %H:%M:%S GMT%z').date() if start_date_str else None
+        end_date = datetime.strptime(end_date_str, '%a %b %d %Y %H:%M:%S GMT%z').date() if end_date_str else None
+
+        # Format dates as 'yyyy-mm-dd'
+        formatted_start_date = start_date.strftime('%Y-%m-%d') if start_date else None
+        formatted_end_date = end_date.strftime('%Y-%m-%d') if end_date else None
 
         # Define your Elasticsearch connection
         es = Elasticsearch(['http://localhost:9200'])
@@ -1212,12 +1221,12 @@ def filtrer_resultats_date(request):
                         {
                             "range": {
                                 "Date": {
-                                    "gte": start_date.isoformat() if start_date else None,
-                                    "lte": end_date.isoformat() if end_date else None
+                                    "gte": formatted_start_date .isoformat() if formatted_start_date  else None,
+                                    "lte": formatted_end_date .isoformat() if formatted_end_date  else None
                                 }
                             }
                         }
-                    ] if start_date and end_date else []
+                    ] if formatted_start_date  and formatted_end_date  else []
                 }
             }
         }
@@ -1250,7 +1259,7 @@ def generate_random_password_view(request):
     else:
         return Response(serializer.errors, status=400)
     
-@csrf_exempt
+#@csrf_exempt
 @api_view(['POST'])
 def create_moderator_view(request):
     if request.method == 'POST':
@@ -1359,31 +1368,35 @@ def change_moderator_username(request):
     return Response({'message': 'Username changed successfully'}, status=status.HTTP_200_OK)
 
 
-@csrf_exempt
+
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@login_required
+#@login_required
 def submit_feedback(request):
+
     try:
+        
         user = request.user
         stars = request.data.get('stars')
         comment = request.data.get('comment')
+        user_email = request.data.get('email')  # Retrieve user email from the request data
+        user_pseudo = request.data.get('pseudo')
 
-        # Validate stars and comment
-        if stars is None or not (0 <= stars <= 5):
-            return JsonResponse({'error': 'Invalid stars value'}, status=400)
+        # Validate stars, comment, and user email
+        if stars is None or not (0 <= stars <= 5) or not user_email:
+            return JsonResponse({'error': 'Invalid input values'}, status=400)
 
         # Sending email
         subject = 'Feedback from User'
-        message = f"Stars: {stars}\nComment: {comment}\nUser: {user.username}\nEmail: {user.email}"
-        from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
+        message = f"Stars: {stars}\nComment: {comment}\nUser: {user_pseudo}\nEmail: {user_email}"
+        from_email = user_email  # Use the email provided in the payload
         to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
         send_mail(subject, message, from_email, [to_email])
 
         return JsonResponse({'message': 'Feedback submitted successfully'}, status=201)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
-
 
 @csrf_protect
 @api_view(['POST'])
@@ -1400,7 +1413,7 @@ def contact_us(request):
 
         # Sending email
         subject = 'Contact Support'
-        message = f"Nom: {name}\nMessage: {message}\nEmail: {email}"
+        message = f"Nom: {name}\nEmail: {email}\nMessage: {message}"
         from_email = 'boutheynalaouar7@gmail.com'  # Replace with your email
         to_email = 'lb_laouar@esi.dz'  # Replace with the destination email
         send_mail(subject, message, from_email, [to_email])
@@ -1410,6 +1423,105 @@ def contact_us(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+# @api_view(['GET','POST'])
+# def contact_view(request):
+#     try:
+#         if request.method == 'POST':
+#             # data = json.loads(request.body.decode('utf-8'))
+#             # nom = data.get('nom')
+#             # email = data.get('email')
+#             # message = data.get('message')
+#             print(request.POST)
+#             form = ContactForm(request.POST)
+
+#             if form.is_valid():
+#                 # Le formulaire est valide, vous pouvez maintenant accéder aux données du formulaire
+#                 nom = form.cleaned_data['nom']
+#                 email = form.cleaned_data['email']
+#                 message = form.cleaned_data['message']
+
+#                 # Print statements for debugging
+#                 print(f'nom: {nom}, email: {email} , message: {message}')
+
+#                 # Envoyer un e-mail
+#                 subject = 'Contact Support'
+#                 email_message = f"Nom: {nom}\nMessage: {message}\nEmail: {email}"
+#                 from_email = 'boutheynalaouar7@gmail.com'  # Remplacez par votre adresse e-mail
+#                 to_email = 'lb_laouar@esi.dz'  # Remplacez par l'adresse e-mail de destination
+#                 send_mail(subject, email_message, from_email, [to_email])
+
+#                 # Vous pouvez maintenant utiliser ces données comme vous le souhaitez
+#                 # (par exemple, enregistrer dans la base de données, envoyer un e-mail, etc.)
+
+#                 # Pour cette démonstration, renvoyez simplement une réponse JSON
+#                 response_data = {
+#                     'status': 'Success',
+#                     'message': 'Form submitted successfully!',
+#                     'data': {
+#                         'nom': nom,
+#                         'email': email,
+#                         'message': message,
+#                     }
+#                 }
+#                 return JsonResponse(response_data)
+#             else:
+#                 # Le formulaire n'est pas valide
+#                 response_data = {
+#                     'status': 'Error',
+#                     'message': 'Form validation failed.',
+#                     'errors': form.errors
+#                 }
+#             return JsonResponse(response_data, status=400)
+#         else:
+#             # La requête n'est pas de type POST, renvoyer une page de formulaire vide
+#             # (peut être une page de confirmation)
+#          return render(request, 'contact.html')  # Assurez-vous d'avoir un template HTML pour cette vue
+
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=500)
+    
+#@csrf_exempt
+@api_view(['GET', 'POST'])
+def contact_view(request):
+    
+        if request.method == 'POST':
+            if request.content_type == 'application/json':
+                # Si les données sont en format JSON, utilisez request.body
+                data = json.loads(request.body.decode('utf-8'))
+                nom = data.get('nom')
+                email = data.get('email')
+                message = data.get('message')
+            else:
+                # Si les données sont en format de formulaire, utilisez request.POST
+                nom = request.POST.get('nom')
+                email = request.POST.get('email')
+                message = request.POST.get('message')
+
+            # Valider et traiter les données
+            if not nom or not email or not message:
+                return JsonResponse({'error': 'Name, email, and message are required fields'}, status=400)
+
+            # Envoyer un e-mail
+            subject = 'Contact Support'
+            email_message = f"Email: {email}\nNom: {nom}\nMessage: {message}"
+            from_email = 'boutheynalaouar7@gmail.com'
+            to_email = 'ls_tahri@esi.dz'
+            send_mail(subject, email_message, from_email, [to_email])
+
+            # Répondre avec succès
+            response_data = {
+                'status': 'Success',
+                'message': 'Form submitted successfully!',
+                'data': {
+                    'nom': nom,
+                    'email': email,
+                    'message': message,
+                }
+            }
+            return JsonResponse(response_data)
+        else:
+            # La requête n'est pas de type POST, renvoyer une page de formulaire vide
+            return render(request, 'contactus.jsx')
 # to bring the article from elastic search using it's ID to display it in the Article page
 
 # Establish connection to your Elasticsearch cluster
@@ -1449,7 +1561,68 @@ def get_article_details(request, article_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
+@csrf_exempt   
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@login_required    
+def create_article(request, format=None):
+    try:
+        # Get the JSON data from the request
+        article_json = request.data
 
+        # Extract only the relevant attributes for creating the article
+        relevant_attributes = {
+            'titre': article_json.get('titre'),
+            'abstract': article_json.get('abstract'),
+            'key_words': article_json.get('key_words'),
+            'full_text': article_json.get('full_text'),
+            'pdf_file': article_json.get('pdf_file'),
+            'references': article_json.get('references'),
+            'etat': Etat.objects.get(code='A'),  # Use the instance for 'A' (EN_ATTENTE)
+        }
+
+        # Your existing logic to create the article
+        new_article, article_data = create_article_instance(relevant_attributes)
+
+        if new_article:
+            return Response({'message': 'Article created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({'message': 'Error creating article'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# Move the create_article logic outside the view function
+def create_article_instance(relevant_attributes):
+    try:
+        # Create a new instance of the Article model with the relevant attributes
+        new_article = Article.objects.create(**relevant_attributes)
+
+        # Add any additional logic for handling authors if needed
+        # authors_list = relevant_attributes.get('auteurs', [])
+        # new_article.auteurs.set(authors_list)
+
+        return new_article, relevant_attributes
+    except Exception as e:
+        # Handle errors when creating the article
+        print(f"Error creating article: {e}")
+        return None, None
+         
+@api_view(['POST'])
+@authentication_classes([BasicAuthentication])
+@permission_classes([IsAuthenticated])
+@login_required
+def get(self, request, format=None):
+        try:
+            # Obtenez tous les articles en attente
+            articles_En_Attentes= Article.objects.filter(state='enAttente')
+
+            # Sérialisez les articles pour les renvoyer en réponse
+            serialized_articles = [{'id': article.id, 'other_field': article.other_field} for article in articles_En_Attentes]
+
+            return Response({'articles_En_Attentes': serialized_articles}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 @api_view(['GET'])
 def get_moderator_articles(moderator_id):
@@ -1513,3 +1686,6 @@ def changer_etat_article(article_id, moderateur_id):
         article = Article.objects.get(pk=article_id)
         article.etat = 'C'  # Mettre à jour l'état à "En Cours"
         article.save()
+
+
+

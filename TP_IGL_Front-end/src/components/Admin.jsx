@@ -23,6 +23,7 @@ import { getUser } from '../userStorage'
 
 
 const Admin = () =>  {
+
   const [nav, setNav] =useState(false);
   const [showItems, setShowItems] = useState(false);
   const [ImShift, setImShift] = useState(false);
@@ -177,20 +178,6 @@ const handleClick = (e)=>{
   handleModifierModName();
   }
   
-  // const handleButtonClick = (e) => {
-  // const compareResult = usernameNew.localeCompare('');
-  // const areEqual = compareResult === 0;
-  // const compareRes = password.localeCompare('');
-  // const isEqual = compareRes === 0;
-  // const inter = compareRes + compareResult;
-  // {areEqual  ? console.log("Pseudo pas modifié"):handleModifierModName()  } 
-  
-  //  {isEqual  ? console.log("Mot de passe pas modifié"): handleModifierModPW(e) } 
-  //  {isEqual && areEqual ? console.log("Pas de modification"): handleButtonClick(e)}
-  // }
-  
-
-
  const handleUploadArticle = () => {
     const file = fileInput.files[0];
     const formData = new FormData();
@@ -263,6 +250,21 @@ const handleClick = (e)=>{
   const handleNav = () =>{
     setNav(!nav)
   }
+  const handlenotifiermoderateur = () => {
+  
+  
+    const csrfToken = getCSRFTokenFromCookies();
+
+   fetch('http://localhost:8000/notify-moderators/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFTokenFromCookies(),
+          },
+  });
+  
+        
+}  
   return (
     
     <div className='flex flex-col bg-gradient-to-r lg:h-screen h-screen w-screen from-GLbleu via-GLpink to-orange-300   '>
@@ -418,7 +420,7 @@ const handleClick = (e)=>{
                 onChange={handleChangeP}
                />
                  <p className='text-darkPink'>{data}</p>
-               <button type='button' onClick={()=>handleDelete()} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
+               <button type='button' onClick={handleDelete} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
      
               </div>
              
@@ -466,10 +468,8 @@ const handleClick = (e)=>{
               </ul>
               
               
-            </div>
-      
+            </div> 
       </div>  
-
      {/*Image Profile top right corner*/}
       <div onClick={handleNav} style={{position: 'absolute',top: 15,right: 10, }}>
       <Link to='/ProfileAdminMod'><img style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} src={avatar} alt='/'/></Link>

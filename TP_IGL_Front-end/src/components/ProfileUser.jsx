@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import avatar from "../assets/images/images2.jpg"
+import avatar from "../assets/images/profile5.jpg"
 import logo from "../assets/images/Logo.png"
 
 import { MdOutlinePersonOutline } from "react-icons/md";
@@ -9,9 +9,12 @@ import { LuLogOut } from "react-icons/lu";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { Link } from 'react-router-dom';
-
+import { saveUser,getUser } from '../userStorage';
 
 const ProfileUser = () => {
+
+  const storedUser = getUser();
+  const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
 
   const [ModifierInfo,setModifierInfo] = useState(true);
   const [ModifierPwd, setModifierPwd] = useState(false);
@@ -29,12 +32,222 @@ const ProfileUser = () => {
     setModifierPwd(true);
     setModifierInfo(false);
   };
+  const handleLogout = (e) => {
+    e.preventDefault();
+    const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
+    
+    fetch("http://localhost:8000/logout/", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${basicAuthCredentials}`,
+        },
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then((data) => {
+        console.log('Logout Response:', data);
+        // Handle successful response, e.g., redirect to login page
+    })
+    .catch((error) => {
+        console.error('Logout failed:', error);
+        // Handle errors, e.g., show an error message to the user
+    });
+};
+
+  const [formData, setFormData] = useState({
+    old_password: '',
+    new_password: '',
+    username:storedUser.Pseudo,
+});
+
+const handleChange = (e) => {
+const { name, value } = e.target;
+    setFormData(prevState => ({ ...prevState, [name]: value }));
+    console.log(formData); // Add this line
+};
+
+
+const handleSubmit = (e) => {
+  
+    e.preventDefault();
+    console.log(storedUser.Pseudo);
+    console.log(storedUser.MotdePasse);
+    const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
+    fetch("http://localhost:8000/change-password/", { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${basicAuthCredentials}`,
+        },
+        body: JSON.stringify(formData),
+    })
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then((data) => {
+        console.log('Server Response:', data);
+        // Handle successful response
+    setFormData({
+         old_password: '',
+         new_password: '',
+        });    
+    })
+    .catch((error) => {
+        console.error('failed:', error);
+        if (error.response) {
+          // If the response is available, log its text
+          error.response.text().then((text) => console.log('Response Text:', text));
+      } else {
+          // If there is no response, log a general error message
+          console.log('No response received.');
+      }
+    });
+    
+};
+
+const [form, setForm] = useState({
+  username:''
+});
+
+const handleChanges = (e) => {
+const { name, value } = e.target;
+  setFormData({ ...form, [name]: value });
+  console.log(form); // Add this line
+};
+
+
+const handleSubmits = (e) => {
+  e.preventDefault();
+  const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
+  fetch("http://localhost:8000/change-username/", {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${basicAuthCredentials}`,
+          
+      },
+      body: JSON.stringify(form),
+  })
+  .then((response) => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.text();
+  })
+  .then((data) => {
+      console.log('Server Response:', data);
+      // Handle successful response
+  setFormData({
+      username:''
+      });    
+  })
+  .catch((error) => {
+      console.error('failed:', error);
+      // Handle errors
+  });
+  
+};
+
+
+const fetchUserData = async () => {
+  try {
+    const response = await fetch(`${apiUrl}/user/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${storedUser.MotdePasse}`, // Assuming MotdePasse is your authentication token
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const userData = await response.json();
+    setUser(userData);
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+  }
+};
+
+function getCSRFTokenFromCookies() {
+  // Split cookies into an array
+  const cookiesArray = document.cookie.split(';');
+
+  // Loop through cookies to find the one containing the CSRF token
+  for (let i = 0; i < cookiesArray.length; i++) {
+    const cookie = cookiesArray[i].trim();
+
+    // Check if the cookie starts with the name 'csrftoken'
+    if (cookie.startsWith('csrftoken=')) {
+      // Extract and return the CSRF token value
+      return cookie.substring('csrftoken='.length, cookie.length);
+    }
+  }
+
+  // Return null if CSRF token is not found
+  return null;
+}
+
+
+const handleDeleteAccount = () => {
+  
+  const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
+  const usernameToDelete = storedUser.Pseudo;  
+
+  const csrfToken = getCSRFTokenFromCookies();
+
+  fetch("http://localhost:8000/delete-account/", {
+    method: 'DELETE',
+    headers: {
+
+      'Content-Type': 'application/json',
+      'Authorization': `Basic ${basicAuthCredentials}`,
+      'X-CSRFToken': getCSRFTokenFromCookies(),
+
+    },
+    body: JSON.stringify({ Pseudo: usernameToDelete }),
+  })
+
+  .then((response) => {
+    console.log('Server Response:', response);
+
+    if (response.status === 204) {
+      // Successful DELETE, handle accordingly
+      console.log('Account deleted successfully');
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return response.json();
+  })
+  .then((data) => {
+    console.log('Delete Account Response:', data);
+    // Handle successful response (if needed)
+  })
+  .catch((error) => {
+    console.error('Delete Account failed:', error);
+    // Handle errors
+  });
+};
+
+
    
   return (
     <div className='flex flex-col bg-gradient-to-r lg:h-screen h-full w-screen from-GLbleu via-GLpink to-orange-300   '>
         <div className='flex flex-row p-2 justify-between mt-4 '>
           <div  className='flex flex-row  justify-start space-y-2 space-x-3'>
-          <img  src={logo} style={{borderRadius:'50%', height:'40px',width:'40px',objectFit:'cover'}} alt='/'/>
+          <img  src={logo} style={{ height:'40px',width:'40px',objectFit:'cover'}} alt='/'/>
           <h className='md:hidden lg:block  font-bold text-gray-600 text-xl'>Surfey</h>  
           </div>
          
@@ -66,11 +279,11 @@ const ProfileUser = () => {
                 </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
               <MdOutlineDeleteForever className='mt-1 ' color='DF1477' size={20} />
-              <li className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Supprimer Compte</li>
+              <li onClick={handleDeleteAccount} className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Supprimer Compte</li>
                </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
                 <LuLogOut className='mt-1 ' color='DF1477' size={20}/>
-                <li className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Se déconnecter</li>
+                <li  onClick={handleLogout} className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Se déconnecter</li>
               </div>
           
                 </ul> 
@@ -89,15 +302,18 @@ const ProfileUser = () => {
                     <p>Pseudo</p>
                     {ModifierPseudo &&(<div>
                     <input
-                    type="text"
-                    className="rounded-md w-full"
-                    placeholder="Jacobi23"
+                     type="text"
+                     name='username'
+                     value={form.username}
+                     onChange={handleChanges} 
+                     className="rounded-md w-[80]"
+                     placeholder={storedUser.Pseudo}   
                     /> </div> )}
-                    {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={()=>handleModifierPseudo}>Jacobi</p></div>
+                    {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={handleModifierPseudo}>{storedUser.Pseudo}</p></div>
                   )}
                     
                     <p >Email</p>
-                   <div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p>*******@esi.dz</p></div>
+                   <div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p>{storedUser.Email}</p></div>
                     </div>
                     {ModifierPseudo &&( <div className='flex justify-end w-full '>
                     <button onClick={()=>handleModifierPseudo} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
@@ -116,27 +332,33 @@ const ProfileUser = () => {
                     <p>Mot de passe actuel</p>
                     <div className='flex flex-col'>
                     <input
-                    type="text"
-                    className="rounded-md w-full "
-                    placeholder="Jacobi23"
+                     type="text"
+                     name='old_password'  // Make sure 'name' matches the property in formData
+                     value={formData.old_password}
+                     onChange={handleChange}
+                     className="rounded-md w-[80%] "
+                     placeholder=""
                     />
-                    <p className='lg:text-[80%] text-[70%] text-blue-500'>Mot de passe oublié ?</p>
+                    <Link to="/SendCode"><a href="" className='text-[#5E6DF5] text-sm '>Mot de passe Oublié ?</a></Link>
                     </div>
                     <p>Nouveau mot de passe</p>
                     <input
                     type="password"
+                    name='new_password'  // Make sure 'name' matches the property in formData
+                    value={formData.new_password}
+                    onChange={handleChange}
                     className="rounded-md w-full"
-                    placeholder="*****"
+                    placeholder=""
                  />
                     <p>Confirmer mot de passe</p>
                     <input
                     type="password"
                     className="rounded-md w-full"
-                    placeholder="******"
+                    placeholder=""
                     />
                     </div>
                     <div className='flex justify-end w-full '>
-                    <button className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
+                    <button onClick={handleSubmit}  className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
                     </div>
                 </div>
                   )}

@@ -66,10 +66,12 @@ const SignIn = () => {
         };
          saveUser(userData);
 
-         if(userData.Pseudo==='SurfeyAdmin'){ 
-            setjumpA(true)
-            navigate('/admin');
-        }else{
+        if (data.message === 'Authentification réussie'){
+            setjump(true)
+            console.log("*******************",userData)
+
+            navigate('/user', { state: { user: userData } });
+        } else{
         if ( data.message === 'Authentification en tant que modérateur réussie') {
             setjumpM(true)
             storedUser2.Pseudo=formData.Pseudo

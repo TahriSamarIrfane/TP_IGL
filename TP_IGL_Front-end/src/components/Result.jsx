@@ -12,21 +12,19 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 //import images
-import science4 from'../assets/images/science4.png';
-import science3 from'../assets/images/science3.png';
-import science2 from'../assets/images/science2.png';
-import science1 from'../assets/images/science1.png';
 import { IoClose } from "react-icons/io5";
 import { GoPlus } from "react-icons/go";
 import { IoFilter } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaFilePdf } from "react-icons/fa6";
 import { useLocation } from "react-router-dom";
-
+import science3 from'../assets/images/science3.png';
 
 const Result = () => {
 
   const location = useLocation();
+  const user = location.state?.user;
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [initialSearchDone, setInitialSearchDone] = useState(false);
 
@@ -56,7 +54,7 @@ useEffect(() => {
 
 const [startDate, setStartDate] = useState(null);
 const [endDate, setEndDate] = useState(null);
-
+console.log("ù************************",startDate);
 
 const handleStartDateChange = (date) => {
   setStartDate(date);
@@ -78,6 +76,11 @@ const [Institutions, setInstitutions] = useState([]);
 
 const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
 
+useEffect(() => {
+  const storedFavorites = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+
+  setFavorite(storedFavorites.map(id => ({ id })));
+}, []);
 
 const toggleFavorite = async (id, index) => {
   setFavorite((prevFavorites) => {
@@ -94,6 +97,7 @@ const toggleFavorite = async (id, index) => {
           body: JSON.stringify({
             id: id,
             action: isFavorite ? 'remove' : 'add',
+            email:user.Email,
           }),
         });
 
@@ -110,7 +114,7 @@ const toggleFavorite = async (id, index) => {
     // Update localStorage with the updated favorites
     const updatedFavorites = isFavorite
       ? prevFavorites.filter((fav) => fav.id !== id)
-      : [...prevFavorites, { id, index }];
+      : [...prevFavorites, { id }];
 
     localStorage.setItem('favoriteIds', JSON.stringify(updatedFavorites.map((fav) => fav.id)));
 
@@ -118,6 +122,7 @@ const toggleFavorite = async (id, index) => {
     return updatedFavorites;
   });
 };
+
 
 
  
@@ -166,10 +171,23 @@ filteredResults = filteredResults.filter(result => {
   }));
 });
   
-// Apply date range filter
+/* Apply date range filter
 filteredResults = filteredResults.filter(result => {
   const articleDate = new Date(result._source?.Date.split('/').reverse().join('-'));
   return (!startDate || articleDate >= startDate) && (!endDate || articleDate <= endDate);
+});*/ //the format dd/mm/yyyy
+
+// Apply date range filter
+filteredResults = filteredResults.filter(result => {
+  const articleDate = new Date(result._source?.Date);
+
+  // Format the articleDate to dd-mm-yyyy
+  const formattedDate = `${articleDate.getDate().toString().padStart(2, '0')}-${(articleDate.getMonth() + 1).toString().padStart(2, '0')}-${articleDate.getFullYear()}`;
+console.log("------------------",formattedDate);
+  // Parse the formatted date into a new Date object
+  const parsedDate = new Date(formattedDate);
+
+  return (!startDate || parsedDate >= startDate) && (!endDate || parsedDate <= endDate);
 });
       
   
@@ -254,20 +272,22 @@ const [message, setMessage] = useState('');
 const handleSearch = async () => {
   try {
     const response = await fetch('http://localhost:8000/rechercher_articles/', {
+      
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         mots_cles: searchTerm,
+
       }),
     });
+    
 
     if (response.ok) {
-      console.log('**********************************');
+      
       const data = await response.json();
       ///console.log('Search results:', data.search_results);
-
             // Update state with search results
             setSearchResults(data.search_results);
             setOriginalSearchResults(data.search_results);
@@ -316,8 +336,8 @@ const handleNavigate = (result) => {
                           onChange={(e) => setSearchTerm(e.target.value)}
                           name='searchBar'
                           />
-                    <button id='search' className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl' onClick={handleSearch}>   
-                    <h2 className='text-white font-bold text-xl'>Search </h2>                   
+                    <button className=' ml-auto bg-darkPink h-full w-24 rounded-tr-2xl rounded-br-2xl' onClick={handleSearch}>   
+                    <h2 className='text-white font-bold text-xl'>Surf </h2>                   
                     </button>
                  </div>
                  </div>
@@ -366,11 +386,11 @@ const handleNavigate = (result) => {
                  {/*<FaRegHeart /> empty heartTOOOO change lateeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer */}
                  </div>
                  </div>
-                 <p className='font-bold text-lg'>{result._source.titre}</p>
+                 <p className='font-bold text-lg cursor-pointer' onClick={() => navigate(`/Article/${result._id}`, { state: { article: result._source } })}>{result._source.titre}</p>
                  <p className="line-clamp-2 text-darkGery text-sm">
                  {result._source.full_text}</p>
 
-<p className="text-black font-bold text-sm" onClick={() => navigate(`/Article/${result._id}`, { state: { article: result._source } })}>
+<p className="text-black font-bold text-sm cursor-pointer" onClick={() => navigate(`/Article/${result._id}`, { state: { article: result._source } })}>
   Voir plus
 </p>
 
@@ -400,7 +420,7 @@ const handleNavigate = (result) => {
                     
                     ))
                     ) : (
-                      <p>No search results found.</p>
+                      <p>Aucun résultat de recherche trouvé.</p>
                     )}
 
 
