@@ -10,6 +10,7 @@ import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { saveUser,getUser } from '../userStorage';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileAdminMod = () => {
   
@@ -18,7 +19,7 @@ const ProfileAdminMod = () => {
   const [ModifierInfo,setModifierInfo] = useState(true);
   const [ModifierPwd, setModifierPwd] = useState(false);
   const [ModifierPseudo, setModifierPseudo] = useState(false);
-
+  const navigate = useNavigate();
   const handleModifierPseudo= () => {
     setModifierPseudo(!ModifierPseudo);
   };
@@ -31,8 +32,8 @@ const ProfileAdminMod = () => {
     setModifierInfo(false);
   };
 
-  const handleLogout = (e) => {
-    e.preventDefault();
+  const handleLogout = () => {
+
     const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
     
     fetch("http://localhost:8000/logout/", {
@@ -50,6 +51,7 @@ const ProfileAdminMod = () => {
     })
     .then((data) => {
         console.log('Logout Response:', data);
+        navigate('/')
         // Handle successful response, e.g., redirect to login page
     })
     .catch((error) => {
@@ -127,17 +129,18 @@ const handleDeleteAccount = () => {
   const usernameToDelete = storedUser.Pseudo;  
 
   const csrfToken = getCSRFTokenFromCookies();
-
+  console.log(storedUser.Pseudo);
+  console.log(storedUser.MotdePasse);
   fetch("http://localhost:8000/delete-account/", {
     method: 'DELETE',
     headers: {
 
       'Content-Type': 'application/json',
       'Authorization': `Basic ${basicAuthCredentials}`,
-      'X-CSRFToken': getCSRFTokenFromCookies(),
+      'X-CSRFToken': csrfToken,
 
     },
-    body: JSON.stringify({ Pseudo: usernameToDelete }),
+    body: JSON.stringify({ Pseudo: usernameToDelete, }),
   })
 
   .then((response) => {
@@ -146,6 +149,7 @@ const handleDeleteAccount = () => {
     if (response.status === 204) {
       // Successful DELETE, handle accordingly
       console.log('Account deleted successfully');
+      navigate('/')
       return;
     }
 
@@ -201,11 +205,11 @@ const handleDeleteAccount = () => {
                 
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
               <MdOutlineDeleteForever className='mt-1 ' color='DF1477' size={20} />
-              <li onClick={handleDeleteAccount}  className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Supprimer Compte</li>
+              <li onClick={()=>handleDeleteAccount()}  className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Supprimer Compte</li>
                </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
                 <Link to='/'><LuLogOut className='mt-1 ' color='DF1477' size={20}/></Link>
-                <li onClick={handleLogout} className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Se déconnecter</li>
+                <li onClick={()=>handleLogout()} className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Se déconnecter</li>
               </div>
           
                 </ul> 

@@ -10,15 +10,19 @@ import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { saveUser,getUser } from '../userStorage';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileUser = () => {
 
   const storedUser = getUser();
+  const navigate = useNavigate();
   const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
 
   const [ModifierInfo,setModifierInfo] = useState(true);
   const [ModifierPwd, setModifierPwd] = useState(false);
   const [ModifierPseudo, setModifierPseudo] = useState(false);
+  const [Mess, setMess] = useState('');
+  const [Mess1, setMess1] = useState('');
 
   const handleModifierPseudo= () => {
     setModifierPseudo(!ModifierPseudo);
@@ -52,6 +56,7 @@ const ProfileUser = () => {
     })
     .then((data) => {
         console.log('Logout Response:', data);
+        navigate('/SignIn');
         // Handle successful response, e.g., redirect to login page
     })
     .catch((error) => {
@@ -73,11 +78,12 @@ const { name, value } = e.target;
 };
 
 
-const handleSubmit = (e) => {
-  
-    e.preventDefault();
+const handleSubmit = () => {
+    setMess('')
     console.log(storedUser.Pseudo);
     console.log(storedUser.MotdePasse);
+    console.log(formData.old_password);
+    console.log(formData.new_password);
     const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
     fetch("http://localhost:8000/change-password/", { 
         method: 'POST',
@@ -85,16 +91,20 @@ const handleSubmit = (e) => {
             'Content-Type': 'application/json',
             'Authorization': `Basic ${basicAuthCredentials}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          username : storedUser.Pseudo,
+          old_password: formData.old_password,
+          new_password: formData.new_password,
+        }),
     })
     .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
+       
         return response.text();
+
     })
     .then((data) => {
         console.log('Server Response:', data);
+        setMess1(data)
         // Handle successful response
     setFormData({
          old_password: '',
@@ -126,8 +136,9 @@ const { name, value } = e.target;
 
 
 const handleSubmits = () => {
-  console.log(form)
+  setMess('')
   const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
+  console.log(form)
   fetch("http://localhost:8000/change-username/", {
       method: 'POST',
       headers: {
@@ -135,7 +146,9 @@ const handleSubmits = () => {
           'Authorization': `Basic ${basicAuthCredentials}`,
           
       },
-      body: JSON.stringify(form),
+      body: JSON.stringify(
+        {new_username: form,}
+      ),
   })
   .then((response) => {
       if (!response.ok) {
@@ -145,6 +158,7 @@ const handleSubmits = () => {
   })
   .then((data) => {
       console.log('Server Response:', data);
+      setMess(data)
       // Handle successful response
   setFormData({
       username:''
@@ -211,10 +225,10 @@ const handleDeleteAccount = () => {
 
       'Content-Type': 'application/json',
       'Authorization': `Basic ${basicAuthCredentials}`,
-      'X-CSRFToken': getCSRFTokenFromCookies(),
+      'X-CSRFToken': csrfToken,
 
     },
-    body: JSON.stringify({ Pseudo: usernameToDelete }),
+    body: JSON.stringify({ Pseudo: usernameToDelete, }),
   })
 
   .then((response) => {
@@ -223,6 +237,7 @@ const handleDeleteAccount = () => {
     if (response.status === 204) {
       // Successful DELETE, handle accordingly
       console.log('Account deleted successfully');
+      navigate('/')
       return;
     }
 
@@ -310,7 +325,7 @@ const handleDeleteAccount = () => {
                      className="rounded-md w-[80]"
                      placeholder={storedUser.Pseudo}   
                     /> 
-                    <p>{form.username}</p>
+              
                     </div> )}
                     {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={()=>handleModifierPseudo()}>{storedUser.Pseudo}</p></div>
                   )}
@@ -318,8 +333,9 @@ const handleDeleteAccount = () => {
                     <p >Email</p>
                    <div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p>{storedUser.Email}</p></div>
                     </div>
+                    <p className='text-darkPink'>{Mess}</p>
                     {ModifierPseudo &&( <div className='flex justify-end w-full '>
-                    <button onClick={()=>handleSubmits()} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
+                      <button onClick={()=>handleSubmits()} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
                     </div>)}
                 </div>
                   )}
@@ -360,8 +376,9 @@ const handleDeleteAccount = () => {
                     placeholder=""
                     />
                     </div>
+                    <p className='text-darkPink'>{Mess1}</p>
                     <div className='flex justify-end w-full '>
-                    <button onClick={handleSubmit}  className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
+                    <button onClick={()=>handleSubmit()}  className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
                     </div>
                 </div>
                   )}

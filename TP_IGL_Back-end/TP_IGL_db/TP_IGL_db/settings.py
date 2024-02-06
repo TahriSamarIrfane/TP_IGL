@@ -173,6 +173,7 @@ ELASTICSEARCH_DSL = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
+    "http://localhost:3000",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
@@ -181,6 +182,7 @@ CORS_ALLOW_HEADERS = [
     'access-control-allow-credentials',
     'content-type',
     'authorization',
+    'x-csrftoken', 
 ]
 
 SELENIUM_BROWSER = 'firefox'  # Utilisez 'firefox' pour Firefox, 'chrome' pour Chrome, etc.
