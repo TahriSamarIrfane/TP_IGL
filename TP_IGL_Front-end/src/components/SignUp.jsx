@@ -44,7 +44,7 @@ const SignUp = () => {
     
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+       
         console.log(formData);
         fetch(`${apiUrl}/signup/`, {
             method: 'POST',
@@ -142,7 +142,7 @@ const SignUp = () => {
                     </form>
                     <p className='text-darkPink'>{mess}</p>
                     <button onClick={()=>handleSubmit()} className='bg-darkPink w-full h-10 rounded-md mt-5'>
-                   <a href="" className='text-white font-bold text-lg'>Créer Compte</a>
+                   <p className='text-white font-bold text-lg'>Créer Compte</p>
                         
                     </button>
 

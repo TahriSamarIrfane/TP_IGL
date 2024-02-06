@@ -123,7 +123,6 @@ const SendCode = () => {
     const handleButton = (e) =>{
     
      const url = "http://localhost:8000/request-password-reset/";
-      e.preventDefault();
       fetch(url, {
         method: 'POST',
         headers: {

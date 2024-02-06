@@ -25,7 +25,7 @@ const ProfileUser = () => {
   };
 
   const handleModifierInfo= () => {
-    setModifierInfo(!ModifierInfo);
+    setModifierInfo(true);
     setModifierPwd(false);
   };
   const handleModifierPwd= () => {
@@ -275,7 +275,7 @@ const handleDeleteAccount = () => {
                  </div>
                 <div className= 'flex flex-row mx-8 mb-3 space-x-2 py-1 '>
                  <LuKeyRound  className='mt-1  ' color='DF1477' size={20}/>
-                  <li onClick={()=>handleModifierPwd} className={!ModifierPwd ?'text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10':'text-black border-b-2 border-b-darkPink lg:text-md text-10'} >Modifier Mot de Passe</li>
+                  <li onClick={()=>handleModifierPwd()} className={!ModifierPwd ?'text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10':'text-black border-b-2 border-b-darkPink lg:text-md text-10'} >Modifier Mot de Passe</li>
                 </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
               <MdOutlineDeleteForever className='mt-1 ' color='DF1477' size={20} />

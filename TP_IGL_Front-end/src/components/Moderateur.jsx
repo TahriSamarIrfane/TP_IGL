@@ -11,9 +11,11 @@ import { BiSolidEdit } from "react-icons/bi";
 import { IoIosAddCircleOutline } from "react-icons/io";
 import { Link } from 'react-router-dom';
 import { saveUser,getUser } from '../userStorage';
-
+import { useNavigate } from 'react-router-dom';
 
 const Moderateur = () =>  {
+
+  const navigate = useNavigate();
   const [nav, setNav] =useState(false);
   const [Article, setArticle] = useState(true);
   const [MesArticles, setMesArticles] = useState(false);
@@ -74,6 +76,7 @@ const Moderateur = () =>  {
         })
         .then((data) => {
             console.log('Logout Response:', data);
+            navigate('/');
             // Handle successful response, e.g., redirect to login page
         })
         .catch((error) => {         console.error('Logout failed:', error);

@@ -20,10 +20,10 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineDeleteForever } from "react-icons/md";
 import { Link } from 'react-router-dom';
 import { getUser } from '../userStorage'
-
+import { useNavigate } from 'react-router-dom';
 
 const Admin = () =>  {
-
+  const storedUser = getUser();
   const [nav, setNav] =useState(false);
   const [showItems, setShowItems] = useState(false);
   const [ImShift, setImShift] = useState(false);
@@ -36,9 +36,9 @@ const Admin = () =>  {
     const[usernameNew,setusernameNew] =useState('');
     const[email,setemail] =useState('');
     const[password,setpassword] =useState('');
-    const[data,setdata] =useState('');
+    const[Data,setData] =useState('');
     const[dataName,setdataName] =useState('');
-    
+    const navigate = useNavigate();
  
   
 
@@ -74,7 +74,8 @@ const Admin = () =>  {
       })
       .then((response) => {
           if (!response.ok) {             throw new Error(`HTTP error! Status: ${response.status}`);
-          }         return response.json();
+          }         return response.json(),
+         navigate('/');
  
       })
       .then((data) => {
@@ -104,9 +105,9 @@ const handleNewModInfo = (e) =>{
   storedUser2.id=data.id
   console.log(data.id)
     if (data.message === 'Moderator created successfully') {
-      setdata(data.message)
+      setData(data.message)
     } else {
-      setdata('Mail ou Pseudo éxistent déjà')
+      setData('Mail ou Pseudo éxistent déjà')
     }
   });
 }
@@ -126,7 +127,12 @@ const handleModifierModName = () =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    setdataName(data.message)
+    console.log(username)
+    console.log(usernameNew)
+    if(data.message == 'Username changed successfully')
+    {setData(data.message)}else{
+      setData('Pseudo déjà existant')
+    }
  
   });
 }
@@ -145,7 +151,10 @@ const handleModifierModPW = () =>{
   })
   .then((response) => response.json())
   .then((data) => {
-    setdata(data.message)
+    if(data.message == 'Password changed successfully')
+    {setData(data.message)}else{
+      setData('Pseudo déjà existant')
+    }
  
   });
 }
@@ -160,14 +169,14 @@ const handleDelete = () =>{
       username: username
     }),
   })
-  .then((response) =>{ 
-    console.log(response.json())})
+  .then((response) => 
+    response.json())
   .then((data) => {
     console.log(data)
     if (data.message == 'Moderator removed successfully') {
-      setdata(data.message)
+      setData(data.message)
     } else {
-      setdata(data.error)
+      setData(data.error)
     }
 
   });
@@ -199,7 +208,7 @@ const handleClick = (e)=>{
   })
   .then(data => {
     console.log('Server response:', data);
-    setdata(data.message);
+    setData(data.message);
   })
   .catch(error => {
     console.error('Error uploading file:', error);
@@ -209,7 +218,7 @@ const handleClick = (e)=>{
     setShowItems(!showItems);
   };
   const handleModifierMod= () => {
-    setdata('');
+    setData('');
     setdataName('');
     setModifierMod(true);
     setNewMod(false);
@@ -217,7 +226,7 @@ const handleClick = (e)=>{
     setDeleteMod(false);
   };
   const handleDeleteMod = () => {
-    setdata('');
+    setData('');
     setdataName('');
     setDeleteMod(true);
     setNewMod(false);
@@ -226,7 +235,7 @@ const handleClick = (e)=>{
 
   };
   const handleNewMod = () => {
-    setdata('');
+    setData('');
     setdataName('');
     setNewMod(true);
     setUpload(false);
@@ -239,7 +248,7 @@ const handleClick = (e)=>{
 
   };
   const handleUpload = () => {
-    setdata('');
+    setData('');
     setdataName('');
     setUpload(true);
     setNewMod(false);
@@ -371,7 +380,7 @@ const handleClick = (e)=>{
                 value={password}
                 onChange={handleChangePW}
                />
-               <p className='text-darkPink'>{data}</p>
+               <p className='text-darkPink'>{Data}</p>
                <p className='text-darkPink'>{dataName}</p>
                <button type='button' onClick={handleClick} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
      
@@ -399,7 +408,7 @@ const handleClick = (e)=>{
                 value={email}
                 onChange={handleChangeE}
                />
-               <p className='text-darkPink'>{data}</p>
+               <p className='text-darkPink'>{Data}</p>
                <button type='button' onClick={handleNewModInfo} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Ajouter</button>
      
               </div>
@@ -419,7 +428,7 @@ const handleClick = (e)=>{
                 value={username}
                 onChange={handleChangeP}
                />
-                 <p className='text-darkPink'>{data}</p>
+                 <p className='text-darkPink'>{Data}</p>
                <button type='button' onClick={handleDelete} className='p-1 px-7 bg-darkPink text-center text-white rounded-md '>Supprimer</button>
      
               </div>
