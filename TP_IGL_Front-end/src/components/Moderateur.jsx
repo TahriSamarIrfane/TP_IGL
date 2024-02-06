@@ -110,7 +110,7 @@ const Moderateur = () =>  {
   }
   const handleWrapper2=(id)=>{
     handleMArticles();
-    handleMesArticles(id);
+    // handleMesArticles(id);
   }
     const handleafficher=()=>{
    setaffiche(true)
@@ -217,7 +217,7 @@ const Moderateur = () =>  {
                               <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.Text}</p>
                               </div>
                               <div className='flex justify-end mb-3 mr-1 '>
-                            <IoIosAddCircleOutline onClick={()=>handleWrapper2(item.id)}  size={23} color='#DF1477' />
+                            <IoIosAddCircleOutline onClick={()=>handleMesArticles(item.id)}  size={23} color='#DF1477' />
                                            </div>
                               </div>
                            </li>
@@ -229,7 +229,7 @@ const Moderateur = () =>  {
           
            {/*NavBar for a small frame */}
            
-       
+                                
            <div className={!nav ? ' fixed left-0 top-20 w-[30%] h-full border-r border-gray-900 bg-white lg:hidden' : 'fixed left-[-100%]'}>
               <ul className=' flex-col pt-10 h-full w-full' style={{overflow: 'hidden'}}>
                  <div className={Article ? 'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 border-b-darkPink ':'flex flex-row mx-8 mb-6 space-x-2 py-1 border-b-2 hover:border-b-darkPink cursor-pointer'}>

@@ -22,6 +22,7 @@ const ProfileUser = () => {
 
   const handleModifierPseudo= () => {
     setModifierPseudo(!ModifierPseudo);
+    
   };
 
   const handleModifierInfo= () => {
@@ -124,8 +125,8 @@ const { name, value } = e.target;
 };
 
 
-const handleSubmits = (e) => {
-  e.preventDefault();
+const handleSubmits = () => {
+  console.log(form)
   const basicAuthCredentials = btoa(`${storedUser.Pseudo}:${storedUser.MotdePasse}`);
   fetch("http://localhost:8000/change-username/", {
       method: 'POST',
@@ -279,7 +280,7 @@ const handleDeleteAccount = () => {
                 </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
               <MdOutlineDeleteForever className='mt-1 ' color='DF1477' size={20} />
-              <li onClick={handleDeleteAccount} className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Supprimer Compte</li>
+              <li onClick={()=>handleDeleteAccount()} className=' text-black border-b-2 hover:border-b-darkPink cursor-pointer lg:text-md text-10'>Supprimer Compte</li>
                </div>
                 <div className='flex flex-row mx-8 mb-3 space-x-2 py-1'>
                 <LuLogOut className='mt-1 ' color='DF1477' size={20}/>
@@ -305,18 +306,20 @@ const handleDeleteAccount = () => {
                      type="text"
                      name='username'
                      value={form.username}
-                     onChange={handleChanges} 
+                     onChange={e=>setForm(e.target.value)} 
                      className="rounded-md w-[80]"
                      placeholder={storedUser.Pseudo}   
-                    /> </div> )}
-                    {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={handleModifierPseudo}>{storedUser.Pseudo}</p></div>
+                    /> 
+                    <p>{form.username}</p>
+                    </div> )}
+                    {!ModifierPseudo && (<div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p on onClick={()=>handleModifierPseudo()}>{storedUser.Pseudo}</p></div>
                   )}
                     
                     <p >Email</p>
                    <div className='border-2 p-2 rounded-md border-grey border-opacity-35'> <p>{storedUser.Email}</p></div>
                     </div>
                     {ModifierPseudo &&( <div className='flex justify-end w-full '>
-                    <button onClick={()=>handleModifierPseudo} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
+                    <button onClick={()=>handleSubmits()} className='p-1 lg:px-6 px-2 bg-darkPink text-center text-white rounded-md '>Enregistrer</button>
                     </div>)}
                 </div>
                   )}
