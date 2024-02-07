@@ -5,7 +5,7 @@ from django.contrib import admin
 from .views import LoginPage ,LogoutPage , change_password , change_username , delete_account , signup_page ,reset_password , request_password_reset_code , home
 from .views import *
 from django.contrib.auth.views import LoginView
-
+from .views import *
 urlpatterns = [
     path('',home, name='home'),
     path('signup/', signup_page, name='signup'),
@@ -58,10 +58,11 @@ urlpatterns = [
     path('GetArticlesEnAttente/',get,name='GetArticlesEnAttente'), 
     path('create_article/',create_article,name='create_article'),
     path('get_article_details/<int:article_id>/', views.get_article_details, name='get_article_details'),
-    path('get-moder-articles/',get_moderator_articles,name='get-moder-articles'),
-    path('modify-pohto/<int:id>/',ProfilePhotoAPIView.as_view(),name='modify-photo'),
-    path('change-etat/',changer_etat_article,name='change-etat'),
+    
+    path('modify-photo/<int:id>/',ProfilePhotoAPIView.as_view(),name='modify-photo'),
+    path('choose-article/moderator/<str:moderator_username>/article/<int:article_id>/',choose_article,name='choose-article'),
     path('accounts/login/', LoginView.as_view(), name='login'),
+    path('get-moder-articles/<str:moderator_username>/',articles_by_moderator,name='get-moder-articles'),
 ]
 
     

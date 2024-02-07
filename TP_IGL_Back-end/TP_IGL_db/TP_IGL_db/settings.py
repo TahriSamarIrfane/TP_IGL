@@ -102,9 +102,9 @@ WSGI_APPLICATION = 'TP_IGL_db.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'SY2024',
+        'NAME': 'last_articles',
+        'USER': 'yacine_naoui',
+        'PASSWORD': 'yacine@2003',
         'HOST': 'localhost',  # Ou l'adresse IP de votre serveur PostgreSQL
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }
@@ -159,8 +159,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'lh_bayadh@esi.dz'
-EMAIL_HOST_PASSWORD = 'hadjer2803'
+EMAIL_HOST_USER = 'surfeycontact@gmail.com'
+EMAIL_HOST_PASSWORD = 'i s y c k f m c o d x l b g d f'
 
 
 # Application definition
@@ -173,6 +173,8 @@ ELASTICSEARCH_DSL = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
+    "http://localhost:3000",
+    "http://localhost:3001"
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True

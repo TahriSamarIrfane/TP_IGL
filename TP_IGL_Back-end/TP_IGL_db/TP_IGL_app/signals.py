@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import Article,Moderateur
 from django.core.mail import send_mail
 from .utils import send_email_to_moderator
+
 @receiver(post_save,sender=Article)
 def notify_moderators(sender,**kwargs):
    if kwargs['created']:

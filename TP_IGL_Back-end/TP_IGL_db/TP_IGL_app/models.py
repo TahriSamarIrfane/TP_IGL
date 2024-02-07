@@ -92,7 +92,7 @@ class Auteur(Model):
 
 class UploadedFile(Model):
     id = models.BigAutoField(primary_key=True)
-    uploaded_file = models.FileField(upload_to='./',validators=[FileExtensionValidator()])
+    uploaded_file = models.FileField(upload_to='./',validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
     def __str__(self):
         return self.id
     
@@ -114,7 +114,7 @@ class Article(Model):
     references = models.TextField(blank=True)
     publication_date = models.DateField(auto_now_add=True)
     auteurs = models.ManyToManyField(Auteur ,related_name='authors')
-    
+    moderateur=models.ForeignKey(Moderateur,on_delete=models.SET_NULL, null=True, related_name='+', blank=True)
     EN_ATTENTE='A'
     EN_COURS='C'
     TERMINE='T'

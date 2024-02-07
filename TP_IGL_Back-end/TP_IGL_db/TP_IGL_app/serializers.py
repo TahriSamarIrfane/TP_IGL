@@ -82,9 +82,12 @@ class FileUploadSerializer(ModelSerializer):
     class Meta:
         model = UploadedFile
         fields =('id','uploaded_file')
-
+class ModeratorCreationSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255)
+    email = serializers.EmailField()
 class ArticleSerializer(ModelSerializer):
     auteurs=AuteurSerializer(many=True)
+    #moderateur=ModeratorCreationSerializer()
     #pdf_file=FileUploadSerializer()
     class Meta:
         model = Article
@@ -169,9 +172,7 @@ class PasswordGeneratorSerializer(serializers.Serializer):
     generated_password = serializers.CharField(max_length=12)
 
 
-class ModeratorCreationSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=255)
-    email = serializers.EmailField()
+
 class ModeratorArticleSerializer(ModelSerializer):
     moderator=ModeratorCreationSerializer()
     class Meta:

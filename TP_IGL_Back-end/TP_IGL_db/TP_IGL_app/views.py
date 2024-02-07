@@ -141,6 +141,7 @@ from .serializers import ProfilePhotoSerializer
 from pathlib import Path
 import json
 import os.path
+from .models import Etat
 BASE_DIR1 = Path(__file__).resolve().parent.parent
 file_path=os.path.join(BASE_DIR1,'/fichier_es.json')
 json_file_path=os.path.abspath('fichier_es.json')
@@ -195,9 +196,9 @@ mapping = {
 
 }
 }
-@authentication_classes([BasicAuthentication])
-@permission_classes([IsAuthenticated])
-@login_required
+# @authentication_classes([BasicAuthentication])
+# @permission_classes([IsAuthenticated])
+# @login_required
 @api_view(['GET'])
 def get_articles(request, format=None):
     try:
@@ -229,7 +230,7 @@ def Article_correct_and_remove(request,id):
         return Response(status=status.HTTP_404_NOT_FOUND)
     le_id=id
     if request.method == 'PATCH':
-        serializer=ArticleSerializer(article,data=request.data)
+        serializer=ArticleSerializer(data=request.data)
         if serializer.is_valid():
            serializer.save()
            le_document={
@@ -256,7 +257,7 @@ def Article_correct_and_remove(request,id):
         except:
             print("erreur lors de la suppression de l'index")
         
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response("successfully deleted",status=status.HTTP_204_NO_CONTENT)
 
 
 class FileUploadAPIView(APIView):
@@ -1625,67 +1626,27 @@ def get(self, request, format=None):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 @api_view(['GET'])
-def get_moderator_articles(moderator_id):
-    
+def articles_by_moderator(request, moderator_username):
     try:
-        # Recherchez l'instance ModeratorArticle correspondante à l'ID du modérateur
-        moderator_article = ModeratorArticle.objects.get(moderator_id=moderator_id)
-
-        # Accédez au tableau elasticsearch_ids
-        elasticsearch_ids = moderator_article.elasticsearch_ids
-
-        # Utilisez ces IDs pour récupérer les données des articles correspondants depuis Elasticsearch
-        es = Elasticsearch(['http://localhost:9200'])
-        index_name = 'index_articles'
-
-        moderator_articles = []
-        for article_id in elasticsearch_ids:
-            try:
-                article_data = es.get(index=index_name, id=article_id)['_source']
-                moderator_articles.append(article_data)
-            except ElasticsearchException:
-                # Gérez le cas où l'article n'existe pas dans Elasticsearch
-                pass
-
-        return moderator_articles
-
-    except ModeratorArticle.DoesNotExist:
-        # Gérez le cas où il n'y a pas d'entrée ModeratorArticle pour cet ID de modérateur
-        return []
-
-    except Exception as e:
-        # Imprimez l'exception à des fins de débogage
-        print(f'An error occurred: {e}')
-        return []
-
+        moderator = Moderateur.objects.get(username=moderator_username)
+        articles = Article.objects.filter(moderateur=moderator).prefetch_related('moderateur')
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Moderateur.DoesNotExist:
+        return Response({"error": "Moderator not found"}, status=status.HTTP_404_NOT_FOUND)
 @api_view(['PATCH'])
-def changer_etat_article(article_id, moderateur_id):
+def choose_article(request,moderator_username,article_id):
     try:
-        # Rechercher l'instance de ModeratorArticle pour le modérateur donné
-        moderator_article = ModeratorArticle.objects.get(moderator_id=moderateur_id)
-
-        # Vérifier si l'article existe déjà dans elasticsearch_ids
-        if article_id not in moderator_article.elasticsearch_ids:
-            # Ajouter l'article à elasticsearch_ids
-            moderator_article.elasticsearch_ids.append(article_id)
-            moderator_article.save()
-
-        # Mettre à jour l'état de l'article
-        article = Article.objects.get(pk=article_id)
-        article.etat = 'C'  # Mettre à jour l'état à "En Cours"
-        article.save()
-
-    except ModeratorArticle.DoesNotExist:
-        # Si l'instance de ModeratorArticle n'existe pas, la créer
-        new_moderator_article = ModeratorArticle.objects.create(
-            moderator_id=moderateur_id,
-            elasticsearch_ids=[article_id],
-        )
-
-        # Mettre à jour l'état de l'article
-        article = Article.objects.get(pk=article_id)
-        article.etat = 'C'  # Mettre à jour l'état à "En Cours"
-        article.save()
-
-
-
+        m_username=request.data.get("moderator_username")
+        moderateur=Moderateur.objects.get(username=m_username)
+    except Moderateur.DoesNotExist:
+        return Response('moderator does not exists ',status=status.HTTP_404_NOT_FOUND)
+    try:
+        a_id=request.data.get("article_id")
+        article=Article.objects.get(pk=a_id)
+    except Article.DoesNotExist:
+        return Response('article does not exist',status=status.HTTP_404_NOT_FOUND)
+    article.etat='C'
+    article.moderateur=moderateur
+    article.save()
+    return Response({"mssg":"article sucessfully choosed"},status=status.HTTP_200_OK)
