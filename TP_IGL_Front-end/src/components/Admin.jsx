@@ -6,7 +6,8 @@ import avatar from "../assets/images/Avatar.png"
 import imageModifierMod from "../assets/images/ModifierMod.png"
 import imageNewMod from "../assets/images/NewMod.png"
 import imageDeleteMod from "../assets/images/DeleteMod.png"
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -23,6 +24,7 @@ import { getUser } from '../userStorage'
 import { useNavigate } from 'react-router-dom';
 
 const Admin = () =>  {
+  
   const storedUser = getUser();
   const [nav, setNav] =useState(false);
   const [showItems, setShowItems] = useState(false);
@@ -39,11 +41,11 @@ const Admin = () =>  {
     const[Data,setData] =useState('');
     const[dataName,setdataName] =useState('');
     const navigate = useNavigate();
- 
-  
-
-
+    const [selectedFile, setSelectedFile] = useState(null)
     const storedUser2 =getUser();
+    const notify = () => {toast("article uploaded successfuly!",{type:'success'})};
+    const notify_err=()=>{toast("error while uploading the article",{type:'error'})}
+
 
   const handleChangePW = (e) => {
     setpassword(e.target.value);
@@ -80,6 +82,7 @@ const Admin = () =>  {
       })
       .then((data) => {
           console.log('Logout Response:', data);
+          
           // Handle successful response, e.g., redirect to login page
       })
       .catch((error) => {         console.error('Logout failed:', error);
@@ -186,20 +189,26 @@ const handleClick = (e)=>{
   handleModifierModPW(e);
   handleModifierModName();
   }
-  
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+  };
  const handleUploadArticle = () => {
-    const file = fileInput.files[0];
+    const file = selectedFile;
+    console.log(file)
     const formData = new FormData();
-    formData.append('file', file);
-
-  fetch('http://localhost:8000/upload-file/', {
+    formData.append('uploaded_file', file);
+    console.log(formData.data)
+    if (file){
+    fetch('http://localhost:8000/upload-file/', {
     method: 'POST',
     headers: {
-      'Content-Type':'application/json'
+     // 'Content-Type':'multipart/form-data; boundary=----WebKitFormBoundary7ZaI7SkA4ubYG8Uw'
     },
     body: formData
   })
   .then(response => {
+    console.log(response.data)
     if (response.ok) {
       return response.json();
     } else {
@@ -209,10 +218,15 @@ const handleClick = (e)=>{
   .then(data => {
     console.log('Server response:', data);
     setData(data.message);
+    notify()
   })
   .catch(error => {
     console.error('Error uploading file:', error);
-  });
+    notify_err()
+  });}
+  else{
+    console.log("no file selected")
+  }
  }
   const handleListItemClick = () => {
     setShowItems(!showItems);
@@ -232,7 +246,6 @@ const handleClick = (e)=>{
     setNewMod(false);
     setUpload(false);
     setModifierMod(false);
-
   };
   const handleNewMod = () => {
     setData('');
@@ -277,6 +290,7 @@ const handleClick = (e)=>{
   return (
     
     <div className='flex flex-col bg-gradient-to-r lg:h-screen h-screen w-screen from-GLbleu via-GLpink to-orange-300   '>
+        <ToastContainer />
       <div className='flex flex-row justify-center items-center space-x-8 w-full h-full'> 
 
        {/*Barre des d'actions (Menu) */}
@@ -338,13 +352,13 @@ const handleClick = (e)=>{
           <div className="flex flex-col items-center justify-center rounded-2xl max-w-auto h-[80%] w-[95%] mt-11 bg-white">
           {Upload && ( <div className="flex flex-col justify-center items-center space-y-10 h-full w-full">
              <div className='flex flex-row  items-center w-[60%] '>
-             <form action="http://localhost:8000/upload-file/" method="POST" encType='multipart/form-data'>
+             <form onSubmit={e=>e.preventDefault()} encType='multipart/form-data'>
                <input
                 type="file"
                 name="uploaded_file"
                 id='uploaded_file'
                 className=" w-[75%] rounded-l-xl border-b-2 border-t-2 border-l-2  "
-                /> 
+                onChange={handleFileChange}/> 
                <button onClick={handleUploadArticle}  style={{ position:'relative',fontSize: 'auto', overflow:'hidden' }} className='fixed h-full py-[2.1%] w-[25%] border-b-2  border-r-2 bg-darkPink rounded-r-xl text-white text-size-auto '>Upload</button>
                </form>
               </div>

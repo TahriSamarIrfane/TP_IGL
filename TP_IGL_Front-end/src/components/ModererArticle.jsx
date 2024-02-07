@@ -63,8 +63,7 @@ const ModérerArticle = () => {
             'Content-Type':'application/json'
           },
           body: JSON.stringify({
-            auteur: Auteur,
-            
+            auteurs: Auteur,
             titre: Titre,
             abstract:Abstract,
             references:Ref,
@@ -92,7 +91,9 @@ const ModérerArticle = () => {
         }).then(
           response => {response.json()
           console.log("successfully deleted")}
-          )  
+          ).then(
+            navigate('/Moderateur')
+          ) 
         
         }
     

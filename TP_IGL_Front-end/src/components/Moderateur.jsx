@@ -42,7 +42,12 @@ const Moderateur = () =>  {
   const storedUser=getUser()
   const storedUser2=getUser()
 // /*********Afficher les articles en attente de modération******** */
-  const handleNewArticle= async ()=>{
+const updateData=(array)=>{
+  setData(array)
+}  
+
+
+const handleNewArticle= async ()=>{
     const url = 'http://localhost:8000/get-articles/'
     const response = await fetch(url,{
       method:'GET',
@@ -51,12 +56,14 @@ const Moderateur = () =>  {
       },
     }) 
     const data = await response.json();
-
+    console.log(data)
         // Extract articles_en_attente array from the data
         const articlesAttente = data.articles_en_attente;
-  
+        
         setData(articlesAttente);
+        //console.log(articlesAttente)
         console.log(Data)
+      
       }
    //***********Se déconnecter */
       const handleLogout = (e) => {
@@ -109,7 +116,7 @@ const Moderateur = () =>  {
     setNav(!nav)
   }
   const handleWrapper2=(id)=>{
-    handleMArticles();
+    handleMArticles(storedUser.Pseudo);
     // handleMesArticles(id);
   }
     const handleafficher=()=>{
@@ -121,22 +128,31 @@ const Moderateur = () =>  {
       setMesArticles(false);
       handleNewArticle();
     }
-    const handleMArticles = () => {
+    const handleMArticles = async(moderator_username) => {
+        const url=`http://localhost:8000/get-moder-articles/${moderator_username}/`
+        const response =await fetch(url,{
+          method:'GET',
+          headers: {
+            'Content-Type':'application/json'
+          } })
+          const data = await response.json();
+          console.log(data)
+
       setMesArticles(true);
       setArticle(false);
     };
 
-    // /*******Choix de l'article à Modérer****** */
-  const handleMesArticles = (id) => {
-    const url='http://localhost:8000/change-etat/'
+  //const moderator_username= storedUser2.Pseudo// /*******Choix de l'article à Modérer****** */
+  const handleMesArticles = (moderator_usernamemoderator_username,article_id) => {
+    const url=`http://localhost:8000/choose-article/moderator/${moderator_username}/article/${article_id}/`
+    const updated_data={
+    moderator_username: moderator_username,  // j'ai besoin le id du moderateur courant et le id de l'article choisis
+    article_id: article_id,}
     fetch(url,{
       method:'PATCH',
       headers: {
         'Content-Type':'application/json'
-      },body:{
-        moderateur_id : storedUser2.Pseudo,  // j'ai besoin le id du moderateur courant et le id de l'article choisis
-        article_id : id,
-      }
+      },body:JSON.stringify(updated_data)
     }).then(response => response.json()
     ).then(
       data => console.log(data)
@@ -190,7 +206,7 @@ const Moderateur = () =>  {
          </div>
           
          <div className="flex flex-col items-center justify-center  rounded-2xl  max-w-auto h-full w-[95%] mt-11 bg-white">
-          {MesArticles && (<ul className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6  overflow-auto'>
+          {MesArticles && (<ul  className='lg:column-list column-list2 h-[90%] w-[90%] space-y-6  overflow-auto'>
                               {Data2.map((item) => (
                           
                            <li   className='flex flex-colmax-h-40 max-w-40 border-darkPink  border-2 rounded-md bg-white'>
@@ -198,7 +214,7 @@ const Moderateur = () =>  {
                              <p className=' ellipsis-text px-1 font-medium text-xl'>{item.titre}</p>
                               <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.abstract}</p>
                               </div>
-                              <div className='flex justify-end mb-2'>
+                              <div className='flex justify-end mb-2' >
                               <Link to={`/ModererArticle/${item.id}`}><button onClick={()=>handleModerArticle(item.id)} className= ' px-2 mr-2 bg-darkPink text-[90%] text-center text-white rounded-xl '>Modérer</button></Link>
                                   </div>
                               </div>
@@ -210,14 +226,14 @@ const Moderateur = () =>  {
                    { affiche && Article &&( 
                     <ul className='lg:column-list  column-list2 h-[90%] w-[90%] space-y-6 '>
                               {Data.map((item) => (
-                          
-                           <li   className='flex flex-col max-h-40 max-w-40 border-darkPink border-2 rounded-md bg-white'>
+                               
+                           <li   key={item.id} className='flex flex-col max-h-40 max-w-40 border-darkPink border-2 rounded-md bg-white'>
                              <div className='flex flex-col  justify-start '>
                              <p style={containerStyle} className=' ellipsis-textp-1 font-medium text-md'>{item.Titre}</p>
                               <div className=' flex px-2 justify-start py-1 '><p className= 'text-start text-sm line-clamp-1' style={{textOverflow:'ellipsis',overflow:'hidden',width:'130px'}}>{item.Text}</p>
                               </div>
                               <div className='flex justify-end mb-3 mr-1 '>
-                            <IoIosAddCircleOutline onClick={()=>handleMesArticles(item.id)}  size={23} color='#DF1477' />
+                            <IoIosAddCircleOutline onClick={()=>handleMesArticles(storedUser2.Pseudo,item.id)}  size={23} color='#DF1477' />
                                            </div>
                               </div>
                            </li>
